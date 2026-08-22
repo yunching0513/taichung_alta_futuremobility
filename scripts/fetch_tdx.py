@@ -79,6 +79,12 @@ ENDPOINTS = [
     # 走固定時刻表的路線給 Timetables，兩種都算得出每小時班次。
     ('bus_schedule_taichung.json', '/Bus/Schedule/City/Taichung',
      '臺中公車班表與班距。線寬按頻率畫粗細就靠這一份', True),
+    # 班表的 StopTimes 只給起站那一筆（11,516 班裡有 11,484 班如此），
+    # 所以「某一區每天有幾次車停靠」算不出來，只能算出「以該區為起點發幾班」。
+    # 停靠站序在 StopOfRoute：每條子路線的完整站序，
+    # 乘上那條子路線的班次，才是該區的停靠班次。
+    ('bus_stopofroute_taichung.json', '/Bus/StopOfRoute/City/Taichung',
+     '臺中公車每條子路線的完整停靠站序。區級的停靠班次靠它乘班次算出來', True),
 ]
 
 PAGE = 1000      # 一頁幾筆。TDX 對 $top 有上限，取一個保守值
