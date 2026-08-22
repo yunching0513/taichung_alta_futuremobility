@@ -238,6 +238,14 @@ svg.zoomable .crash-pt { vector-effect: non-scaling-stroke; }
             font-size: 11px; color: var(--grey-1); align-items: center; }
 .mode-key .it { display: flex; align-items: center; gap: 6px; }
 .mode-key .mk { width: 11px; height: 11px; border-radius: 50%; border: 1px solid var(--black); }
+/* 里級單元與退回區級的單元必須一眼分得出來，否則讀者會把一個區的平均
+   當成一個里的值。斜線網底是「這一格比別格粗」的標記，不是另一種資料。 */
+.vil { stroke: var(--white); stroke-width: 0.35; cursor: default; }
+.vil:hover { stroke: var(--black); stroke-width: 1.4; }
+.vil.coarse { stroke: var(--black); stroke-width: 1.1; stroke-dasharray: 4 2.5; }
+.vil-hatch { fill: url(#hatch); pointer-events: none; }
+svg.zoomable .vil, svg.zoomable .vil-hatch { vector-effect: non-scaling-stroke; }
+.mode-key .mk.sq { border-radius: 0; }
 .rate-bar { display: grid; grid-template-columns: 4.6em 1fr 8.4em; gap: 8px; align-items: center;
             font-size: 11.5px; padding: 2px 0; }
 .rate-bar .nm { color: var(--black); }
@@ -259,6 +267,8 @@ svg.zoomable .crash-pt { vector-effect: non-scaling-stroke; }
 .bar-row .vv { font-family: var(--font-en); font-size: 10.5px; color: var(--grey-1); text-align: right;
                font-variant-numeric: tabular-nums; }
 .bar-row.on .nm { font-weight: 700; }
+/* 里的名字比區名長，欄寬要放得下「西屯區何厝里」這種六個字 */
+.vil-bars .bar-row { grid-template-columns: 80px 1fr 74px; }
 
 /* ── scatter ── */
 .dot { fill: var(--lime-dk); }
@@ -394,9 +404,45 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
   </div>
 </div>
 
-<!-- ══ 04 兩件事的關係 ══ -->
+<!-- ══ 04 里級人口 ══ -->
 <div class="section">
-  <div class="section-label">04 — Weak Correlation <span class="zh">空屋與通勤，關係比想像中弱</span></div>
+  <div class="section-label">04 — Village Grain <span class="zh">把尺度縮到里，臺中的人住得多密</span></div>
+  <div class="card">
+    <h4>Population by Village <span class="zh">· 625個里，其中457個畫得到界線</span></h4>
+
+    <div class="ctrl">
+      <div class="ctrl-g">
+        <span class="ctrl-k">Metric 指標</span>
+        <div class="cat-bar" id="vil-metrics"></div>
+      </div>
+      <div class="ctrl-g">
+        <span class="ctrl-k">Rail 軌道疊圖</span>
+        <div class="cat-bar" id="vil-rail"></div>
+      </div>
+    </div>
+
+    <svg class="map big" id="map-vil" role="img"
+         aria-label="臺中里級人口面量圖"></svg>
+    <div class="legend" id="legend-vil"></div>
+    <div class="legend-ticks" id="ticks-vil"></div>
+    <div class="mode-key" id="vil-key"></div>
+    <p class="caption" id="cap-vil"></p>
+
+    <div class="sig-foot">
+      <div class="bars vil-bars" id="bars-vil"></div>
+      <div>
+        <div class="stat-row" id="vil-stats"></div>
+        <p class="body-zh" id="vil-body-1" style="margin-top:20px"></p>
+        <p class="body-zh" id="vil-body-2"></p>
+        <p class="body-zh" id="vil-body-3"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 05 兩件事的關係 ══ -->
+<div class="section">
+  <div class="section-label">05 — Weak Correlation <span class="zh">空屋與通勤，關係比想像中弱</span></div>
   <div class="two-col">
     <div class="card">
       <h4>Vacancy × Day/Night <span class="zh">· 29個區</span></h4>
@@ -413,9 +459,9 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
   </div>
 </div>
 
-<!-- ══ 05 公車班次 ══ -->
+<!-- ══ 06 公車班次 ══ -->
 <div class="section">
-  <div class="section-label">05 — Bus Frequency <span class="zh">哪幾條走廊常有車，哪一區的人搭得到</span></div>
+  <div class="section-label">06 — Bus Frequency <span class="zh">哪幾條走廊常有車，哪一區的人搭得到</span></div>
   <div class="card">
     <h4>Routes by Service Frequency <span class="zh">· 線寬與濃度都是班次，696條子路線</span></h4>
 
@@ -462,9 +508,9 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
   </div>
 </div>
 
-<!-- ══ 06 A1死亡事故 ══ -->
+<!-- ══ 07 A1死亡事故 ══ -->
 <div class="section">
-  <div class="section-label">06 — Vision Zero <span class="zh">十年，臺中的道路上死了多少人</span></div>
+  <div class="section-label">07 — Vision Zero <span class="zh">十年，臺中的道路上死了多少人</span></div>
   <div class="card">
     <h4>A1 Fatal Crashes <span class="zh">· 逐件落點，依受害者運具著色</span></h4>
 
@@ -504,16 +550,16 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
   </div>
 </div>
 
-<!-- ══ 07 還沒接的 ══ -->
+<!-- ══ 08 還沒接的 ══ -->
 <div class="section">
-  <div class="section-label">07 — Still Missing <span class="zh">社宅基地的座標</span></div>
+  <div class="section-label">08 — Still Missing <span class="zh">社宅基地的座標</span></div>
   <div class="card pending">
     <span class="tag">Pending · 待接資料</span>
     <h4>Social Housing Sites <span class="zh">· 這一層還沒有資料</span></h4>
     <div class="two-col">
       <div>
         <p class="body-zh"><b>要畫的是什麼。</b>把社會住宅基地與近十年新建住宅的落點，
-          疊在第05節那張公車班次圖上，算每一個基地到最近站牌的距離與那個站牌的班次：
+          疊在第07節那張公車班次圖上，算每一個基地到最近站牌的距離與那個站牌的班次：
           臺中的社宅蓋在有車可搭的地方，還是蓋在只能開車到的地方。
           公共運輸那一半已經到位，社宅那一半還沒有。</p>
       </div>
@@ -541,6 +587,7 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
 <script type="application/json" id="rail">__RAIL_JSON__</script>
 <script type="application/json" id="bus">__BUS_JSON__</script>
 <script type="application/json" id="crash">__CRASH_JSON__</script>
+<script type="application/json" id="vil">__VIL_JSON__</script>
 <script>__MAPZOOM_JS__</script>
 <script>
 (() => {
@@ -549,6 +596,7 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
   const RL = JSON.parse(document.getElementById('rail').textContent);
   const BUS = JSON.parse(document.getElementById('bus').textContent);
   const CR = JSON.parse(document.getElementById('crash').textContent);
+  const VL = JSON.parse(document.getElementById('vil').textContent);
   const R = D.districts;
   const NS = 'http://www.w3.org/2000/svg';
   const el = (t, a = {}, txt) => { const n = document.createElementNS(NS, t);
@@ -921,7 +969,172 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
   });
   paintBase();
 
-  /* ── 04 散布圖 ── */
+  /* ── 04 里級人口 ────────────────────────────────────────────────────
+     這一節的單元有兩種：畫得到界線的里，與退回區級的區。
+     兩者用同一個色階，唯區級的那七格加上斜線網底與虛線外框：
+     **一個區的平均與一個里的值不是同一種東西**，混在一起看會把 太平區 讀成
+     一個均質的地方，而它其實是全市里數最多的區之一。 */
+  {
+    const U = VL.units, C = VL.counts;
+    const coarse = new Set(U.filter(u => u.villages).map(u => u.name));
+    /* 密度用對數色階，不用線性。
+       最密的東區富台里是最稀的和平區平等里的一萬四千倍，線性色階之下
+       除了舊市區那幾格以外全部是白的，等於一張只畫得出「市中心很擠」的圖，
+       而那件事不用畫也知道。取對數之後，山區、海線、市郊之間的差別才出得來。
+       戶量的範圍只有兩三倍，取對數反而讓差異消失，所以維持線性。 */
+    const VM = [
+      { zh: '人口密度', k: 'density', log: true, fmt: v => int(v) + '人/km²',
+        note: '每平方公里的登記人口，色階取對數。里的面積從0.04到336平方公里，密度差一萬四千倍，線性色階看不出東西。' },
+      { zh: '人口', k: 'pop', log: true, fmt: v => int(v) + '人',
+        note: '戶政司登記的人口，含共同生活戶、共同事業戶與單獨生活戶。與普查的常住人口是兩套量法，數字不會一樣。' },
+      { zh: '戶數', k: 'households', log: true, fmt: v => int(v) + '戶',
+        note: '三類戶的合計。單獨生活戶多的里，平均戶量會被拉低。' },
+      { zh: '平均戶量', k: 'perHousehold', log: false, fmt: v => v.toFixed(2) + '人/戶',
+        note: '人口除以戶數，色階為線性：範圍只有兩三倍，取對數會把差異壓平。舊市區與新開發區的差別在這個指標上最明顯。' },
+    ];
+    /* 對數色階。lo 可能是 0（無人的里），所以下限夾在 1。 */
+    const vcol = (v, lo, hi, log) => log
+      ? seqColor(Math.log(Math.max(1, v)), Math.log(Math.max(1, lo)), Math.log(Math.max(1, hi)))
+      : seqColor(v, lo, hi);
+    let vm = 0, vr = 1;
+
+    // 斜線網底：SVG 的 pattern 要放在 defs 裡，而 defs 不能被重畫清掉，
+    // 所以掛在 svg 上而不是縮放群組裡
+    const svg = document.getElementById('map-vil');
+    const defs = el('defs');
+    const pat = el('pattern', { id: 'hatch', width: 5, height: 5,
+      patternUnits: 'userSpaceOnUse', patternTransform: 'rotate(45)' });
+    pat.appendChild(el('line', { x1: 0, y1: 0, x2: 0, y2: 5,
+      stroke: '#1A1A1A', 'stroke-width': 1.1, 'stroke-opacity': 0.28 }));
+    defs.appendChild(pat);
+    svg.appendChild(defs);
+
+    function paintVil() {
+      const m = VM[vm];
+      const vals = U.map(u => u[m.k]).filter(v => v != null);
+      const lo = Math.min(...vals), hi = Math.max(...vals);
+      svg.setAttribute('viewBox', `0 0 ${BIG.W} ${BIG.H}`);
+      const box = svg.querySelector('g[data-zoom]') || svg;
+      // defs 要留著，只清內容
+      [...box.childNodes].forEach(n => { if (n.nodeName !== 'defs') n.remove(); });
+
+      U.forEach(u => {
+        const v = u[m.k];
+        const isC = coarse.has(u.name);
+        const d = BIG.path(u.rings);
+        const path = el('path', { class: 'vil' + (isC ? ' coarse' : ''), d,
+          fill: v == null ? '#FFFFFF' : vcol(v, lo, hi, m.log) });
+        path.appendChild(el('title', {},
+          `${u.district === u.name ? u.name + '（整區）' : u.district + u.name}　` +
+          `${v == null ? '－' : m.fmt(v)}\n` +
+          `人口${int(u.pop)}　戶數${int(u.households)}　面積${u.area}km²` +
+          (isC ? `\n這一格是整個${u.name}的合計：` +
+                 `${u.villages}個里裡只有${u.mapped}個有界線，畫不到里` : '')));
+        box.appendChild(path);
+        if (isC) box.appendChild(el('path', { class: 'vil-hatch', d }));
+      });
+      // 區名標在里的上面，否則457個里會讓人認不出這是哪裡
+      R.forEach(d => {
+        if (d.area < 12) return;
+        const [cx, cy] = BIG.centroid(d);
+        box.appendChild(el('text', { class: 'dist-lbl', x: cx, y: cy,
+          'text-anchor': 'middle' }, d.name.replace(/區$/, '')));
+      });
+      if (vr === 0) drawRail(box, BIG);
+
+      const leg = document.getElementById('legend-vil');
+      leg.innerHTML = '';
+      const at = t => m.log
+        ? Math.exp(Math.log(Math.max(1, lo)) + (Math.log(Math.max(1, hi)) - Math.log(Math.max(1, lo))) * t)
+        : lo + (hi - lo) * t;
+      for (let i = 0; i < 40; i++) {
+        const b = document.createElement('i');
+        b.style.background = vcol(at(i / 39), lo, hi, m.log);
+        leg.appendChild(b);
+      }
+      // 對數色階要標中間刻度，否則讀者會以為色帶是等距的
+      document.getElementById('ticks-vil').innerHTML =
+        [0, 0.25, 0.5, 0.75, 1].map(t => `<span>${m.fmt(at(t))}</span>`).join('')
+        + (m.log ? '<span style="color:var(--grey-2)">對數</span>' : '');
+      document.getElementById('vil-key').innerHTML =
+        `<span class="it"><span class="mk sq" style="background:var(--grey-4)"></span>` +
+        `里（${C.drawnVillages}個，${C.fineDistricts}個區）</span>` +
+        `<span class="it"><span class="mk sq" style="background:var(--grey-4);` +
+        `border:1.4px dashed var(--black)"></span>整區合計（${C.coarseDistricts}個區，斜線網底）</span>`;
+
+      const fine = U.filter(u => !coarse.has(u.name) && u[m.k] != null);
+      const top = [...fine].sort((a, b) => b[m.k] - a[m.k]);
+      document.getElementById('cap-vil').innerHTML =
+        `${m.zh}，資料期${VL.period}。畫得到界線的${fine.length}個里裡，` +
+        `最高${top[0].district}${top[0].name}${m.fmt(top[0][m.k])}、` +
+        `最低${top[top.length - 1].district}${top[top.length - 1].name}` +
+        `${m.fmt(top[top.length - 1][m.k])}。${m.note}` +
+        `<b>斜線網底的七格是整個區的合計，不是里。</b>` +
+        (m.k === 'density'
+          ? `西邊那塊伸進海裡的多邊形不是畫錯：<b>臺中港的水域在行政上屬於梧棲區草湳里</b>，` +
+            `那個里因此有21.67平方公里，密度的分母含水域，數字偏低。` +
+            `和平區的幾個里同理，平等里336平方公里裡多數是山。` : '') +
+        VL.caveat;
+
+      // 長條只排里，區級單元不混進排名
+      const box2 = document.getElementById('bars-vil');
+      const sorted = top.slice(0, 20);
+      const bhi = sorted[0][m.k];
+      box2.innerHTML = sorted.map((u, i) =>
+        `<div class="bar-row${i === 0 ? ' on' : ''}">` +
+        `<span class="nm">${u.district.replace(/區$/, '')}${u.name.replace(/里$/, '')}</span>` +
+        `<div class="track"><i style="left:0;width:${u[m.k] / bhi * 100}%;` +
+        `background:${vcol(u[m.k], lo, hi, m.log)}"></i></div>` +
+        `<span class="vv">${m.fmt(u[m.k])}</span></div>`).join('');
+
+      document.getElementById('vil-stats').innerHTML = [
+        ['Villages 里', int(C.villages), `其中${C.drawnVillages}個畫得到界線`],
+        ['Population 人口', man(C.population) + '人', `戶政司${VL.period}登記`],
+        ['Households 戶數', man(C.households) + '戶',
+         `平均戶量${(C.population / C.households).toFixed(2)}人`],
+      ].map(([k, v, n]) =>
+        `<div class="stat"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`
+      ).join('');
+    }
+
+    mkPills('vil-metrics', VM, () => vm, i => { vm = i; paintVil(); });
+    mkPills('vil-rail', [{ zh: '顯示' }, { zh: '隱藏' }], () => vr, i => { vr = i; paintVil(); });
+
+    const dens = U.filter(u => !coarse.has(u.name) && u.density)
+      .sort((a, b) => b.density - a.density);
+    const top5 = dens.slice(0, 5);
+    document.getElementById('vil-body-1').innerHTML =
+      `把尺度從29個區縮到625個里，第03節那張圖上看起來均質的區，會散成很不一樣的東西。` +
+      `<b>密度最高的${top5[0].district}${top5[0].name}是${int(top5[0].density)}人每平方公里，` +
+      `最低的${dens[dens.length - 1].district}${dens[dens.length - 1].name}是` +
+      `${int(dens[dens.length - 1].density)}人，相差` +
+      `${Math.round(top5[0].density / Math.max(1, dens[dens.length - 1].density)).toLocaleString('en-US')}倍。</b>` +
+      `區級的全距做不到這個量級：**尺度本身就是一個發現**，`
+        .replace('**尺度本身就是一個發現**', '<b>尺度本身就是一個發現</b>') +
+      `一個區的平均把里與里之間的差異抹平了。`;
+    document.getElementById('vil-body-2').innerHTML =
+      `唯這張圖有${C.coarseDistricts}個區畫不到里，那七格是整區的合計。` +
+      `<b>原因不是缺資料，是缺界線。</b>` +
+      `臺中現有${C.villages}個里，拿得到的界線是民國71年版，只有${C.polygons}個多邊形。` +
+      `被再分割的里，同名的舊多邊形範圍比現在大，把現在的人口填進去，` +
+      `畫出來的密度會偏低而且偏得沒有規律。` +
+      `<b>那不是缺一塊，那是畫錯。</b>因此規則是一個區的每一個里都對得到多邊形才畫到里，` +
+      `只要有一個對不到就整個區退回區級。太平區最嚴重：${C.villages ? '' : ''}` +
+      `39個里只有19個多邊形，對不到的那些住了十萬人。`;
+    document.getElementById('vil-body-3').innerHTML =
+      `要升級這七個區，需要的是內政部的現行村里界圖` +
+      `（政府資料開放平臺 dataset 7438，民國115年6月24日版）。` +
+      `那份檔案放在 tgos.tw，本專案目前的網路環境取不到，回403。` +
+      `拿得到的話，換掉 <code>data_TW/from_moi/village_geo_taichung.json</code> 再重跑一次 ` +
+      `<code>prep_villages.py</code> 即可，程式不必改：` +
+      `對得到多邊形的區會自動從七個變成零個。` +
+      `<span class="en-small">Boundaries pending</span>`;
+
+    paintVil();
+    enableMapZoom(svg, { max: 12, anchor: ANCHOR });
+  }
+
+  /* ── 05 散布圖 ── */
   {
     const svg = document.getElementById('scatter');
     const W2 = 460, H2 = 360, L = 46, Rr = 14, T2 = 16, B = 40;
@@ -957,7 +1170,7 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
       `虛線是日夜比1.0。標名的是空屋率前三高，以及日夜比的兩個極端。`;
   }
 
-  /* ── 05 公車班次 ────────────────────────────────────────────────────
+  /* ── 06 公車班次 ────────────────────────────────────────────────────
      線寬與濃度都跟著班次走。兩個通道編碼同一個變數是刻意的：
      這張圖要回答的是「哪幾條走廊常有車」，不是「這裡有沒有公車」，
      後者在臺中29個區裡幾乎處處成立，等於沒有資訊。
@@ -968,7 +1181,7 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
     /* 分母兩種都給，而且讓讀者自己切。
        每千人問的是「這一區的人搭不搭得到車」，每平方公里問的是「路網有多密」。
        和平區只有七千多人卻有開到谷關的長程路線，每千人的數字因此高居第一，
-       那不是它公車多，是它人少。第06節的假相關就是同一個分母造成的，
+       那不是它公車多，是它人少。第07節的假相關就是同一個分母造成的，
        與其在圖說裡解釋，不如讓人按一下就看見。 */
     const PER = [
       { zh: '每千人', k: 'callsPerK', en: 'per 1,000 Residents',
@@ -1076,7 +1289,7 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
     enableMapZoom(document.getElementById('map-bus'), { max: 8, anchor: ANCHOR });
   }
 
-  /* ── 06 A1死亡事故 ────────────────────────────────────────────────── */
+  /* ── 07 A1死亡事故 ────────────────────────────────────────────────── */
   {
     const MODE_COLOR = { '人': '#C8D400', '機車': '#1A1A1A', '汽車': '#888888',
                          '慢車': '#4A4A4A', '其他': '#D0D0D0' };
@@ -1219,7 +1432,7 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
         `唯十年${mo.deaths}人這個數字不大，區間也寬，不宜當成穩定的排名讀。`;
 
       document.getElementById('crash-body-3').innerHTML =
-        `把第05節的公車服務與這一節的死亡率放在一起，` +
+        `把第07節的公車服務與這一節的死亡率放在一起，` +
         `${use.length}個區（排除樣本過少的）的相關係數是${sg(rPop)}，` +
         `看起來像是「公車越多的地方死越多人」。<b>這個數字是假的。</b>` +
         `每千人班次與每十萬人死亡共用同一個人口分母，` +

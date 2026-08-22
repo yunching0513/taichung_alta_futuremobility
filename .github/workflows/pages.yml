@@ -56,6 +56,9 @@ jobs:
       - name: 解析 A1 死亡事故
         run: python3 scripts/prep_crash.py
 
+      - name: 解析里級人口
+        run: python3 scripts/prep_villages.py
+
       - name: 建置版面
         run: python3 scripts/build.py
 
