@@ -55,9 +55,8 @@ jobs:
           if git diff --cached --quiet; then
             echo "資料沒有變動，不提交"
           else
-            git commit -m "抓 TDX 資料（$(date -u +%Y-%m-%d)）
-
-由 fetch-tdx.yml 手動觸發抓取，data_TW/from_tdx/ 為原始 JSON，
-並重跑 prep_districts.py 與 prep_rail.py 更新中間檔。"
+            git commit \
+              -m "抓 TDX 資料（$(date -u +%Y-%m-%d)）" \
+              -m "由 fetch-tdx.yml 手動觸發，data_TW/from_tdx/ 是原始 JSON，並重跑 prep 更新中間檔。"
             git push
           fi
