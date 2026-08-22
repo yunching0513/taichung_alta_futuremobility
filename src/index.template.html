@@ -538,17 +538,24 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
   }
 
   /* ── 軌道疊圖 ──────────────────────────────────────────────────────
-     線色用來源檔自帶的營運商色（臺鐵 #c8102e、高鐵 #f37021）。
+     線色用營運商色（臺鐵 #c8102e、高鐵 #f37021、臺中捷運綠線 #1E9E5A）。
      成追線畫成虛線：它是連接山線與海線的短支線，實線會讓人以為是主幹。
-     車站的分別不是臺鐵官方站等（來源檔沒有那個欄位），而是本程式從線形算出來的三級：
-     與高鐵線相距400公尺內的轉乘站、山海線的交會站、以及一般站。 */
-  const RAIL_COLOR = { tra: '#c8102e', thsr: '#f37021', metro: '#3A7CC3', lrt: '#4CAF50' };
-  const STOP_TIERS = [
-    { k: 'hsr', zh: '高鐵轉乘', r: 5.4, fill: '#f37021' },
-    { k: 'jx', zh: '山海線交會', r: 4.2, fill: '#1A1A1A' },
-    { k: 'std', zh: '一般臺鐵站', r: 3.0, fill: '#c8102e' },
-  ];
-  const tierOf = t => t.hsrNear ? 'hsr' : t.junction ? 'jx' : 'std';
+
+     車站的大小照臺鐵的**官方站等**（TDX 的 StationClass，特等至招呼六級），
+     不是本程式算出來的分別。大小是唯一的編碼：等級是有序的，
+     用面積表示比用顏色表示更讀得出順序，也不用去記圖例。
+     高鐵與捷運不分站等，各給一個固定的記號。 */
+  const RAIL_COLOR = { tra: '#c8102e', thsr: '#f37021', metro: '#1E9E5A', lrt: '#4CAF50' };
+  const CLS_R = { '0': 6.4, '1': 5.4, '2': 4.4, '3': 3.5, '4': 2.7, '5': 2.2, 'B': 2.2 };
+  const SYS_MARK = {
+    tra: { fill: '#c8102e', r: 3.0 },
+    thsr: { fill: '#f37021', r: 6.4 },
+    metro: { fill: '#FFFFFF', r: 2.8, stroke: '#1E9E5A' },
+  };
+  const stopR = t => t.cls ? CLS_R[t.cls] : SYS_MARK[t.sys].r;
+  /* 全圖只標得下大站：臺鐵二等以上與高鐵。其餘（三等、簡易與18個捷運站）
+     標成 tiny，放大過2.2倍才顯示，理由與中區的標籤同一條。 */
+  const alwaysLabel = t => t.sys === 'thsr' || (t.cls && t.cls <= '2');
 
   function drawRail(box, P) {
     const g = el('g', { 'aria-label': '軌道路網' });
@@ -564,16 +571,21 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
           }));
         });
       });
-    RL.stops.forEach(t => {
-      const T = STOP_TIERS.find(x => x.k === tierOf(t));
+    // 先畫小站再畫大站，特等站才不會被旁邊的簡易站蓋住
+    [...RL.stops].sort((a, b) => stopR(a) - stopR(b)).forEach(t => {
+      const M = SYS_MARK[t.sys];
+      const r = stopR(t);
       const cx = P.px(t.lon), cy = P.py(t.lat);
-      const c = el('circle', { class: 'stop', cx, cy, r: T.r, fill: T.fill });
-      c.appendChild(el('title', {}, `${t.name}站　${t.lines.join('＋')}　${t.district}` +
-        (t.hsrNear ? '　與高鐵線相距400公尺內' : '')));
+      const c = el('circle', { class: 'stop', cx, cy, r, fill: M.fill,
+                               style: M.stroke ? `stroke:${M.stroke};stroke-width:1.6` : '' });
+      c.appendChild(el('title', {}, `${t.sysLabel}${t.name}站　${t.clsLabel || t.sysLabel}　` +
+        `${t.lines.join('＋')}　${t.district}` +
+        (t.xfer.length ? `　轉乘：${t.xfer.join('、')}` : '')));
       g.appendChild(c);
-      if (T.k !== 'std')
-        g.appendChild(el('text', { class: 'stop-lbl', x: cx, y: cy - T.r - 3,
-          'text-anchor': 'middle' }, t.name));
+      g.appendChild(el('text', {
+        class: 'stop-lbl' + (alwaysLabel(t) ? '' : ' tiny'),
+        x: cx, y: cy - r - 3, 'text-anchor': 'middle',
+      }, t.name));
     });
     box.appendChild(g);
   }
@@ -709,20 +721,34 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
 
     const key = document.getElementById('rail-key');
     key.hidden = ri !== 0;
+    // 站等的圖例照大小排，讀者看一眼就知道圓越大等級越高，不必回頭對照
+    const clsKeys = Object.keys(RL.byClass).sort();
     key.innerHTML = ri !== 0 ? '' :
       RL.lines.map(L2 =>
         `<span class="it"><span class="ln" style="background:${RAIL_COLOR[L2.kind]}` +
         `${L2.line === '成追線' ? ';opacity:.55' : ''}"></span>${L2.sysLabel}　${L2.line}` +
         `${L2.line === '成追線' ? '（虛線）' : ''}</span>`).join('') +
-      STOP_TIERS.map(T =>
-        `<span class="it"><span class="mk" style="background:${T.fill}"></span>${T.zh}</span>`).join('');
+      clsKeys.map(c =>
+        `<span class="it"><span class="mk" style="background:#c8102e;` +
+        `width:${CLS_R[c] * 2}px;height:${CLS_R[c] * 2}px"></span>` +
+        `${RL.classLabels[c]}${RL.byClass[c]}</span>`).join('') +
+      [['thsr', '高鐵臺中站'], ['metro', '捷運車站']].map(([k, zh]) =>
+        `<span class="it"><span class="mk" style="background:${SYS_MARK[k].fill};` +
+        `width:${SYS_MARK[k].r * 2}px;height:${SYS_MARK[k].r * 2}px;` +
+        `${SYS_MARK[k].stroke ? `border-color:${SYS_MARK[k].stroke}` : ''}"></span>${zh}</span>`
+      ).join('');
 
+    const xfer = RL.stops.filter(t => t.sys === 'metro' && t.xfer.length)
+      .map(t => t.name).join('、');
     document.getElementById('cap-rail').innerHTML = ri !== 0 ? '' :
       `軌道：${RL.lines.map(L2 => L2.sysLabel + L2.line).join('、')}，` +
-      `裁切至臺中市行政區界內；臺鐵車站${RL.stops.length}個，` +
-      `其中${RL.byLine['西部幹線']}站在山線、${RL.byLine['西部幹線 (海線)']}站在海線、` +
-      `${RL.byLine['成追線']}站在成追線（追分與成功同時屬於兩條線，因此重複計入）。` +
-      `<b>車站的分別不是臺鐵官方站等。</b>${RL.caveat}`;
+      `裁切至臺中市行政區界內。<b>臺鐵在臺中的${RL.bySystem['臺鐵']}個車站裡，` +
+      `特等站只有臺中站一個，一等站只有豐原站一個。</b>` +
+      `其餘是二等${RL.byClass['2']}、三等${RL.byClass['3']}、簡易${RL.byClass['4']}，` +
+      `圓的大小就是官方站等（TDX 的 StationClass）。` +
+      `捷運烏日文心北屯線${RL.bySystem['捷運']}站，` +
+      `其中${xfer}${xfer.split('、').length}站與臺鐵或高鐵轉乘。${RL.caveat}` +
+      `放大之後會顯示三等站、簡易站與捷運車站的站名。`;
     drawBars('bars-sig', get, L.fmt, L.mode, L.mid != null ? L.mid : 0);
 
     const hi = [...R].sort((a, c) => get(c) - get(a))[0];
@@ -758,7 +784,16 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
   paintSig();
   // 先畫再啟用：mapzoom 需要 viewBox 才有座標系可算，而 viewBox 是 drawMap 設的。
   // 只掛在這一張大圖上，03 節那幾張小圖各自只有一個圖層，放大沒有東西可看。
-  enableMapZoom(document.getElementById('map-sig'), { max: 8 });
+  //
+  // anchor 用夜間人口加權的重心，不用幾何中心：臺中的幾何中心在和平區，
+  // 那一區佔全市六成面積、住不到一萬人，對著它放大等於放大一片空白。
+  // 加權之後重心落在西屯與北屯之間，也就是這張圖真正有變化的地方。
+  const wsum = R.reduce((a, d) => a + d.work.night, 0);
+  const ANCHOR = [
+    R.reduce((a, d) => a + BIG.centroid(d)[0] * d.work.night, 0) / wsum,
+    R.reduce((a, d) => a + BIG.centroid(d)[1] * d.work.night, 0) / wsum,
+  ];
+  enableMapZoom(document.getElementById('map-sig'), { max: 8, anchor: ANCHOR });
 
   /* ── 03 住宅基本盤 ── */
   const METRICS = [

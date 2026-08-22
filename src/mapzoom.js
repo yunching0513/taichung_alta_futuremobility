@@ -15,6 +15,12 @@
  * 其三，倍率超過2.2倍才顯示小區的標籤。全圖時中區只有0.9平方公里，
  * 塞不下標籤所以留給 tooltip；放大之後塞得下了，就該讓它出現。
  *
+ * opts.anchor 是「按下加號時要往哪裡靠」的那個點，用 viewBox 座標給。
+ * 臺中的幾何中心落在和平區：那一區佔全市六成面積，圖上幾乎沒有東西。
+ * 對著幾何中心放大，等於把使用者送到一片空白裡。因此加號與減號改成靠著 anchor 縮放，
+ * **唯有 anchor 還看得見的時候才這樣做**：使用者若已經拖到別處，就不該被拉回來。
+ * 游標縮放（滾輪、雙擊、雙指）本來就以游標為定點，不受這一條影響。
+ *
  * 滾輪是「合作式」的：直接滾動捲頁面並提示，⌘／Ctrl 加滾輪才縮放。
  * 這張圖將近1120單位寬、佔滿版面，若滾輪直接縮放，滑鼠每次經過都會把捲動吃掉。
  * 右上角的「滾輪」開關可以改成直接縮放，選擇記在 sessionStorage，一個分頁內有效。
@@ -60,9 +66,8 @@ function enableMapZoom(svg, opts = {}) {
     return [(cx - r.left) / r.width * W, (cy - r.top) / r.height * H];
   };
 
-  /** 以 (cx, cy) 為定點縮放 f 倍：游標底下的那個點不動 */
-  function zoomAt(cx, cy, f) {
-    const [px, py] = toLocal(cx, cy);
+  /** 以 viewBox 座標的 (px, py) 為定點縮放 f 倍 */
+  function zoomAtLocal(px, py, f) {
     const next = Math.min(MAX, Math.max(1, k * f));
     if (next === k) return;
     tx = px - (px - tx) * (next / k);
@@ -70,9 +75,22 @@ function enableMapZoom(svg, opts = {}) {
     k = next;
     apply();
   }
+  /** 以 (cx, cy) 為定點縮放 f 倍：游標底下的那個點不動 */
+  function zoomAt(cx, cy, f) {
+    zoomAtLocal(...toLocal(cx, cy), f);
+  }
+  /** anchor 目前落在畫面的哪裡（viewBox 座標）。太靠邊或沒給就回 null */
+  function anchorAt() {
+    const a = typeof opts.anchor === 'function' ? opts.anchor() : opts.anchor;
+    if (!a) return null;
+    const px = a[0] * k + tx, py = a[1] * k + ty;
+    const m = 0.15;      // 邊緣一成五之內就當作看不見，免得放大時把圖甩出畫面
+    return (px > W * m && px < W * (1 - m) && py > H * m && py < H * (1 - m))
+      ? [px, py] : null;
+  }
   function zoomCentre(f) {
-    const r = svg.getBoundingClientRect();
-    zoomAt(r.left + r.width / 2, r.top + r.height / 2, f);
+    const a = anchorAt();
+    zoomAtLocal(...(a || [W / 2, H / 2]), f);
   }
   function reset0() { k = 1; tx = 0; ty = 0; apply(); }
 
