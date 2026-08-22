@@ -25,6 +25,13 @@ TDX 的 tra_station.json 有 StationClass，因此本版直接用官方站等，
 其二，**臺中捷運綠線進來了。** 上一版的來源檔完全沒有臺中捷運。
 本版接 TDX 的 TMRT 端點：18個車站與烏日文心北屯線的線形。
 
+── 進出站人次只有臺鐵有 ────────────────────────────────────────────
+臺鐵每日各站進出站人數來自 data.gov.tw dataset 8792，本檔算成每日平均。
+**高鐵與臺中捷運沒有對應的公開檔案可取**：交通部統計查詢網 stat.motc.gov.tw
+與臺中市政府資料中心 datacenter.taichung.gov.tw 在本專案目前的網路環境都連不到。
+因此那兩個系統的車站 ridership 是 null，不是0，版面上會標明「無公開資料」。
+**不會拿臺鐵的數字去頂替，也不會用路線長度之類的東西估一個出來。**
+
 ── 兩件仍然要講清楚的事 ──────────────────────────────────────────────
 其一，市界的裁切用行政區界的點在多邊形內判定，不是矩形。
 矩形會把三義、彰化、花壇這些鄰縣的車站算進來，實際上它們不在臺中市。
@@ -49,6 +56,7 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 SRC = ROOT / 'data_TW' / 'from_tdx_transit_twin'
+RIDE = ROOT / 'data_TW' / 'from_tra' / 'tra_station_ridership.json'
 TDX = ROOT / 'data_TW' / 'from_tdx'
 DIST = ROOT / 'data' / 'tc_districts.json'
 OUT = ROOT / 'data' / 'tc_rail.json'
@@ -83,6 +91,15 @@ SYS_LABEL = {'tra': '臺鐵', 'thsr': '高鐵', 'metro': '捷運', 'lrt': '輕�
 # 臺鐵官方站等。B 是號誌站，全臺只有樹林調車場一個，不在臺中。
 CLASS = {'0': '特等站', '1': '一等站', '2': '二等站',
          '3': '三等站', '4': '簡易站', '5': '招呼站', 'B': '號誌站'}
+
+# 進站與出站人次在七個月的尺度上應該接近，差太多通常代表欄位讀反了。
+# 唯有兩站是例外，而且例外的是同一組：成追線上的追分與成功。
+# 這裡把量到的值寫出來，而不是把容差放寬到讓它們通過：
+# 放寬容差會讓「欄位讀反了」這種真正的錯也一起通過。
+# 成因沒有查證過，本檔不臆測，只記錄事實。
+RIDE_ASYM = {'追分': 2.55, '成功': 0.61}
+RIDE_TOL = 0.25          # 其餘的站，進出比必須落在 1 ± 這個值之內（實測都在 ±6% 內）
+RIDE_ASYM_TOL = 0.20     # 例外的兩站，實測值與上表相差不得超過這個比例
 
 
 def load(path):
@@ -264,6 +281,76 @@ def main():
     if not stops:
         sys.exit('臺中市界內一個車站都沒有，判定邏輯有問題，停下來')
 
+    # ── 進出站人次。只有臺鐵有，其餘給 null ─────────────────────────────
+    ride_note, ride_period = None, None
+    if RIDE.exists():
+        raw = json.loads(RIDE.read_text(encoding='utf-8'))['data']
+        agg = {}
+        for r in raw:
+            a = agg.setdefault(r['staCode'], {'days': set(), 'in': 0, 'out': 0})
+            a['days'].add(r['trnOpDate'])
+            a['in'] += int(r['gateInComingCnt'])
+            a['out'] += int(r['gateOutGoingCnt'])
+        if not agg:
+            sys.exit('進出站人次讀進來是空的')
+        days = {k: len(v['days']) for k, v in agg.items()}
+        # 各站的天數必須一致。不一致代表某些站有缺日，那時候「每日平均」
+        # 的分母就不一樣，站與站之間不能比。
+        if len(set(days.values())) != 1:
+            sys.exit(f'各站的資料天數不一致：{sorted(set(days.values()))}，'
+                     f'每日平均的分母不同，站與站之間不能比')
+        nd = next(iter(days.values()))
+        alldates = sorted({r['trnOpDate'] for r in raw})
+        ride_period = f'{alldates[0]} 至 {alldates[-1]}'
+        miss = []
+        for t in stops:
+            if t['sys'] != 'tra':
+                t['ridership'] = None
+                continue
+            a = agg.get(t['id'])
+            if a is None:
+                miss.append(t['name'])
+                t['ridership'] = None
+                continue
+            t['ridership'] = {'in': round(a['in'] / nd), 'out': round(a['out'] / nd),
+                              'total': round((a['in'] + a['out']) / nd), 'days': nd}
+        if miss:
+            sys.exit(f'這些臺鐵站在進出站人次裡找不到：{miss}。'
+                     f'staCode 與 TDX 的 StationID 應該是同一套代碼')
+        # 進站與出站在七個月的尺度上應該接近，除了具名的那兩站
+        odd, drift = [], []
+        for t in stops:
+            r = t.get('ridership')
+            if not r or not r['out']:
+                continue
+            ratio = r['in'] / r['out']
+            exp = RIDE_ASYM.get(t['name'])
+            if exp is None:
+                if abs(ratio - 1) > RIDE_TOL:
+                    odd.append(f'{t["name"]} {ratio:.2f}')
+            elif abs(ratio - exp) / exp > RIDE_ASYM_TOL:
+                drift.append(f'{t["name"]} 實測 {ratio:.2f}、表上 {exp}')
+            if exp is not None:
+                r['asym'] = round(ratio, 2)
+        if odd:
+            sys.exit(f'這些站的進站與出站人次不對稱：{odd}（容差 ±{RIDE_TOL:.0%}）。'
+                     f'七個月的尺度上兩者應該接近，差這麼多通常代表欄位讀反了。'
+                     f'若查證後確認是真的，把站名與量到的比值加進 RIDE_ASYM，不要放寬容差')
+        if drift:
+            sys.exit(f'具名例外的比值變了：{drift}。RIDE_ASYM 該更新，'
+                     f'或者來源資料出了別的問題')
+        ride_note = (f'臺鐵每日平均進出站人次，{ride_period}共{nd}天，'
+                     f'來源 data.gov.tw dataset 8792。'
+                     f'高鐵與臺中捷運沒有可取得的公開檔案，因此是 null 而不是 0。'
+                     f'23站裡有21站的進出站人次相差在6%以內，'
+                     + '、'.join(f'唯{k}的進站是出站的{v}倍' if v > 1
+                                else f'{k}的進站只有出站的{v}倍' for k, v in RIDE_ASYM.items())
+                     + '，兩者都在成追線上。這是量到的事實，成因未經查證，本檔不臆測')
+    else:
+        for t in stops:
+            t['ridership'] = None
+        ride_note = '沒有進出站人次：先跑 python3 scripts/fetch_roads.py'
+
     # ── 跨系統轉乘：門檻內、且不同系統的兩站互相登記 ─────────────────────
     for t in stops:
         t['xfer'] = sorted(
@@ -332,6 +419,8 @@ def main():
                               f'本檔採 TDX。' for r in cases))),
         'classLabels': CLASS,
         'boundaryCases': cases,
+        'ridershipNote': ride_note,
+        'ridershipPeriod': ride_period,
         'systems': sorted({L['sysLabel'] for L in lines}),
         'lines': lines,
         'stops': stops,
@@ -356,6 +445,21 @@ def main():
     for r in cases:
         print(f'  坐落在區界上：{r["sysLabel"]}{r["name"]}　TDX：{r["tdx"]}　'
               f'界線判定：{r["geo"]}　距區界 {r["edgeM"]} 公尺（採 TDX）')
+    rd = [t for t in stops if t.get('ridership')]
+    if rd:
+        print(f'  每日平均進出站人次（{ride_period}）：')
+        for t in sorted(rd, key=lambda t: -t['ridership']['total'])[:6]:
+            r = t['ridership']
+            print(f"    {t['name']:5s} 進 {r['in']:>6,}　出 {r['out']:>6,}　"
+                  f"合計 {r['total']:>6,}　（{t['clsLabel']}）")
+        print(f'    最少：' + '、'.join(
+            f"{t['name']}{t['ridership']['total']:,}"
+            for t in sorted(rd, key=lambda t: t['ridership']['total'])[:3]))
+        for t in rd:
+            if t['ridership'].get('asym'):
+                print(f"    不對稱：{t['name']} 進出比 {t['ridership']['asym']}"
+                      f"（具名例外，成因未查證）")
+        print('  高鐵與捷運：無公開資料，ridership 給 null')
     if dropped:
         print(f'  裁切後不進臺中而捨棄的線：{"、".join(dropped)}')
 

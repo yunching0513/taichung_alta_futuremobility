@@ -79,18 +79,20 @@ python3 scripts/prep_districts.py  # data_TW/from_housing/         → data/tc_d
 python3 scripts/prep_rail.py       # data_TW/from_tdx*/            → data/tc_rail.json
 python3 scripts/prep_bus.py        # data_TW/from_tdx/             → data/tc_bus.json
 python3 scripts/prep_crash.py      # data_TW/from_mobility_atlas/  → data/tc_crash.json
+python3 scripts/prep_roads.py      # data_TW/from_mobility_atlas/  → data/tc_roads.json
 python3 scripts/prep_villages.py   # data_TW/from_moi/             → data/tc_villages.json
 python3 scripts/build.py           # data/ + src/                  → dist/index.html
 ```
 
-抓新的 TDX 原始檔要金鑰（見下），平常的建置不用：`data_TW/` 已納入版控。
+抓資料的兩支：`fetch_tdx.py`（要金鑰）與 `fetch_roads.py`、`fetch_villages.py`（不用）。
+平常的建置都不用抓，`data_TW/` 已納入版控。
 
 `dist/index.html` 是單一檔案、點開就能看，五節：
 
 | 節 | 內容 |
 |---|---|
 | 01 Commuter Flow | 全市日夜間人口比0.997與29區的全距0.379 |
-| 02 **One Map** | **五組資料疊在同一張圖上。**底圖六選一（信令／住宅／里級人口／公車／交通事故／不著色），疊圖三選多（軌道路網／公車路線／A1事故點），可縮放平移 |
+| 02 **One Map** | **六組資料疊在同一張圖上。**底圖六選一（信令／住宅／里級人口／公車／交通事故／不著色）；疊圖分三組可複選：軌道（火車／捷運／高鐵）、公路（國道／快速公路／省道）、其他（公車路線／A1事故點）。**點車站看每日平均進出站人次**，可縮放平移 |
 | 03 Housing Base | 民國109年普查的五個欄位，論述與跳轉 |
 | 04 Village Grain | 625個里的人口與密度，以及七個區為什麼只畫得到區級 |
 | 05 Weak Correlation | 空屋率×日夜比散布圖，相關係數0.282 |
@@ -103,6 +105,28 @@ python3 scripts/build.py           # data/ + src/                  → dist/inde
 與高鐵線相距400公尺內的轉乘站（新烏日）、山海線的交會站（追分、成功）、一般站。
 **這個分別不是臺鐵官方的站等**，官方站等分特等至招呼共六級，來源檔沒有那個欄位。
 臺中捷運綠線也不在來源檔裡，兩者都列在待收清單。
+
+## 公路、軌道與車站人次
+
+第02節的疊圖分三組，每一組都可以複選：
+
+**軌道分三系統**：火車、捷運、高鐵。臺鐵的車站大小是官方站等（TDX 的 `StationClass`），
+**點下去會顯示每日平均進出站人次**：臺中站48,644人、
+新烏日18,233人、豐原16,357人，資料期民國115年1月1日至8月1日共213天，
+來源是 data.gov.tw dataset 8792。
+**高鐵與臺中捷運沒有可取得的公開運量檔案**：交通部統計查詢網 stat.motc.gov.tw
+與臺中市政府資料中心 datacenter.taichung.gov.tw 在本專案目前的網路環境都連不到，
+因此那兩個系統的車站顯示「無公開資料」，不是0，也不會拿臺鐵的數字去頂替。
+
+**公路分三級**：國道830段、快速公路233段、省道4378段。
+線寬跟著等級走，因為**公路的等級就是它的設計速度與出入口密度**，
+而那兩件事決定了它旁邊的人怎麼移動、以及一次碰撞的動能有多大。
+把它與第07節的A1死亡率疊在一起看才有意義。
+
+**市區道路不在裡面，而且短期內接不進來。** 公路局的公開圖資只到省道；
+市區道路是市政府的權責，臺中市政府資料中心連不到。這一級缺席的後果要講清楚：
+**圖上看起來沒有路的地方不是沒有路**，是那些路不在這份資料的範圍內。
+在那之前，公車路線疊圖是最接近的替代：696條子路線走的就是市區的主要道路。
 
 ## 為什麼只有一張地圖
 

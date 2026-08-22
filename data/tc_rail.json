@@ -20,6 +20,8 @@
    "edgeM": 50.6
   }
  ],
+ "ridershipNote": "臺鐵每日平均進出站人次，20260101 至 20260801共213天，來源 data.gov.tw dataset 8792。高鐵與臺中捷運沒有可取得的公開檔案，因此是 null 而不是 0。23站裡有21站的進出站人次相差在6%以內，唯追分的進站是出站的2.55倍、成功的進站只有出站的0.61倍，兩者都在成追線上。這是量到的事實，成因未經查證，本檔不臆測",
+ "ridershipPeriod": "20260101 至 20260801",
  "systems": [
   "捷運",
   "臺鐵",
@@ -13507,6 +13509,7 @@
     "烏日文心北屯線"
    ],
    "junction": false,
+   "ridership": null,
    "xfer": []
   },
   {
@@ -13525,6 +13528,7 @@
     "烏日文心北屯線"
    ],
    "junction": false,
+   "ridership": null,
    "xfer": []
   },
   {
@@ -13543,6 +13547,7 @@
     "烏日文心北屯線"
    ],
    "junction": false,
+   "ridership": null,
    "xfer": [
     "臺鐵松竹"
    ]
@@ -13563,6 +13568,7 @@
     "烏日文心北屯線"
    ],
    "junction": false,
+   "ridership": null,
    "xfer": []
   },
   {
@@ -13581,6 +13587,7 @@
     "烏日文心北屯線"
    ],
    "junction": false,
+   "ridership": null,
    "xfer": []
   },
   {
@@ -13599,6 +13606,7 @@
     "烏日文心北屯線"
    ],
    "junction": false,
+   "ridership": null,
    "xfer": []
   },
   {
@@ -13617,6 +13625,7 @@
     "烏日文心北屯線"
    ],
    "junction": false,
+   "ridership": null,
    "xfer": []
   },
   {
@@ -13635,6 +13644,7 @@
     "烏日文心北屯線"
    ],
    "junction": false,
+   "ridership": null,
    "xfer": []
   },
   {
@@ -13653,6 +13663,7 @@
     "烏日文心北屯線"
    ],
    "junction": false,
+   "ridership": null,
    "xfer": []
   },
   {
@@ -13671,6 +13682,7 @@
     "烏日文心北屯線"
    ],
    "junction": false,
+   "ridership": null,
    "xfer": []
   },
   {
@@ -13689,6 +13701,7 @@
     "烏日文心北屯線"
    ],
    "junction": false,
+   "ridership": null,
    "xfer": []
   },
   {
@@ -13707,6 +13720,7 @@
     "烏日文心北屯線"
    ],
    "junction": false,
+   "ridership": null,
    "xfer": []
   },
   {
@@ -13725,6 +13739,7 @@
     "烏日文心北屯線"
    ],
    "junction": false,
+   "ridership": null,
    "xfer": []
   },
   {
@@ -13743,6 +13758,7 @@
     "烏日文心北屯線"
    ],
    "junction": false,
+   "ridership": null,
    "xfer": [
     "臺鐵大慶"
    ]
@@ -13763,6 +13779,7 @@
     "烏日文心北屯線"
    ],
    "junction": false,
+   "ridership": null,
    "xfer": []
   },
   {
@@ -13781,6 +13798,7 @@
     "烏日文心北屯線"
    ],
    "junction": false,
+   "ridership": null,
    "xfer": []
   },
   {
@@ -13799,6 +13817,7 @@
     "烏日文心北屯線"
    ],
    "junction": false,
+   "ridership": null,
    "xfer": [
     "臺鐵新烏日",
     "高鐵臺中"
@@ -13820,6 +13839,7 @@
     "烏日文心北屯線"
    ],
    "junction": false,
+   "ridership": null,
    "xfer": [
     "臺鐵烏日"
    ]
@@ -13840,6 +13860,7 @@
     "臺灣高鐵線"
    ],
    "junction": false,
+   "ridership": null,
    "xfer": [
     "捷運高鐵臺中站",
     "臺鐵新烏日"
@@ -13861,6 +13882,12 @@
     "西部幹線 (海線)"
    ],
    "junction": false,
+   "ridership": {
+    "in": 405,
+    "out": 396,
+    "total": 801,
+    "days": 213
+   },
    "xfer": []
   },
   {
@@ -13879,6 +13906,12 @@
     "西部幹線 (海線)"
    ],
    "junction": false,
+   "ridership": {
+    "in": 4102,
+    "out": 4114,
+    "total": 8216,
+    "days": 213
+   },
    "xfer": []
   },
   {
@@ -13897,6 +13930,12 @@
     "西部幹線"
    ],
    "junction": false,
+   "ridership": {
+    "in": 573,
+    "out": 578,
+    "total": 1152,
+    "days": 213
+   },
    "xfer": []
   },
   {
@@ -13915,6 +13954,12 @@
     "西部幹線"
    ],
    "junction": false,
+   "ridership": {
+    "in": 2563,
+    "out": 2551,
+    "total": 5114,
+    "days": 213
+   },
    "xfer": []
   },
   {
@@ -13933,6 +13978,12 @@
     "西部幹線 (海線)"
    ],
    "junction": false,
+   "ridership": {
+    "in": 213,
+    "out": 217,
+    "total": 430,
+    "days": 213
+   },
    "xfer": []
   },
   {
@@ -13951,6 +14002,12 @@
     "西部幹線 (海線)"
    ],
    "junction": false,
+   "ridership": {
+    "in": 1611,
+    "out": 1546,
+    "total": 3157,
+    "days": 213
+   },
    "xfer": []
   },
   {
@@ -13969,6 +14026,12 @@
     "西部幹線"
    ],
    "junction": false,
+   "ridership": {
+    "in": 8040,
+    "out": 8317,
+    "total": 16357,
+    "days": 213
+   },
    "xfer": []
   },
   {
@@ -13987,6 +14050,12 @@
     "西部幹線 (海線)"
    ],
    "junction": false,
+   "ridership": {
+    "in": 2992,
+    "out": 2926,
+    "total": 5918,
+    "days": 213
+   },
    "xfer": []
   },
   {
@@ -14005,6 +14074,12 @@
     "西部幹線"
    ],
    "junction": false,
+   "ridership": {
+    "in": 1067,
+    "out": 1022,
+    "total": 2089,
+    "days": 213
+   },
    "xfer": []
   },
   {
@@ -14023,6 +14098,12 @@
     "西部幹線"
    ],
    "junction": false,
+   "ridership": {
+    "in": 2630,
+    "out": 2653,
+    "total": 5283,
+    "days": 213
+   },
    "xfer": []
   },
   {
@@ -14041,6 +14122,12 @@
     "西部幹線 (海線)"
    ],
    "junction": false,
+   "ridership": {
+    "in": 617,
+    "out": 639,
+    "total": 1256,
+    "days": 213
+   },
    "xfer": []
   },
   {
@@ -14059,6 +14146,12 @@
     "西部幹線"
    ],
    "junction": false,
+   "ridership": {
+    "in": 832,
+    "out": 819,
+    "total": 1651,
+    "days": 213
+   },
    "xfer": []
   },
   {
@@ -14077,6 +14170,12 @@
     "西部幹線"
    ],
    "junction": false,
+   "ridership": {
+    "in": 3202,
+    "out": 3193,
+    "total": 6395,
+    "days": 213
+   },
    "xfer": [
     "捷運松竹"
    ]
@@ -14097,6 +14196,12 @@
     "西部幹線"
    ],
    "junction": false,
+   "ridership": {
+    "in": 2405,
+    "out": 2377,
+    "total": 4782,
+    "days": 213
+   },
    "xfer": []
   },
   {
@@ -14115,6 +14220,12 @@
     "西部幹線 (海線)"
    ],
    "junction": false,
+   "ridership": {
+    "in": 826,
+    "out": 847,
+    "total": 1673,
+    "days": 213
+   },
    "xfer": []
   },
   {
@@ -14133,6 +14244,12 @@
     "西部幹線"
    ],
    "junction": false,
+   "ridership": {
+    "in": 1632,
+    "out": 1622,
+    "total": 3254,
+    "days": 213
+   },
    "xfer": []
   },
   {
@@ -14151,6 +14268,12 @@
     "西部幹線"
    ],
    "junction": false,
+   "ridership": {
+    "in": 24481,
+    "out": 24162,
+    "total": 48644,
+    "days": 213
+   },
    "xfer": []
   },
   {
@@ -14169,6 +14292,12 @@
     "西部幹線"
    ],
    "junction": false,
+   "ridership": {
+    "in": 2078,
+    "out": 2105,
+    "total": 4183,
+    "days": 213
+   },
    "xfer": []
   },
   {
@@ -14188,6 +14317,13 @@
     "西部幹線 (海線)"
    ],
    "junction": true,
+   "ridership": {
+    "in": 755,
+    "out": 296,
+    "total": 1050,
+    "days": 213,
+    "asym": 2.55
+   },
    "xfer": []
   },
   {
@@ -14206,6 +14342,12 @@
     "西部幹線"
    ],
    "junction": false,
+   "ridership": {
+    "in": 3346,
+    "out": 3159,
+    "total": 6505,
+    "days": 213
+   },
    "xfer": [
     "捷運大慶"
    ]
@@ -14227,6 +14369,13 @@
     "成追線"
    ],
    "junction": true,
+   "ridership": {
+    "in": 713,
+    "out": 1177,
+    "total": 1890,
+    "days": 213,
+    "asym": 0.61
+   },
    "xfer": []
   },
   {
@@ -14245,6 +14394,12 @@
     "西部幹線"
    ],
    "junction": false,
+   "ridership": {
+    "in": 9322,
+    "out": 8912,
+    "total": 18233,
+    "days": 213
+   },
    "xfer": [
     "捷運高鐵臺中站",
     "高鐵臺中"
@@ -14266,6 +14421,12 @@
     "西部幹線"
    ],
    "junction": false,
+   "ridership": {
+    "in": 671,
+    "out": 672,
+    "total": 1343,
+    "days": 213
+   },
    "xfer": [
     "捷運烏日"
    ]

@@ -31,6 +31,7 @@ PAGES = {
         '__BUS_JSON__': 'tc_bus.json',
         '__CRASH_JSON__': 'tc_crash.json',
         '__VIL_JSON__': 'tc_villages.json',
+        '__ROAD_JSON__': 'tc_roads.json',
     }, {
         '__MAPZOOM_JS__': 'mapzoom.js',
     }),
