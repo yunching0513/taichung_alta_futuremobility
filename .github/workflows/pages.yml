@@ -1,0 +1,71 @@
+# 把 dist/ 部署到 GitHub Pages。
+#
+# 上線需要有人做一件事，而且只有這一件：
+#     Settings → Pages → Source 選「GitHub Actions」（不要選 Deploy from a branch）
+#
+# 為什麼不能自動：configure-pages 有一個 enablement 參數會嘗試用 API 開啟 Pages，
+# 這裡也開著，唯實測回的是「Create Pages site failed: Resource not accessible by
+# integration」：工作流程的 GITHUB_TOKEN 沒有建立 Pages 站臺的權限。
+# 那是帳號層級的限制，改 workflow 沒有用。開完之後這個參數會變成沒有作用的保險。
+#
+# 開好之後，每一次推送到 main 都會自動重新建置並部署。
+#
+# 刻意重跑整條管線而不是直接上傳 dist/：dist/ 沒有納入版控（見 .gitignore），
+# 所以上線的版面一定是 data_TW/ → prep → data/ → build 跑出來的結果，
+# 不會有「有人手動改了 dist/ 卻忘了改資料」這種事。
+# 也刻意不裝任何套件：整條管線只用 Python 內建函式庫，所以沒有 pip install 這一步。
+
+name: 部署臺中資料站到 GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 同時只跑一個部署，後來的取代排隊中的，但不中斷進行中的
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 顯示 Python 版本
+        run: python3 --version
+
+      - name: 解析 29 區基本盤
+        run: python3 scripts/prep_districts.py
+
+      - name: 建置版面
+        run: python3 scripts/build.py
+
+      - name: 確認產出存在且不是空的
+        run: |
+          test -s dist/index.html
+          echo "dist/index.html $(wc -c < dist/index.html) bytes"
+
+      - uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
