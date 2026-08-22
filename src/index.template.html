@@ -243,9 +243,25 @@ svg.zoomable .crash-pt { vector-effect: non-scaling-stroke; }
 .vil { stroke: var(--white); stroke-width: 0.35; cursor: default; }
 .vil:hover { stroke: var(--black); stroke-width: 1.4; }
 .vil.coarse { stroke: var(--black); stroke-width: 1.1; stroke-dasharray: 4 2.5; }
+/* 底圖切到里的時候，457個小多邊形會讓人認不出這是哪裡，所以區界照畫，
+   只是不填色。這一條線是讀者唯一的定位點。 */
+.dist-outline { fill: none; stroke: var(--black); stroke-width: 0.9; stroke-opacity: .45;
+                pointer-events: none; }
 .vil-hatch { fill: url(#hatch); pointer-events: none; }
-svg.zoomable .vil, svg.zoomable .vil-hatch { vector-effect: non-scaling-stroke; }
+svg.zoomable .vil, svg.zoomable .vil-hatch,
+svg.zoomable .dist-outline { vector-effect: non-scaling-stroke; }
 .mode-key .mk.sq { border-radius: 0; }
+/* 「在地圖上看這一層」。一張圖之後，每一節的論述都要有辦法把讀者送回那張圖，
+   而且要順便把圖層切到這一節在講的那一層，否則讀者得自己找。 */
+.jumps { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px;
+         padding-top: 18px; border-top: 1px solid var(--grey-3); }
+.jump { font-family: var(--font-zh); font-size: 11.5px; padding: 7px 13px;
+        border: 1px solid var(--grey-3); background: var(--white); color: var(--grey-1);
+        cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+.jump:hover { border-color: var(--black); color: var(--black); background: var(--grey-4); }
+.jump:focus-visible { outline: 2px solid var(--black); outline-offset: 2px; }
+.jump .ar { font-family: var(--font-en); font-size: 10px; color: var(--grey-2); }
+.jump:hover .ar { color: var(--black); }
 .rate-bar { display: grid; grid-template-columns: 4.6em 1fr 8.4em; gap: 8px; align-items: center;
             font-size: 11.5px; padding: 2px 0; }
 .rate-bar .nm { color: var(--black); }
@@ -339,45 +355,61 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
   </div>
 </div>
 
-<!-- ══ 02 大型信令地圖 ══ -->
-<div class="section">
-  <div class="section-label">02 — The City Breathing <span class="zh">一天之內，臺中怎麼呼吸</span></div>
+<!-- ══ 02 一張圖 ══ -->
+<div class="section" id="atlas">
+  <div class="section-label">02 — One Map <span class="zh">五組資料疊在同一張圖上</span></div>
   <div class="card">
-    <h4>Signal Population by District <span class="zh">· 電信信令停留人口，29個行政區</span></h4>
+    <h4>Taichung Atlas
+      <span class="zh">· 29個區、625個里、696條公車子路線、1,573件A1事故，同一套投影</span></h4>
 
     <div class="ctrl">
       <div class="ctrl-g">
-        <span class="ctrl-k">Layer 圖層</span>
-        <div class="cat-bar" id="sig-layers"></div>
+        <span class="ctrl-k">Base 底圖</span>
+        <div class="cat-bar" id="at-groups"></div>
       </div>
-      <div class="ctrl-g" id="sig-band-wrap">
+      <div class="ctrl-g" id="at-metric-wrap">
+        <span class="ctrl-k">Metric 指標</span>
+        <div class="cat-bar" id="at-metrics"></div>
+      </div>
+      <div class="ctrl-g" id="at-band-wrap">
         <span class="ctrl-k">Time 時段</span>
-        <div class="cat-bar" id="sig-bands"></div>
+        <div class="cat-bar" id="at-bands"></div>
       </div>
-      <div class="ctrl-g" id="sig-day-wrap">
+      <div class="ctrl-g" id="at-day-wrap">
         <span class="ctrl-k">Day 平假日</span>
-        <div class="cat-bar" id="sig-days"></div>
-      </div>
-      <div class="ctrl-g">
-        <span class="ctrl-k">Rail 軌道疊圖</span>
-        <div class="cat-bar" id="sig-rail"></div>
+        <div class="cat-bar" id="at-days"></div>
       </div>
     </div>
 
-    <svg class="map big" id="map-sig" role="img"
-         aria-label="臺中29個行政區的電信信令人口大型面量圖"></svg>
-    <div class="legend" id="legend-sig"></div>
-    <div class="legend-ticks" id="ticks-sig"></div>
-    <div class="rail-key" id="rail-key"></div>
-    <p class="caption" id="cap-sig"></p>
-    <p class="caption" id="cap-rail"></p>
+    <div class="ctrl">
+      <div class="ctrl-g">
+        <span class="ctrl-k">Overlay 疊圖 · 可複選</span>
+        <div class="cat-bar" id="at-overlays"></div>
+      </div>
+      <div class="ctrl-g" id="at-busband-wrap">
+        <span class="ctrl-k">Bus time 公車時段</span>
+        <div class="cat-bar" id="at-busbands"></div>
+      </div>
+      <div class="ctrl-g" id="at-mode-wrap">
+        <span class="ctrl-k">Victim 受害者運具</span>
+        <div class="cat-bar" id="at-modes"></div>
+      </div>
+    </div>
+
+    <svg class="map big" id="map-atlas" role="img"
+         aria-label="臺中綜合地圖：可切換底圖與疊圖"></svg>
+    <div class="legend" id="legend-atlas"></div>
+    <div class="legend-ticks" id="ticks-atlas"></div>
+    <div class="mode-key" id="key-atlas"></div>
+    <p class="caption" id="cap-atlas"></p>
+    <p class="caption" id="cap-atlas-ov"></p>
 
     <div class="sig-foot">
-      <div class="bars" id="bars-sig"></div>
+      <div class="bars" id="bars-atlas"></div>
       <div>
-        <div class="stat-row" id="sig-stats"></div>
-        <p class="body-zh" id="sig-body-1" style="margin-top:20px"></p>
-        <p class="body-zh" id="sig-body-2"></p>
+        <div class="stat-row" id="stats-atlas"></div>
+        <p class="body-zh" id="at-body-1" style="margin-top:20px"></p>
+        <p class="body-zh" id="at-body-2"></p>
       </div>
     </div>
   </div>
@@ -387,20 +419,18 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
 <div class="section">
   <div class="section-label">03 — Housing Base <span class="zh">住宅、家戶、空屋、人口、屋齡</span></div>
   <div class="card">
-    <h4>Five Census Fields <span class="zh">· 切換著色依據</span></h4>
-    <div class="cat-bar" id="pills"></div>
-    <div class="map-grid">
+    <h4>Five Census Fields <span class="zh">· 民國109年普查，29個行政區</span></h4>
+    <div class="two-col">
       <div>
-        <svg class="map" id="map-base" viewBox="0 0 560 700" role="img"
-             aria-label="臺中29個行政區的住宅基本盤面量圖"></svg>
-        <div class="legend" id="legend-base"></div>
-        <div class="legend-ticks" id="ticks-base"></div>
+        <div class="stat-row" id="hb-stats"></div>
+        <p class="body-zh" id="hb-1" style="margin-top:20px"></p>
       </div>
       <div>
-        <div class="bars" id="bars-base"></div>
+        <p class="body-zh" id="hb-2"></p>
+        <p class="body-zh" id="hb-3"></p>
       </div>
     </div>
-    <p class="caption" id="cap-base"></p>
+    <div class="jumps" id="hb-jumps"></div>
   </div>
 </div>
 
@@ -409,34 +439,17 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
   <div class="section-label">04 — Village Grain <span class="zh">把尺度縮到里，臺中的人住得多密</span></div>
   <div class="card">
     <h4>Population by Village <span class="zh">· 625個里，其中457個畫得到界線</span></h4>
-
-    <div class="ctrl">
-      <div class="ctrl-g">
-        <span class="ctrl-k">Metric 指標</span>
-        <div class="cat-bar" id="vil-metrics"></div>
-      </div>
-      <div class="ctrl-g">
-        <span class="ctrl-k">Rail 軌道疊圖</span>
-        <div class="cat-bar" id="vil-rail"></div>
-      </div>
-    </div>
-
-    <svg class="map big" id="map-vil" role="img"
-         aria-label="臺中里級人口面量圖"></svg>
-    <div class="legend" id="legend-vil"></div>
-    <div class="legend-ticks" id="ticks-vil"></div>
-    <div class="mode-key" id="vil-key"></div>
-    <p class="caption" id="cap-vil"></p>
-
-    <div class="sig-foot">
-      <div class="bars vil-bars" id="bars-vil"></div>
+    <div class="two-col">
       <div>
         <div class="stat-row" id="vil-stats"></div>
         <p class="body-zh" id="vil-body-1" style="margin-top:20px"></p>
+      </div>
+      <div>
         <p class="body-zh" id="vil-body-2"></p>
         <p class="body-zh" id="vil-body-3"></p>
       </div>
     </div>
+    <div class="jumps" id="vil-jumps"></div>
   </div>
 </div>
 
@@ -463,48 +476,18 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
 <div class="section">
   <div class="section-label">06 — Bus Frequency <span class="zh">哪幾條走廊常有車，哪一區的人搭得到</span></div>
   <div class="card">
-    <h4>Routes by Service Frequency <span class="zh">· 線寬與濃度都是班次，696條子路線</span></h4>
-
-    <div class="ctrl">
-      <div class="ctrl-g">
-        <span class="ctrl-k">Time 時段</span>
-        <div class="cat-bar" id="bus-bands"></div>
-      </div>
-      <div class="ctrl-g">
-        <span class="ctrl-k">Day 平假日</span>
-        <div class="cat-bar" id="bus-days"></div>
-      </div>
-      <div class="ctrl-g">
-        <span class="ctrl-k">Per 面量圖分母</span>
-        <div class="cat-bar" id="bus-per"></div>
-      </div>
-      <div class="ctrl-g">
-        <span class="ctrl-k">Rail 軌道疊圖</span>
-        <div class="cat-bar" id="bus-rail"></div>
-      </div>
-    </div>
-
-    <svg class="map big" id="map-bus" role="img"
-         aria-label="臺中公車路線圖，線寬依班次密度"></svg>
-    <p class="caption" id="cap-bus"></p>
-
-    <div class="sig-foot">
-      <div>
-        <h4 style="margin-bottom:10px" id="h-buscall">Bus Calls
-          <span class="zh">· 每日停靠班次</span></h4>
-        <svg class="map" id="map-buscall" role="img"
-             aria-label="每千位常住人口的每日公車停靠班次面量圖"></svg>
-        <div class="legend" id="legend-buscall"></div>
-        <div class="legend-ticks" id="ticks-buscall"></div>
-        <p class="caption" id="cap-buscall"></p>
-      </div>
+    <h4>Routes by Service Frequency <span class="zh">· 696條子路線，線寬與濃度都是班次</span></h4>
+    <div class="two-col">
       <div>
         <div class="stat-row" id="bus-stats"></div>
         <p class="body-zh" id="bus-body-1" style="margin-top:20px"></p>
+      </div>
+      <div>
         <p class="body-zh" id="bus-body-2"></p>
         <p class="body-zh" id="bus-body-3"></p>
       </div>
     </div>
+    <div class="jumps" id="bus-jumps"></div>
   </div>
 </div>
 
@@ -512,27 +495,8 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
 <div class="section">
   <div class="section-label">07 — Vision Zero <span class="zh">十年，臺中的道路上死了多少人</span></div>
   <div class="card">
-    <h4>A1 Fatal Crashes <span class="zh">· 逐件落點，依受害者運具著色</span></h4>
-
-    <div class="ctrl">
-      <div class="ctrl-g">
-        <span class="ctrl-k">Victim 受害者運具</span>
-        <div class="cat-bar" id="crash-modes"></div>
-      </div>
-      <div class="ctrl-g">
-        <span class="ctrl-k">Base 底圖</span>
-        <div class="cat-bar" id="crash-base"></div>
-      </div>
-    </div>
-
-    <svg class="map big" id="map-crash" role="img"
-         aria-label="臺中A1死亡事故逐件落點圖"></svg>
-    <div class="legend" id="legend-crash"></div>
-    <div class="legend-ticks" id="ticks-crash"></div>
-    <div class="mode-key" id="crash-key"></div>
-    <p class="caption" id="cap-crash"></p>
-
-    <div class="sig-foot">
+    <h4>A1 Fatal Crashes <span class="zh">· 民國105至114年，1,573件、1,607人</span></h4>
+    <div class="sig-foot" style="margin-top:0;padding-top:0;border-top:0">
       <div>
         <h4 style="margin-bottom:10px">Deaths per 100,000 Residents
           <span class="zh">· 每十萬人死亡，附95%區間</span></h4>
@@ -547,6 +511,7 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
         <p class="body-zh" id="crash-body-4"></p>
       </div>
     </div>
+    <div class="jumps" id="crash-jumps"></div>
   </div>
 </div>
 
@@ -653,49 +618,27 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
   const seqColor = (v, lo, hi) =>
     mix('#F2F2F2', '#A8B200', hi === lo ? 0 : (v - lo) / (hi - lo));
 
-  /* ── 面量圖 ── */
-  function drawMap(svgId, legId, tickId, get, fmt, mode, opt = {}) {
-    const P = opt.proj || SMALL;
-    const svg = document.getElementById(svgId);
-    svg.setAttribute('viewBox', `0 0 ${P.W} ${P.H}`);
-    /* 縮放啟用之後，內容住在 <g data-zoom> 裡。重畫時清空那個群組而不是整張 svg，
-       切換圖層或時段時目前的倍率與位置才不會跳回原點。 */
-    const box = svg.querySelector('g[data-zoom]') || svg;
-    box.textContent = '';
-    const vals = R.map(get);
-    const lo = opt.lo != null ? opt.lo : Math.min(...vals);
-    const hi = opt.hi != null ? opt.hi : Math.max(...vals);
-    const mid = opt.mid != null ? opt.mid : 1;
-    const color = v => mode === 'div' ? divColor(v, lo, hi, mid) : seqColor(v, lo, hi);
-    R.forEach(d => {
-      const p = el('path', { class: 'dist', d: P.path(d.rings), fill: color(get(d)) });
-      p.appendChild(el('title', {}, `${d.name}　${fmt(get(d))}`));
-      box.appendChild(p);
+  /* ── 分類鈕。單選，狀態由呼叫端持有。
+     這一頁會在切換底圖大類或按下跳轉鈕時整組重建按鈕，
+     所以監聽只掛一次，處理函式存在元素上每次覆寫：
+     每重建一次就多掛一個監聽的話，按一下會重畫好幾次。 ── */
+  const mkPills = (id, items, sel, on) => {
+    const box = document.getElementById(id);
+    box.innerHTML = items.map((it, i) =>
+      `<button type="button" class="cat-pill" data-i="${i}" ` +
+      `aria-pressed="${i === sel()}">${it.zh}</button>`).join('');
+    box._pick = i => {
+      on(i);
+      box.querySelectorAll('.cat-pill').forEach(x =>
+        x.setAttribute('aria-pressed', String(+x.dataset.i === sel())));
+    };
+    if (box._bound) return;
+    box._bound = true;
+    box.addEventListener('click', e => {
+      const b = e.target.closest('.cat-pill');
+      if (b) box._pick(+b.dataset.i);
     });
-    R.forEach(d => {
-      // 太小的區在全圖尺度塞不下標籤，標成 tiny 先藏起來留給 tooltip；
-      // 放大過門檻之後 CSS 會把它顯示出來（見 .zdeep .tiny）
-      const t = d.area < (opt.minArea || 6) ? ' tiny' : '';
-      const [cx, cy] = P.centroid(d);
-      box.appendChild(el('text', { class: 'dist-lbl' + t, x: cx, y: cy - (opt.sub ? 3 : 0),
-        'text-anchor': 'middle' }, d.name.replace(/區$/, '')));
-      if (opt.sub)
-        box.appendChild(el('text', { class: 'dist-val' + t, x: cx, y: cy + 7,
-          'text-anchor': 'middle' }, opt.sub(d)));
-    });
-    if (opt.rail) drawRail(box, P);
-    const leg = document.getElementById(legId);
-    leg.innerHTML = '';
-    for (let i = 0; i < 40; i++) {
-      const v = lo + (hi - lo) * i / 39;
-      const b = document.createElement('i');
-      b.style.background = color(v);
-      leg.appendChild(b);
-    }
-    document.getElementById(tickId).innerHTML =
-      `<span>${fmt(lo)}</span>${mode === 'div' ? `<span>${fmt(mid)}</span>` : ''}<span>${fmt(hi)}</span>`;
-    return { lo, hi, color };
-  }
+  };
 
   /* ── 軌道疊圖 ──────────────────────────────────────────────────────
      線色用營運商色（臺鐵 #c8102e、高鐵 #f37021、臺中捷運綠線 #1E9E5A）。
@@ -750,42 +693,6 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
     box.appendChild(g);
   }
 
-  /* ── 排序長條 ── */
-  function drawBars(id, get, fmt, mode, base) {
-    const box = document.getElementById(id);
-    box.innerHTML = '';
-    const sorted = [...R].sort((a, b) => get(b) - get(a));
-    const vals = sorted.map(get);
-    const lo = Math.min(...vals), hi = Math.max(...vals);
-    sorted.forEach((d, i) => {
-      const v = get(d);
-      const row = document.createElement('div');
-      row.className = 'bar-row' + (i === 0 || i === sorted.length - 1 ? ' on' : '');
-      const track = document.createElement('div');
-      track.className = 'track';
-      const bar = document.createElement('i');
-      if (mode === 'div') {
-        const z = (base - lo) / (hi - lo) * 100;
-        const w = Math.abs(v - base) / (hi - lo) * 100;
-        bar.style.left = (v >= base ? z : z - w) + '%';
-        bar.style.width = w + '%';
-        bar.style.background = v >= base ? 'var(--lime-dk)' : 'var(--black)';
-        const zl = document.createElement('span');
-        zl.className = 'zero'; zl.style.left = z + '%';
-        track.appendChild(zl);
-      } else {
-        bar.style.left = '0';
-        bar.style.width = ((v - lo) / (hi - lo || 1) * 96 + 4) + '%';
-        bar.style.background = 'var(--lime-dk)';
-      }
-      track.appendChild(bar);
-      const nm = document.createElement('span'); nm.className = 'nm'; nm.textContent = d.name;
-      const vv = document.createElement('span'); vv.className = 'vv'; vv.textContent = fmt(v);
-      row.append(nm, track, vv);
-      box.appendChild(row);
-    });
-  }
-
   /* ── 01 hero ── */
   const T = D.totals, SP = D.spread;
   const top = [...R].sort((a, b) => b.ratio - a.ratio)[0];
@@ -795,344 +702,620 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
     `DAY ${int(T.dayWork)} · NIGHT ${int(T.nightWork)}<br>SIGNAL DATA ${D.periods.signal}`;
   document.getElementById('stamp').innerHTML =
     `Census ${D.periods.census}<br>Signal ${D.periods.signal}`;
-  /* ── 02 大型信令地圖 ────────────────────────────────────────────────
-     六個圖層。前兩個吃「時段」與「平假日」，其餘四個是單一數值，
-     選到它們的時候把那兩排控制項收起來，免得使用者以為切了有作用。 */
-  const BANDS = D.bands;                       // 上午／下午／日間／夜間
-  const DAYS = [{ k: 'work', zh: '平日' }, { k: 'weekend', zh: '假日' }];
-  const LAYERS = [
-    { k: 'fill', zh: '相對夜間', mode: 'div', mid: 1, band: true,
-      get: (d, b, w) => +(d[w][b] / d[w].night).toFixed(3),
-      fmt: v => v.toFixed(3), sub: (d, b, w) => (d[w][b] / d[w].night).toFixed(2),
-      note: '該區該時段的停留人口，除以該區自己的夜間人口。石灰黃綠是白天灌進來的區，'
-          + '近黑是人走光的區，1.0是白色。這一層看的是每一個區自己的漲落，不是區與區比大小。' },
-    { k: 'pop', zh: '停留人口', mode: 'seq', band: true,
-      get: (d, b, w) => d[w][b], fmt: man, sub: (d, b, w) => (d[w][b] / 1000).toFixed(0) + 'k',
-      note: '該時段實際停留在該區的人數。這一層是絕對值，大區必然深，'
-          + '所以它回答的是「人在哪裡」，不是「哪一區變化大」。' },
-    { k: 'trips', zh: '每人趟次', mode: 'seq',
-      get: d => d.tripsPer, fmt: v => v.toFixed(2) + '趟', sub: d => d.tripsPer.toFixed(1),
-      note: '該區平日的移動趟次除以夜間人口。趟次是全區總量，不除以人口就只是在畫人口多寡。' },
-    { k: 'density', zh: '夜間密度', mode: 'seq',
-      get: d => d.nightDensity, fmt: v => int(v) + '人/km²', sub: d => int(Math.round(d.nightDensity / 100) / 10) + 'k',
-      note: '每平方公里的夜間人口。和平區1,037.8平方公里、密度12人，中區0.9平方公里、密度22,897人，'
-          + '兩者相差近兩千倍：臺中的「一個區」不是同一種東西。' },
-    { k: 'signalRatio', zh: '信令÷常住', mode: 'div', mid: 1,
-      get: d => d.signalRatio, fmt: v => v.toFixed(3), sub: d => d.signalRatio.toFixed(2),
-      note: '信令夜間人口除以普查常住人口。兩份資料差三年、量法也不同（一個是設籍與居住事實，'
-          + '一個是手機停留），這個比值同時混著人口變化與量法差異，不宜單獨解讀。' },
-    { k: 'netAbs', zh: '日間淨流', mode: 'div', mid: 0,
-      get: d => d.net, fmt: v => (v > 0 ? '+' : '') + int(v) + '人',
-      sub: d => (d.net > 0 ? '+' : '−') + Math.abs(Math.round(d.net / 1000)) + 'k',
-      note: '日間人口減夜間人口。這一層是人數不是比率，因此看得出「哪一區搬動的人最多」，'
-          + '而不只是「哪一區比例變化最大」。' },
+  /* ══ 02 一張圖 ═══════════════════════════════════════════════════════
+     原本這一頁有五張地圖：信令、住宅、里級人口、公車、事故。
+     五張用的是同一套投影、同一份區界，讀者卻得來回捲動並自己記住哪一區在哪裡。
+     **同一個空間單元的五件事，本來就該疊在同一張圖上比。**
+     因此改成一張圖加圖層控制：底圖是面量的那一層（一次一個，因為顏色只有一個通道），
+     疊圖是線與點的那幾層（可以複選，因為它們不搶顏色）。
+
+     底圖的空間單元有兩種：29個區與625個里。切到里的時候，區界仍然畫在上面，
+     否則457個小多邊形會讓人認不出這是哪裡。 */
+  const busByName = Object.fromEntries(BUS.districts.map(d => [d.name, d]));
+  const crByName = Object.fromEntries(CR.districts.map(d => [d.name, d]));
+  const DAY2 = [{ k: 'work', zh: '平日' }, { k: 'weekend', zh: '假日' }];
+
+  /* 對數色階。lo 可能是 0（無人的里），所以下限夾在 1。 */
+  const logColor = (v, lo, hi) =>
+    seqColor(Math.log(Math.max(1, v)), Math.log(Math.max(1, lo)), Math.log(Math.max(1, hi)));
+
+  const GROUPS = [
+    {
+      zh: '信令', unit: 'd', bands: D.bands, days: DAY2,
+      period: () => D.periods.signal,
+      metrics: [
+        { zh: '相對夜間', mode: 'div', mid: 1,
+          get: (d, b, w) => d[w][b] / d[w].night, fmt: v => v.toFixed(3),
+          sub: (d, b, w) => (d[w][b] / d[w].night).toFixed(2),
+          note: '該區該時段的停留人口，除以該區自己的夜間人口。石灰黃綠是白天灌進來的區，近黑是人走光的區，1.0是白色。這一層看的是每一個區自己的漲落，不是區與區比大小。' },
+        { zh: '停留人口', mode: 'seq',
+          get: (d, b, w) => d[w][b], fmt: v => man(v) + '人',
+          sub: (d, b, w) => man(d[w][b]),
+          note: '該時段實際待在這一區的人數。與戶籍人口、普查常住人口都是不同的量法。' },
+        { zh: '每人趟次', mode: 'seq',
+          get: d => d.tripsPer, fmt: v => v.toFixed(2) + '趟',
+          sub: d => d.tripsPer.toFixed(1),
+          note: '該區平日的移動趟次除以夜間人口。趟次是全區總量，不除以人口就只是在畫人口多寡。' },
+        { zh: '夜間密度', mode: 'seq',
+          get: d => d.nightDensity, fmt: v => int(v) + '人/km²',
+          sub: d => int(d.nightDensity),
+          note: '夜間停留人口除以面積。這是「人住得多密」，與白天的聚集是兩件事。' },
+        { zh: '信令÷常住', mode: 'div', mid: 1,
+          get: d => d.signalRatio, fmt: v => v.toFixed(3),
+          sub: d => d.signalRatio.toFixed(2),
+          note: '信令的夜間人口除以普查的常住人口。兩套量法的差距本身就是一個資訊：差得多的區，代表有大量非設籍的居住。' },
+        { zh: '日間淨流', mode: 'div', mid: 0,
+          get: d => d.net, fmt: v => (v >= 0 ? '＋' : '－') + int(Math.abs(v)) + '人',
+          sub: d => (d.net >= 0 ? '+' : '') + Math.round(d.net / 1000) + 'k',
+          note: '日間停留人口減夜間停留人口。正的是白天多出來的人，負的是白天走掉的人。' },
+      ],
+    },
+    {
+      zh: '住宅', unit: 'd', period: () => D.periods.census,
+      metrics: [
+        { zh: '住宅', mode: 'seq', get: d => d.houses, fmt: v => man(v) + '宅',
+          note: '普查認定的住宅總數。西屯區與北屯區各超過十一萬宅，中區不到一萬。' },
+        { zh: '家戶', mode: 'seq', get: d => d.households, fmt: v => man(v) + '戶',
+          note: '普查認定的家戶總數。有五個區的家戶數多於住宅數，中區是其中之一。' },
+        { zh: '空屋率', mode: 'seq', get: d => d.vacancy, fmt: v => v.toFixed(2) + '%',
+          note: '普查的空閒住宅比率。這是民國109年的定義，與內政部按用電判定的低度使用不是同一回事。' },
+        { zh: '常住人口', mode: 'seq', get: d => d.residents, fmt: v => man(v) + '人',
+          note: '普查的常住人口，與信令的夜間人口是兩套量法，數字不會一樣。' },
+        { zh: '屋齡40年以上', mode: 'seq', get: d => d.old40, fmt: v => v.toFixed(1) + '%',
+          note: '屋齡四十年以上的住宅占比。舊市區更新壓力最直接的指標。' },
+      ],
+    },
+    {
+      zh: '里級人口', unit: 'v', period: () => VL.period,
+      metrics: [
+        { zh: '人口密度', mode: 'seq', log: true, get: u => u.density, fmt: v => int(v) + '人/km²',
+          note: '每平方公里的登記人口，色階取對數。里的面積從0.04到336平方公里，密度差一萬四千倍，線性色階看不出東西。' },
+        { zh: '人口', mode: 'seq', log: true, get: u => u.pop, fmt: v => int(v) + '人',
+          note: '戶政司登記的人口，含共同生活戶、共同事業戶與單獨生活戶。與普查的常住人口是兩套量法。' },
+        { zh: '戶數', mode: 'seq', log: true, get: u => u.households, fmt: v => int(v) + '戶',
+          note: '三類戶的合計。單獨生活戶多的里，平均戶量會被拉低。' },
+        { zh: '平均戶量', mode: 'seq', get: u => u.perHousehold, fmt: v => v.toFixed(2) + '人/戶',
+          note: '人口除以戶數，色階為線性：範圍只有兩三倍，取對數會把差異壓平。舊市區與新開發區的差別在這個指標上最明顯。' },
+      ],
+    },
+    {
+      zh: '公車', unit: 'd', bands: BUS.bands, days: DAY2, period: () => BUS.period,
+      metrics: [
+        { zh: '每千人停靠班次', mode: 'seq',
+          get: (d, b, w) => busByName[d.name].callsPerK[w][b], fmt: v => v.toFixed(0) + '次',
+          note: '每千位常住人口的每日公車停靠班次。這一層問的是「這一區的人搭不搭得到車」。和平區七千多人卻有開到谷關的長程路線，排名第一，那不是它公車多，是它人少。' },
+        { zh: '每平方公里停靠班次', mode: 'seq', log: true,
+          get: (d, b, w) => busByName[d.name].callsPerKm2[w][b], fmt: v => int(v) + '次',
+          note: '每平方公里的每日公車停靠班次，色階取對數。這一層問的是「路網有多密」。換一個分母，上面那一層的顏色會整個翻過來。' },
+      ],
+    },
+    {
+      zh: '交通事故', unit: 'd', period: () => CR.period,
+      metrics: [
+        { zh: '每十萬人死亡', mode: 'seq', get: d => crByName[d.name].per100k,
+          fmt: v => v.toFixed(0) + '人',
+          note: '民國105至114年的A1死亡數除以普查常住人口。石岡區十年只有7人，那個率的95%區間寬到不該拿去排名，第07節有附區間的版本。' },
+        { zh: '機車受害占比', mode: 'seq', get: d => crByName[d.name].motoShare,
+          fmt: v => v.toFixed(0) + '%',
+          note: '受害者是機車騎士的件數占該區的比率。全市是64.0%。' },
+        { zh: '行人受害占比', mode: 'seq', get: d => crByName[d.name].pedShare,
+          fmt: v => v.toFixed(0) + '%',
+          note: '受害者是行人的件數占該區的比率。全市是17.9%，唯中區是68%，是唯一一個行人多過機車的區。' },
+      ],
+    },
+    { zh: '不著色', unit: null, metrics: [] },
   ];
-  let li = 0, bi = 0, di = 0;
 
-  const mkPills = (id, items, sel, on) => {
-    const box = document.getElementById(id);
-    box.innerHTML = items.map((it, i) =>
-      `<button type="button" class="cat-pill" data-i="${i}" aria-pressed="${i === sel()}">${it.zh}</button>`).join('');
-    box.addEventListener('click', e => {
-      const b = e.target.closest('.cat-pill');
-      if (!b) return;
-      on(+b.dataset.i);
-      document.querySelectorAll('#' + id + ' .cat-pill').forEach(x =>
-        x.setAttribute('aria-pressed', String(+x.dataset.i === sel())));
-    });
-  };
-  mkPills('sig-layers', LAYERS, () => li, i => { li = i; paintSig(); });
-  mkPills('sig-bands', BANDS, () => bi, i => { bi = i; paintSig(); });
-  mkPills('sig-days', DAYS, () => di, i => { di = i; paintSig(); });
-  const RAILSW = [{ zh: '顯示' }, { zh: '隱藏' }];
-  let ri = 0;
-  mkPills('sig-rail', RAILSW, () => ri, i => { ri = i; paintSig(); });
-
-  function paintSig() {
-    const L = LAYERS[li], b = BANDS[bi].k, w = DAYS[di].k;
-    document.getElementById('sig-band-wrap').hidden = !L.band;
-    document.getElementById('sig-day-wrap').hidden = !L.band;
-    const get = d => L.band ? L.get(d, b, w) : L.get(d);
-    const sub = d => L.band ? L.sub(d, b, w) : L.sub(d);
-    drawMap('map-sig', 'legend-sig', 'ticks-sig', get, L.fmt, L.mode,
-            { proj: BIG, mid: L.mid, sub, minArea: 3, rail: ri === 0 });
-
-    const key = document.getElementById('rail-key');
-    key.hidden = ri !== 0;
-    // 站等的圖例照大小排，讀者看一眼就知道圓越大等級越高，不必回頭對照
-    const clsKeys = Object.keys(RL.byClass).sort();
-    key.innerHTML = ri !== 0 ? '' :
-      RL.lines.map(L2 =>
-        `<span class="it"><span class="ln" style="background:${RAIL_COLOR[L2.kind]}` +
-        `${L2.line === '成追線' ? ';opacity:.55' : ''}"></span>${L2.sysLabel}　${L2.line}` +
-        `${L2.line === '成追線' ? '（虛線）' : ''}</span>`).join('') +
-      clsKeys.map(c =>
-        `<span class="it"><span class="mk" style="background:#c8102e;` +
-        `width:${CLS_R[c] * 2}px;height:${CLS_R[c] * 2}px"></span>` +
-        `${RL.classLabels[c]}${RL.byClass[c]}</span>`).join('') +
-      [['thsr', '高鐵臺中站'], ['metro', '捷運車站']].map(([k, zh]) =>
-        `<span class="it"><span class="mk" style="background:${SYS_MARK[k].fill};` +
-        `width:${SYS_MARK[k].r * 2}px;height:${SYS_MARK[k].r * 2}px;` +
-        `${SYS_MARK[k].stroke ? `border-color:${SYS_MARK[k].stroke}` : ''}"></span>${zh}</span>`
-      ).join('');
-
-    const xfer = RL.stops.filter(t => t.sys === 'metro' && t.xfer.length)
-      .map(t => t.name).join('、');
-    document.getElementById('cap-rail').innerHTML = ri !== 0 ? '' :
-      `軌道：${RL.lines.map(L2 => L2.sysLabel + L2.line).join('、')}，` +
-      `裁切至臺中市行政區界內。<b>臺鐵在臺中的${RL.bySystem['臺鐵']}個車站裡，` +
-      `特等站只有臺中站一個，一等站只有豐原站一個。</b>` +
-      `其餘是二等${RL.byClass['2']}、三等${RL.byClass['3']}、簡易${RL.byClass['4']}，` +
-      `圓的大小就是官方站等（TDX 的 StationClass）。` +
-      `捷運烏日文心北屯線${RL.bySystem['捷運']}站，` +
-      `其中${xfer}${xfer.split('、').length}站與臺鐵或高鐵轉乘。${RL.caveat}` +
-      `放大之後會顯示三等站、簡易站與捷運車站的站名。`;
-    drawBars('bars-sig', get, L.fmt, L.mode, L.mid != null ? L.mid : 0);
-
-    const hi = [...R].sort((a, c) => get(c) - get(a))[0];
-    const lo = [...R].sort((a, c) => get(a) - get(c))[0];
-    const when = L.band ? `${DAYS[di].zh}${BANDS[bi].zh}（${BANDS[bi].when}）` : '平日';
-    document.getElementById('cap-sig').textContent =
-      `${L.zh}，${when}，資料期${D.periods.signal}。最高${hi.name}${L.fmt(get(hi))}、` +
-      `最低${lo.name}${L.fmt(get(lo))}。${L.note}`;
-
-    const cb = D.crossBoundary;
-    document.getElementById('sig-stats').innerHTML = [
-      ['Highest 最高', L.fmt(get(hi)), hi.name],
-      ['Lowest 最低', L.fmt(get(lo)), lo.name],
-      ['City-wide 全市', L.band ? man(R.reduce((a, d) => a + d[w][b], 0)) + '人' : '－',
-       L.band ? `${when}停留人口` : '此圖層無全市值'],
-    ].map(([k, v, n]) =>
-      `<div class="stat"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`
-    ).join('');
-
-    document.getElementById('sig-body-1').innerHTML =
-      `信令把一天切成四段：上午${BANDS[0].when}、下午${BANDS[1].when}，` +
-      `再加上日間與夜間兩個彙總。切換上面的時段，看的是同一批人在29個區之間怎麼重新分布。` +
-      `<b>臺中不是一個封閉的系統。</b>29個區的停留人口加總，` +
-      `日間比夜間少${int(Math.abs(cb.day))}人、上午少${int(Math.abs(cb.morning))}人：` +
-      `那些人白天到市外去了。全國層級的四個時段總量幾乎一模一樣（國境是封閉的），` +
-      `市層級不是，這個差額就是跨市界的淨流。`;
-    document.getElementById('sig-body-2').innerHTML =
-      `唯要說清楚這份資料答不了什麼。<b>信令給的是每一區在每個時段的停留總數，不是起訖對。</b>` +
-      `它算得出北屯區白天少了${int(Math.abs(R.find(d => d.name === '北屯區').net))}人，` +
-      `答不了那些人去了西屯還是去了南屯，也答不了他們用什麼工具移動。` +
-      `要回答前者得接公車票證或運研所的通勤起訖調查，後者要接運具別的調查。`;
-  }
-  paintSig();
-  // 先畫再啟用：mapzoom 需要 viewBox 才有座標系可算，而 viewBox 是 drawMap 設的。
-  // 只掛在這一張大圖上，03 節那幾張小圖各自只有一個圖層，放大沒有東西可看。
-  //
-  // anchor 用夜間人口加權的重心，不用幾何中心：臺中的幾何中心在和平區，
-  // 那一區佔全市六成面積、住不到一萬人，對著它放大等於放大一片空白。
-  // 加權之後重心落在西屯與北屯之間，也就是這張圖真正有變化的地方。
-  const wsum = R.reduce((a, d) => a + d.work.night, 0);
-  const ANCHOR = [
-    R.reduce((a, d) => a + BIG.centroid(d)[0] * d.work.night, 0) / wsum,
-    R.reduce((a, d) => a + BIG.centroid(d)[1] * d.work.night, 0) / wsum,
+  const OVL = [
+    { k: 'rail', zh: '軌道路網' },
+    { k: 'bus', zh: '公車路線' },
+    { k: 'crash', zh: 'A1事故點' },
   ];
-  enableMapZoom(document.getElementById('map-sig'), { max: 8, anchor: ANCHOR });
+  const MODE_COLOR = { '人': '#C8D400', '機車': '#1A1A1A', '汽車': '#888888',
+                       '慢車': '#4A4A4A', '其他': '#D0D0D0' };
+  const CMODES = [{ zh: '全部', k: null }, ...CR.modes.map(m => ({ zh: m, k: m }))];
 
-  /* ── 03 住宅基本盤 ── */
-  const METRICS = [
-    { k: 'houses', zh: '住宅', fmt: v => man(v) + '宅', mode: 'seq',
-      note: '普查認定的住宅總數。西屯區與北屯區各超過十一萬宅，中區不到一萬。' },
-    { k: 'households', zh: '家戶', fmt: v => man(v) + '戶', mode: 'seq',
-      note: '普查認定的家戶總數。有五個區的家戶數多於住宅數，中區是其中之一。' },
-    { k: 'vacancy', zh: '空屋率', fmt: v => v.toFixed(2) + '%', mode: 'seq',
-      note: '普查的空閒住宅比率。這是109年的定義，與內政部按用電判定的低度使用不是同一回事。' },
-    { k: 'residents', zh: '常住人口', fmt: v => man(v) + '人', mode: 'seq',
-      note: '普查的常住人口，與信令的夜間人口是兩套量法，數字不會一樣。' },
-    { k: 'old40', zh: '屋齡40年以上', fmt: v => v.toFixed(1) + '%', mode: 'seq',
-      note: '屋齡四十年以上的住宅占比。舊市區的更新壓力最直接的指標。' },
-  ];
-  let cur = 2;
-  const pills = document.getElementById('pills');
-  pills.innerHTML = METRICS.map((m, i) =>
-    `<button type="button" class="cat-pill" data-i="${i}" aria-pressed="${i === cur}">${m.zh}</button>`).join('');
-  function paintBase() {
-    const m = METRICS[cur];
-    drawMap('map-base', 'legend-base', 'ticks-base', d => d[m.k], m.fmt, m.mode);
-    drawBars('bars-base', d => d[m.k], m.fmt, m.mode, 0);
-    const hi = [...R].sort((a, b) => b[m.k] - a[m.k])[0];
-    const lo = [...R].sort((a, b) => a[m.k] - b[m.k])[0];
-    document.getElementById('cap-base').textContent =
-      `${m.zh}，資料期${D.periods.census}。最高${hi.name}${m.fmt(hi[m.k])}、` +
-      `最低${lo.name}${m.fmt(lo[m.k])}。全市住宅${int(T.houses)}宅、家戶${int(T.households)}戶、` +
-      `常住人口${int(T.residents)}人、空屋率${T.vacancy}%。${m.note}`;
-    pills.querySelectorAll('.cat-pill').forEach(b =>
-      b.setAttribute('aria-pressed', String(+b.dataset.i === cur)));
-  }
-  pills.addEventListener('click', e => {
-    const b = e.target.closest('.cat-pill');
-    if (b) { cur = +b.dataset.i; paintBase(); }
-  });
-  paintBase();
+  let gi = 0, mi = 0, bi = 0, di = 0, obi = 0, odi = 0, cmi = 0;
+  const on = { rail: true, bus: false, crash: false };
 
-  /* ── 04 里級人口 ────────────────────────────────────────────────────
-     這一節的單元有兩種：畫得到界線的里，與退回區級的區。
-     兩者用同一個色階，唯區級的那七格加上斜線網底與虛線外框：
-     **一個區的平均與一個里的值不是同一種東西**，混在一起看會把 太平區 讀成
-     一個均質的地方，而它其實是全市里數最多的區之一。 */
+  const atSvg = document.getElementById('map-atlas');
+  // 斜線網底給退回區級的那七格用。defs 不能被重畫清掉，所以掛在 svg 上而不是縮放群組裡
   {
-    const U = VL.units, C = VL.counts;
-    const coarse = new Set(U.filter(u => u.villages).map(u => u.name));
-    /* 密度用對數色階，不用線性。
-       最密的東區富台里是最稀的和平區平等里的一萬四千倍，線性色階之下
-       除了舊市區那幾格以外全部是白的，等於一張只畫得出「市中心很擠」的圖，
-       而那件事不用畫也知道。取對數之後，山區、海線、市郊之間的差別才出得來。
-       戶量的範圍只有兩三倍，取對數反而讓差異消失，所以維持線性。 */
-    const VM = [
-      { zh: '人口密度', k: 'density', log: true, fmt: v => int(v) + '人/km²',
-        note: '每平方公里的登記人口，色階取對數。里的面積從0.04到336平方公里，密度差一萬四千倍，線性色階看不出東西。' },
-      { zh: '人口', k: 'pop', log: true, fmt: v => int(v) + '人',
-        note: '戶政司登記的人口，含共同生活戶、共同事業戶與單獨生活戶。與普查的常住人口是兩套量法，數字不會一樣。' },
-      { zh: '戶數', k: 'households', log: true, fmt: v => int(v) + '戶',
-        note: '三類戶的合計。單獨生活戶多的里，平均戶量會被拉低。' },
-      { zh: '平均戶量', k: 'perHousehold', log: false, fmt: v => v.toFixed(2) + '人/戶',
-        note: '人口除以戶數，色階為線性：範圍只有兩三倍，取對數會把差異壓平。舊市區與新開發區的差別在這個指標上最明顯。' },
-    ];
-    /* 對數色階。lo 可能是 0（無人的里），所以下限夾在 1。 */
-    const vcol = (v, lo, hi, log) => log
-      ? seqColor(Math.log(Math.max(1, v)), Math.log(Math.max(1, lo)), Math.log(Math.max(1, hi)))
-      : seqColor(v, lo, hi);
-    let vm = 0, vr = 1;
-
-    // 斜線網底：SVG 的 pattern 要放在 defs 裡，而 defs 不能被重畫清掉，
-    // 所以掛在 svg 上而不是縮放群組裡
-    const svg = document.getElementById('map-vil');
     const defs = el('defs');
     const pat = el('pattern', { id: 'hatch', width: 5, height: 5,
       patternUnits: 'userSpaceOnUse', patternTransform: 'rotate(45)' });
     pat.appendChild(el('line', { x1: 0, y1: 0, x2: 0, y2: 5,
       stroke: '#1A1A1A', 'stroke-width': 1.1, 'stroke-opacity': 0.28 }));
     defs.appendChild(pat);
-    svg.appendChild(defs);
+    atSvg.appendChild(defs);
+  }
+  const coarseNames = new Set(VL.units.filter(u => u.villages).map(u => u.name));
 
-    function paintVil() {
-      const m = VM[vm];
-      const vals = U.map(u => u[m.k]).filter(v => v != null);
-      const lo = Math.min(...vals), hi = Math.max(...vals);
-      svg.setAttribute('viewBox', `0 0 ${BIG.W} ${BIG.H}`);
-      const box = svg.querySelector('g[data-zoom]') || svg;
-      // defs 要留著，只清內容
-      [...box.childNodes].forEach(n => { if (n.nodeName !== 'defs') n.remove(); });
+  /* 多選的疊圖鈕。mkPills 是單選的，這裡另寫一個，狀態由 on 決定。 */
+  function mkToggles(id, items, state, flip) {
+    const box = document.getElementById(id);
+    box.innerHTML = items.map(it =>
+      `<button type="button" class="cat-pill" data-k="${it.k}" ` +
+      `aria-pressed="${!!state[it.k]}">${it.zh}</button>`).join('');
+    if (box._bound) return;
+    box._bound = true;
+    box.addEventListener('click', e => {
+      const b = e.target.closest('.cat-pill');
+      if (!b) return;
+      flip(b.dataset.k);
+      box.querySelectorAll('.cat-pill').forEach(x =>
+        x.setAttribute('aria-pressed', String(!!state[x.dataset.k])));
+    });
+  }
 
-      U.forEach(u => {
-        const v = u[m.k];
-        const isC = coarse.has(u.name);
+  function paintAtlas() {
+    const G = GROUPS[gi], M = G.metrics[mi];
+    document.getElementById('at-metric-wrap').hidden = !G.metrics.length;
+    document.getElementById('at-band-wrap').hidden = !G.bands;
+    document.getElementById('at-day-wrap').hidden = !G.bands;
+    document.getElementById('at-busband-wrap').hidden = !on.bus;
+    document.getElementById('at-mode-wrap').hidden = !on.crash;
+
+    atSvg.setAttribute('viewBox', `0 0 ${BIG.W} ${BIG.H}`);
+    const box = atSvg.querySelector('g[data-zoom]') || atSvg;
+    [...box.childNodes].forEach(n => { if (n.nodeName !== 'defs') n.remove(); });
+
+    const bk = G.bands ? G.bands[bi].k : null, wk = G.bands ? G.days[di].k : null;
+    const get = u => G.bands ? M.get(u, bk, wk) : M.get(u);
+    const units = G.unit === 'v' ? VL.units : R;
+    let lo = 0, hi = 1, col = () => '#FFFFFF';
+
+    if (G.unit) {
+      const vals = units.map(get).filter(v => v != null && isFinite(v));
+      lo = Math.min(...vals); hi = Math.max(...vals);
+      const mid = M.mid != null ? M.mid : 1;
+      col = v => v == null ? '#FFFFFF'
+        : M.mode === 'div' ? divColor(v, lo, hi, mid)
+        : M.log ? logColor(v, lo, hi) : seqColor(v, lo, hi);
+      units.forEach(u => {
+        const v = get(u);
+        const isC = G.unit === 'v' && coarseNames.has(u.name);
         const d = BIG.path(u.rings);
-        const path = el('path', { class: 'vil' + (isC ? ' coarse' : ''), d,
-          fill: v == null ? '#FFFFFF' : vcol(v, lo, hi, m.log) });
-        path.appendChild(el('title', {},
-          `${u.district === u.name ? u.name + '（整區）' : u.district + u.name}　` +
-          `${v == null ? '－' : m.fmt(v)}\n` +
-          `人口${int(u.pop)}　戶數${int(u.households)}　面積${u.area}km²` +
-          (isC ? `\n這一格是整個${u.name}的合計：` +
-                 `${u.villages}個里裡只有${u.mapped}個有界線，畫不到里` : '')));
+        const path = el('path', { class: G.unit === 'v' ? 'vil' + (isC ? ' coarse' : '') : 'dist',
+                                  d, fill: col(v) });
+        path.appendChild(el('title', {}, G.unit === 'v'
+          ? `${u.district === u.name ? u.name + '（整區）' : u.district + u.name}　` +
+            `${v == null ? '－' : M.fmt(v)}\n人口${int(u.pop)}　戶數${int(u.households)}　` +
+            `面積${u.area}km²` +
+            (isC ? `\n這一格是整個${u.name}的合計：${u.villages}個里裡只有${u.mapped}個有界線` : '')
+          : `${u.name}　${v == null ? '－' : M.fmt(v)}`));
         box.appendChild(path);
         if (isC) box.appendChild(el('path', { class: 'vil-hatch', d }));
       });
-      // 區名標在里的上面，否則457個里會讓人認不出這是哪裡
-      R.forEach(d => {
-        if (d.area < 12) return;
-        const [cx, cy] = BIG.centroid(d);
-        box.appendChild(el('text', { class: 'dist-lbl', x: cx, y: cy,
-          'text-anchor': 'middle' }, d.name.replace(/區$/, '')));
-      });
-      if (vr === 0) drawRail(box, BIG);
+    } else {
+      R.forEach(d => box.appendChild(el('path', { class: 'bus-base', d: BIG.path(d.rings) })));
+    }
+    // 底圖是里的時候，區界仍然要畫，否則457個小多邊形認不出是哪裡
+    if (G.unit === 'v')
+      R.forEach(d => box.appendChild(el('path', { class: 'dist-outline', d: BIG.path(d.rings) })));
 
-      const leg = document.getElementById('legend-vil');
-      leg.innerHTML = '';
-      const at = t => m.log
+    /* ── 疊圖。線與點不搶顏色，所以可以複選 ── */
+    if (on.bus) {
+      const bb = BUS.bands[obi].k, bw = DAY2[odi].k;
+      const maxT = Math.max(...BUS.routes.map(r => r.trips[bw][bb]));
+      [...BUS.routes].filter(r => r.trips[bw][bb] > 0)
+        .sort((a, c) => a.trips[bw][bb] - c.trips[bw][bb])
+        .forEach(r => {
+          const n = r.trips[bw][bb], f = Math.sqrt(n / maxT);
+          const path = el('path', { class: 'bus-line',
+            d: 'M' + r.path.map(pt => `${BIG.px(pt[0]).toFixed(1)} ${BIG.py(pt[1]).toFixed(1)}`).join('L'),
+            style: `stroke-width:${(0.35 + f * 2.6).toFixed(2)};` +
+                   `stroke-opacity:${(0.10 + f * 0.55).toFixed(3)}` });
+          path.appendChild(el('title', {}, `${r.name}　${r.headsign}　` +
+            `${DAY2[odi].zh}${BUS.bands[obi].zh}${n.toFixed(n % 1 ? 1 : 0)}班` +
+            (r.kind === 'estimated' ? '（由班距估算）' : '')));
+          box.appendChild(path);
+        });
+    }
+    if (on.rail) drawRail(box, BIG);
+    if (on.crash) {
+      const mk = CMODES[cmi].k;
+      // 行人最後畫：它是這一頁真正的主角，被機車的點蓋掉就白畫了
+      [...CR.points].filter(pt => !mk || pt.mode === mk)
+        .sort((a, c) => (a.mode === '人' ? 1 : 0) - (c.mode === '人' ? 1 : 0))
+        .forEach(pt => {
+          const c = el('circle', { class: 'crash-pt',
+            cx: BIG.px(pt.lon).toFixed(1), cy: BIG.py(pt.lat).toFixed(1),
+            r: (2.0 + ((pt.deaths || 1) - 1) * 1.2).toFixed(1),
+            fill: MODE_COLOR[pt.mode] || '#D0D0D0',
+            'fill-opacity': pt.mode === '機車' ? 0.55 : 0.85 });
+          c.appendChild(el('title', {},
+            `民國${pt.year - 1911}年　${pt.district}　${pt.mode}　${pt.deaths || 1}人死亡\n` +
+            `${pt.location || ''}\n` +
+            [pt.road_type && `道路：${pt.road_type}`, pt.speed_limit && `速限${pt.speed_limit}`,
+             pt.road_shape_main, pt.light, pt.cause_main].filter(Boolean).join('　')));
+          box.appendChild(c);
+        });
+    }
+
+    // 區名一律標，這是讀者唯一的定位點
+    R.forEach(d => {
+      if (d.area < 3) return;
+      const [cx, cy] = BIG.centroid(d);
+      box.appendChild(el('text', { class: 'dist-lbl', x: cx, y: cy, 'text-anchor': 'middle' },
+        d.name.replace(/區$/, '')));
+    });
+
+    /* ── 圖例 ── */
+    const leg = document.getElementById('legend-atlas');
+    const ticks = document.getElementById('ticks-atlas');
+    if (G.unit) {
+      const at = t => M.log
         ? Math.exp(Math.log(Math.max(1, lo)) + (Math.log(Math.max(1, hi)) - Math.log(Math.max(1, lo))) * t)
         : lo + (hi - lo) * t;
+      leg.innerHTML = '';
       for (let i = 0; i < 40; i++) {
         const b = document.createElement('i');
-        b.style.background = vcol(at(i / 39), lo, hi, m.log);
+        b.style.background = col(at(i / 39));
         leg.appendChild(b);
       }
-      // 對數色階要標中間刻度，否則讀者會以為色帶是等距的
-      document.getElementById('ticks-vil').innerHTML =
-        [0, 0.25, 0.5, 0.75, 1].map(t => `<span>${m.fmt(at(t))}</span>`).join('')
-        + (m.log ? '<span style="color:var(--grey-2)">對數</span>' : '');
-      document.getElementById('vil-key').innerHTML =
-        `<span class="it"><span class="mk sq" style="background:var(--grey-4)"></span>` +
-        `里（${C.drawnVillages}個，${C.fineDistricts}個區）</span>` +
-        `<span class="it"><span class="mk sq" style="background:var(--grey-4);` +
-        `border:1.4px dashed var(--black)"></span>整區合計（${C.coarseDistricts}個區，斜線網底）</span>`;
+      ticks.innerHTML = (M.log ? [0, 0.25, 0.5, 0.75, 1] : [0, 1])
+        .map(t => `<span>${M.fmt(at(t))}</span>`).join('')
+        + (M.log ? '<span style="color:var(--grey-2)">對數</span>' : '');
+    } else { leg.innerHTML = ''; ticks.innerHTML = ''; }
 
-      const fine = U.filter(u => !coarse.has(u.name) && u[m.k] != null);
-      const top = [...fine].sort((a, b) => b[m.k] - a[m.k]);
-      document.getElementById('cap-vil').innerHTML =
-        `${m.zh}，資料期${VL.period}。畫得到界線的${fine.length}個里裡，` +
-        `最高${top[0].district}${top[0].name}${m.fmt(top[0][m.k])}、` +
-        `最低${top[top.length - 1].district}${top[top.length - 1].name}` +
-        `${m.fmt(top[top.length - 1][m.k])}。${m.note}` +
-        `<b>斜線網底的七格是整個區的合計，不是里。</b>` +
-        (m.k === 'density'
-          ? `西邊那塊伸進海裡的多邊形不是畫錯：<b>臺中港的水域在行政上屬於梧棲區草湳里</b>，` +
-            `那個里因此有21.67平方公里，密度的分母含水域，數字偏低。` +
-            `和平區的幾個里同理，平等里336平方公里裡多數是山。` : '') +
-        VL.caveat;
+    /* ── 疊圖的圖例 ── */
+    const key = [];
+    if (on.rail) {
+      key.push(...RL.lines.map(L => `<span class="it"><span class="ln" ` +
+        `style="background:${RAIL_COLOR[L.kind]}${L.line === '成追線' ? ';opacity:.55' : ''}">` +
+        `</span>${L.sysLabel}${L.line}</span>`));
+      key.push(...Object.keys(RL.byClass).sort().map(c =>
+        `<span class="it"><span class="mk" style="background:#c8102e;` +
+        `width:${CLS_R[c] * 2}px;height:${CLS_R[c] * 2}px"></span>` +
+        `${RL.classLabels[c]}${RL.byClass[c]}站</span>`));
+    }
+    if (on.bus)
+      key.push('<span class="it"><span class="ln" style="background:#1A1A1A"></span>' +
+        `公車路線（粗細與濃度＝班次，${BUS.counts.drawn}條子路線）</span>`);
+    if (on.crash)
+      key.push(...CR.modes.map(m => `<span class="it"><span class="mk" ` +
+        `style="background:${MODE_COLOR[m]}"></span>${m}${int(CR.totals.byMode[m])}件</span>`));
+    if (G.unit === 'v')
+      key.push('<span class="it"><span class="mk sq" style="background:var(--grey-4);' +
+        `border:1.4px dashed var(--black)"></span>整區合計（${VL.counts.coarseDistricts}個區，斜線網底）</span>`);
+    document.getElementById('key-atlas').innerHTML = key.join('');
 
-      // 長條只排里，區級單元不混進排名
-      const box2 = document.getElementById('bars-vil');
-      const sorted = top.slice(0, 20);
-      const bhi = sorted[0][m.k];
-      box2.innerHTML = sorted.map((u, i) =>
-        `<div class="bar-row${i === 0 ? ' on' : ''}">` +
-        `<span class="nm">${u.district.replace(/區$/, '')}${u.name.replace(/里$/, '')}</span>` +
-        `<div class="track"><i style="left:0;width:${u[m.k] / bhi * 100}%;` +
-        `background:${vcol(u[m.k], lo, hi, m.log)}"></i></div>` +
-        `<span class="vv">${m.fmt(u[m.k])}</span></div>`).join('');
-
-      document.getElementById('vil-stats').innerHTML = [
-        ['Villages 里', int(C.villages), `其中${C.drawnVillages}個畫得到界線`],
-        ['Population 人口', man(C.population) + '人', `戶政司${VL.period}登記`],
-        ['Households 戶數', man(C.households) + '戶',
-         `平均戶量${(C.population / C.households).toFixed(2)}人`],
+    /* ── 圖說 ── */
+    const when = G.bands ? `，${G.days[di].zh}${G.bands[bi].zh}（${G.bands[bi].when}）` : '';
+    if (G.unit) {
+      const sorted = [...units].filter(u => get(u) != null).sort((a, c) => get(c) - get(a));
+      const t = sorted[0], b2 = sorted[sorted.length - 1];
+      const nm = u => G.unit === 'v' ? u.district.replace(/區$/, '') + u.name : u.name;
+      document.getElementById('cap-atlas').innerHTML =
+        `<b>${G.zh}｜${M.zh}</b>${when}，資料期${G.period()}。` +
+        `最高${nm(t)}${M.fmt(get(t))}、最低${nm(b2)}${M.fmt(get(b2))}。${M.note}` +
+        (G.unit === 'v' ? `<b>斜線網底的七格是整個區的合計，不是里。</b>` : '');
+      document.getElementById('stats-atlas').innerHTML = [
+        ['Highest 最高', M.fmt(get(t)), nm(t)],
+        ['Lowest 最低', M.fmt(get(b2)), nm(b2)],
+        ['Units 單元', int(sorted.length), G.unit === 'v' ? '里與整區合計' : '行政區'],
       ].map(([k, v, n]) =>
         `<div class="stat"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`
       ).join('');
+
+      const show = sorted.slice(0, G.unit === 'v' ? 20 : sorted.length);
+      const base = M.mode === 'div' ? (M.mid != null ? M.mid : 1) : 0;
+      const span = Math.max(...show.map(u => Math.abs(get(u) - base))) || 1;
+      document.getElementById('bars-atlas').innerHTML = show.map((u, i) =>
+        `<div class="bar-row${i === 0 || i === show.length - 1 ? ' on' : ''}">` +
+        `<span class="nm">${nm(u)}</span><div class="track">` +
+        `<i style="left:0;width:${Math.abs(get(u) - base) / span * 100}%;` +
+        `background:${col(get(u))}"></i></div>` +
+        `<span class="vv">${M.fmt(get(u))}</span></div>`).join('');
+    } else {
+      document.getElementById('cap-atlas').innerHTML =
+        '底圖不著色，只看疊圖。要比較區與區之間的差異，上面挑一組底圖。';
+      document.getElementById('stats-atlas').innerHTML = '';
+      document.getElementById('bars-atlas').innerHTML = '';
     }
 
-    mkPills('vil-metrics', VM, () => vm, i => { vm = i; paintVil(); });
-    mkPills('vil-rail', [{ zh: '顯示' }, { zh: '隱藏' }], () => vr, i => { vr = i; paintVil(); });
+    const ovNote = [];
+    if (on.rail) ovNote.push(`<b>軌道</b>：${RL.lines.map(L => L.sysLabel + L.line).join('、')}，` +
+      `裁切至市界內。圓的大小是臺鐵官方站等（TDX 的 StationClass）。${RL.caveat}`);
+    if (on.bus) ovNote.push(`<b>公車</b>：${DAY2[odi].zh}${BUS.bands[obi].zh}` +
+      `（${BUS.bands[obi].when}）。共用走廊變深是多條線疊在一起的視覺結果，不是加總出來的數字。`);
+    if (on.crash) ovNote.push(`<b>事故</b>：${CMODES[cmi].zh === '全部' ? '全部運具' : '受害者為' + CMODES[cmi].zh}。` +
+      `座標從${CR.coordPeriod}才有，民國105與106兩年的${CR.totals.noCoord}件沒有經緯度。`);
+    document.getElementById('cap-atlas-ov').innerHTML = ovNote.join('　');
+  }
 
-    const dens = U.filter(u => !coarse.has(u.name) && u.density)
-      .sort((a, b) => b.density - a.density);
-    const top5 = dens.slice(0, 5);
+  /* 控制列整組重建。切換底圖大類與按下跳轉鈕都走這裡，
+     因為兩者都會換掉指標與時段的選項清單。 */
+  function syncPills() {
+    mkPills('at-groups', GROUPS, () => gi, i => {
+      gi = i; mi = 0; bi = 0; syncPills(); paintAtlas();
+    });
+    mkPills('at-metrics', GROUPS[gi].metrics, () => mi, i => { mi = i; paintAtlas(); });
+    if (GROUPS[gi].bands)
+      mkPills('at-bands', GROUPS[gi].bands, () => bi, i => { bi = i; paintAtlas(); });
+    mkPills('at-days', DAY2, () => di, i => { di = i; paintAtlas(); });
+    mkToggles('at-overlays', OVL, on, k => { on[k] = !on[k]; paintAtlas(); });
+    mkPills('at-busbands', BUS.bands, () => obi, i => { obi = i; paintAtlas(); });
+    mkPills('at-modes', CMODES, () => cmi, i => { cmi = i; paintAtlas(); });
+  }
+  syncPills();
+
+  document.getElementById('at-body-1').innerHTML =
+    `這一頁原本有五張地圖：信令、住宅、里級人口、公車、事故。` +
+    `五張用的是同一套投影、同一份區界，讀者卻得來回捲動並自己記住哪一區在哪裡。` +
+    `<b>同一個空間單元的五件事，本來就該疊在同一張圖上比。</b>` +
+    `因此改成一張圖加圖層控制：<b>底圖是面量的那一層，一次一個</b>，因為顏色只有一個通道；` +
+    `<b>疊圖是線與點的那幾層，可以複選</b>，因為它們不搶顏色。`;
+  document.getElementById('at-body-2').innerHTML =
+    `底圖的空間單元有兩種：${R.length}個區與${VL.counts.villages}個里。` +
+    `切到里的時候區界仍然畫在上面，否則${VL.counts.drawnVillages}個小多邊形會讓人認不出這是哪裡。` +
+    `底下各節只留論述與非地圖的圖表，每一節結尾有「在地圖上看這一層」的按鈕，` +
+    `按下去會把這張圖切到那一節在講的那一層再捲回來。` +
+    `<b>一張圖之後，「上面那張圖」這句話才有意義。</b>` +
+    `圖可以縮放到12倍，⌘／Ctrl 加滾輪或右上角的控制列都可以。`;
+
+  paintAtlas();
+  // anchor 用夜間人口加權的重心，不用幾何中心：臺中的幾何中心在和平區，
+  // 那一區佔全市近半面積、住不到一萬人，對著它放大等於放大一片空白。
+  const wsum = R.reduce((a, d) => a + d.work.night, 0);
+  const ANCHOR = [
+    R.reduce((a, d) => a + BIG.centroid(d)[0] * d.work.night, 0) / wsum,
+    R.reduce((a, d) => a + BIG.centroid(d)[1] * d.work.night, 0) / wsum,
+  ];
+  enableMapZoom(atSvg, { max: 12, anchor: ANCHOR });
+
+  /* 每一節的論述都要有辦法把讀者送回那張圖，而且順便切到那一節在講的那一層。
+     一張圖之後，「上面那張圖」這句話才有意義。 */
+  function jumps(id, items) {
+    const box = document.getElementById(id);
+    box.innerHTML = items.map((it, i) =>
+      `<button type="button" class="jump" data-i="${i}">${it.zh}` +
+      `<span class="ar">↑ MAP</span></button>`).join('');
+    box.addEventListener('click', e => {
+      const b = e.target.closest('.jump');
+      if (!b) return;
+      const it = items[+b.dataset.i];
+      gi = it.g; mi = it.m || 0; bi = it.b || 0; di = it.d || 0;
+      // ov 沒給就保留目前的疊圖：疊圖是讀者自己開的，跳一次圖層不該把它關掉
+      if (it.ov) OVL.forEach(o => { on[o.k] = it.ov.includes(o.k); });
+      if (it.cm != null) cmi = it.cm;
+      if (it.obi != null) obi = it.obi;
+      syncPills();
+      paintAtlas();
+      document.getElementById('atlas').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+
+  /* ── 03 住宅基本盤（地圖已併進第02節，這裡只留論述與跳轉） ── */
+  {
+    const hi = [...R].sort((a, b) => b.vacancy - a.vacancy)[0];
+    const lo2 = [...R].sort((a, b) => a.vacancy - b.vacancy)[0];
+    const fewer = R.filter(d => d.houses < d.households);
+    document.getElementById('hb-stats').innerHTML = [
+      ['Dwellings 住宅', man(T.houses) + '宅', `資料期${D.periods.census}`],
+      ['Households 家戶', man(T.households) + '戶', `宅戶比${(T.houses / T.households).toFixed(3)}`],
+      ['Vacancy 空屋率', T.vacancy + '%', `${int(T.houses * T.vacancy / 100)}宅`],
+    ].map(([k, v, n]) =>
+      `<div class="stat"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`
+    ).join('');
+    document.getElementById('hb-1').innerHTML =
+      `民國109年普查給的是存量：住宅${int(T.houses)}宅、家戶${int(T.households)}戶、` +
+      `常住人口${int(T.residents)}人、空屋率${T.vacancy}%。` +
+      `<b>區內落差遠大於市際落差。</b>空屋率最高的${hi.name}${hi.vacancy}%與最低的` +
+      `${lo2.name}${lo2.vacancy}%相差${(hi.vacancy - lo2.vacancy).toFixed(2)}個百分點，` +
+      `而臺中市與臺北市之間的市際落差只有3.90個百分點。`;
+    document.getElementById('hb-2').innerHTML =
+      `有${fewer.length}個區的住宅數少於家戶數：` +
+      `${fewer.map(d => d.name).join('、')}。` +
+      `<b>住宅比家戶少、空屋率卻不低，這兩件事要並存，只可能是存量的位置與需求的位置對不上。</b>` +
+      `${hi.name}的住宅${int(hi.houses)}宅少於家戶${int(hi.households)}戶，` +
+      `空屋率卻是全市最高的${hi.vacancy}%。`;
+    document.getElementById('hb-3').innerHTML =
+      `唯這五個欄位都是民國109年的定義，不能跨期比。` +
+      `普查的「空閒住宅」與內政部按用電判定的「低度使用」也不是同一回事：` +
+      `前者靠訪查認定，後者靠電表。` +
+      `<b>兩個數字都叫空屋，量的卻是不同的東西</b>，臺中的普查空屋率13.77%、` +
+      `用電低度使用率8.58%，那個差距不是誰錯了，是定義不同。`;
+    jumps('hb-jumps', [
+      { zh: '空屋率', g: 1, m: 2 }, { zh: '住宅存量', g: 1, m: 0 },
+      { zh: '屋齡40年以上', g: 1, m: 4 },
+    ]);
+  }
+
+  /* ── 04 里級人口 ── */
+  {
+    const C = VL.counts;
+    const dens = VL.units.filter(u => !u.villages && u.density).sort((a, b) => b.density - a.density);
+    const t = dens[0], b2 = dens[dens.length - 1];
+    document.getElementById('vil-stats').innerHTML = [
+      ['Villages 里', int(C.villages), `其中${C.drawnVillages}個畫得到界線`],
+      ['Population 人口', man(C.population) + '人', `戶政司${VL.period}登記`],
+      ['Households 戶數', man(C.households) + '戶',
+       `平均戶量${(C.population / C.households).toFixed(2)}人`],
+    ].map(([k, v, n]) =>
+      `<div class="stat"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`
+    ).join('');
     document.getElementById('vil-body-1').innerHTML =
-      `把尺度從29個區縮到625個里，第03節那張圖上看起來均質的區，會散成很不一樣的東西。` +
-      `<b>密度最高的${top5[0].district}${top5[0].name}是${int(top5[0].density)}人每平方公里，` +
-      `最低的${dens[dens.length - 1].district}${dens[dens.length - 1].name}是` +
-      `${int(dens[dens.length - 1].density)}人，相差` +
-      `${Math.round(top5[0].density / Math.max(1, dens[dens.length - 1].density)).toLocaleString('en-US')}倍。</b>` +
-      `區級的全距做不到這個量級：**尺度本身就是一個發現**，`
-        .replace('**尺度本身就是一個發現**', '<b>尺度本身就是一個發現</b>') +
+      `把尺度從29個區縮到${C.villages}個里，第03節那些看起來均質的區，會散成很不一樣的東西。` +
+      `<b>密度最高的${t.district}${t.name}是${int(t.density)}人每平方公里，` +
+      `最低的${b2.district}${b2.name}是${int(b2.density)}人，` +
+      `相差${Math.round(t.density / Math.max(1, b2.density)).toLocaleString('en-US')}倍。</b>` +
+      `區級的全距做不到這個量級：<b>尺度本身就是一個發現</b>，` +
       `一個區的平均把里與里之間的差異抹平了。`;
     document.getElementById('vil-body-2').innerHTML =
-      `唯這張圖有${C.coarseDistricts}個區畫不到里，那七格是整區的合計。` +
+      `唯有${C.coarseDistricts}個區畫不到里，地圖上那幾格是整區的合計，加了斜線網底。` +
       `<b>原因不是缺資料，是缺界線。</b>` +
       `臺中現有${C.villages}個里，拿得到的界線是民國71年版，只有${C.polygons}個多邊形。` +
       `被再分割的里，同名的舊多邊形範圍比現在大，把現在的人口填進去，` +
       `畫出來的密度會偏低而且偏得沒有規律。` +
       `<b>那不是缺一塊，那是畫錯。</b>因此規則是一個區的每一個里都對得到多邊形才畫到里，` +
-      `只要有一個對不到就整個區退回區級。太平區最嚴重：${C.villages ? '' : ''}` +
-      `39個里只有19個多邊形，對不到的那些住了十萬人。`;
+      `只要有一個對不到就整個區退回區級。太平區最嚴重：39個里只有19個多邊形。`;
     document.getElementById('vil-body-3').innerHTML =
-      `要升級這七個區，需要的是內政部的現行村里界圖` +
+      `要升級這${C.coarseDistricts}個區，需要內政部的現行村里界圖` +
       `（政府資料開放平臺 dataset 7438，民國115年6月24日版）。` +
       `那份檔案放在 tgos.tw，本專案目前的網路環境取不到，回403。` +
       `拿得到的話，換掉 <code>data_TW/from_moi/village_geo_taichung.json</code> 再重跑一次 ` +
-      `<code>prep_villages.py</code> 即可，程式不必改：` +
-      `對得到多邊形的區會自動從七個變成零個。` +
-      `<span class="en-small">Boundaries pending</span>`;
-
-    paintVil();
-    enableMapZoom(svg, { max: 12, anchor: ANCHOR });
+      `<code>prep_villages.py</code> 即可，程式不必改。` +
+      `另外西邊那塊伸進海裡的多邊形不是畫錯：` +
+      `<b>臺中港的水域在行政上屬於梧棲區草湳里</b>，那個里因此有21.67平方公里，` +
+      `密度的分母含水域。<span class="en-small">Boundaries pending</span>`;
+    jumps('vil-jumps', [
+      { zh: '里級人口密度', g: 2, m: 0 }, { zh: '里級平均戶量', g: 2, m: 3 },
+    ]);
   }
+
+  /* ── 06 公車班次 ── */
+  {
+    const C = BUS.counts;
+    const rk = [...BUS.districts].sort((a, b) => a.callsPerK.work.all - b.callsPerK.work.all);
+    const lo2 = rk[0], hi2 = rk[rk.length - 1];
+    document.getElementById('bus-stats').innerHTML = [
+      ['Sub-routes 子路線', int(C.drawn), `${C.counted}條數班次、${C.estimated}條估算`],
+      ['Trips 班次', int(BUS.routes.reduce((a, r) => a + r.trips.work.all, 0)), '平日全日全市'],
+      ['Stops 站牌', int(C.stopsInCity), `市界外另有${C.stopsOutside}個`],
+    ].map(([k, v, n]) =>
+      `<div class="stat"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`
+    ).join('');
+    document.getElementById('bus-body-1').innerHTML =
+      `地圖上那一層的線寬與濃度都是班次，兩個通道編碼同一個變數是刻意的：` +
+      `<b>可及性的變數從來不是有沒有車，而是多久來一班。</b>` +
+      `每條線一樣粗的路線圖，讀到的是「有沒有公車」，那個命題在臺中29個區裡幾乎處處成立。` +
+      `臺中市區公車${C.routes}條路線、${C.shapes}條子路線，其中${C.drawn}條同時有線形與班表。` +
+      `<b>班次是數出來的，不是換算的</b>：${C.counted}條的班表給逐班的發車時刻，直接數；` +
+      `只有${C.estimated}條給班距，才用時段長度除以班距去估，兩者分開標記。`;
+    document.getElementById('bus-body-2').innerHTML =
+      `把班次除以人口，順序就翻過來了。` +
+      `<b>每千位常住人口的每日停靠班次，最少的是${lo2.name}${lo2.callsPerK.work.all}次，` +
+      `最多的是${hi2.name}${hi2.callsPerK.work.all}次。</b>` +
+      `${lo2.name}住了${int(R.find(d => d.name === lo2.name).residents)}人，` +
+      `是臺中人口第${[...R].sort((a, b) => b.residents - a.residents)
+        .findIndex(d => d.name === lo2.name) + 1}多的區，公車服務卻是全市最稀的。` +
+      `這不是山區的問題：${lo2.name}緊鄰市區，唯它沒有軌道、公車班次也追不上人口。`;
+    document.getElementById('bus-body-3').innerHTML =
+      `唯要說清楚這個數字是怎麼來的。<b>區的停靠班次不是逐站點名，是推算的：` +
+      `子路線在該區的站牌數，乘上那條子路線的班次。</b>` +
+      `班表的逐班到站時刻只給起站那一筆，逐站的時刻拿不到，這是唯一可推的路。` +
+      `代價在時段：一班車整趟都被歸進發車的那個時段，路線長的線受這個影響大。` +
+      `而班次終究是計畫班次，塞車、脫班、臨時停駛都不在裡面。`;
+    jumps('bus-jumps', [
+      { zh: '公車路線疊圖', g: 5, ov: ['bus'] },
+      { zh: '每千人停靠班次', g: 3, m: 0 },
+      { zh: '每平方公里停靠班次', g: 3, m: 1 },
+      { zh: '公車＋軌道一起看', g: 5, ov: ['bus', 'rail'] },
+    ]);
+  }
+
+  /* ── 07 A1死亡事故 ── */
+  {
+    const M = CR.totals;
+    const bn = Object.fromEntries(BUS.districts.map(d => [d.name, d]));
+    const dn = Object.fromEntries(R.map(d => [d.name, d]));
+    const use = CR.districts.filter(d => !d.small);
+    const corr = (xs, ys) => {
+      const n = xs.length;
+      const mx = xs.reduce((a, b) => a + b, 0) / n, my = ys.reduce((a, b) => a + b, 0) / n;
+      return xs.reduce((a, x, i) => a + (x - mx) * (ys[i] - my), 0)
+        / Math.sqrt(xs.reduce((a, x) => a + (x - mx) ** 2, 0)
+                  * ys.reduce((a, y) => a + (y - my) ** 2, 0));
+    };
+    const ys = use.map(d => d.per100k);
+    const rPop = corr(use.map(d => bn[d.name].callsPerK.work.all), ys);
+    const rArea = corr(use.map(d => bn[d.name].callsPerKm2.work.all), ys);
+    const rDens = corr(use.map(d => dn[d.name].residents / dn[d.name].area), ys);
+    const sg = v => (v >= 0 ? '＋' : '－') + Math.abs(v).toFixed(3);
+    const mo = [...CR.districts].sort((a, b) => b.pedShare - a.pedShare)[0];
+
+    /* 每十萬人的橫條畫的是95%區間，不是一根長條。
+       石岡區十年只有7人，那個率的區間寬到不該拿去排名，所以點與區間一起畫出來。 */
+    const rk = [...CR.districts].sort((a, b) => b.per100k - a.per100k);
+    const hiR = Math.max(...rk.map(d => d.per100kHi));
+    document.getElementById('crash-rates').innerHTML = rk.map(d =>
+      `<div class="rate-bar${d.small ? ' small' : ''}">` +
+      `<span class="nm">${d.name}</span>` +
+      `<span class="tr"><span class="ci" style="left:${d.per100kLo / hiR * 100}%;` +
+      `width:${(d.per100kHi - d.per100kLo) / hiR * 100}%"></span>` +
+      `<span class="pt" style="left:calc(${d.per100k / hiR * 100}% - 1.5px)"></span></span>` +
+      `<span class="vv">${d.per100k.toFixed(0)}　${d.deaths}人</span></div>`).join('');
+    const small = CR.districts.filter(d => d.small).map(d => d.name);
+    document.getElementById('cap-rates').innerHTML =
+      `直線是每十萬常住人口的十年死亡數，灰帶是95%區間（卜瓦松近似）。` +
+      `<b>區間越寬，那個排名越不該當真。</b>` +
+      (small.length ? `${small.join('、')}十年死亡數低於10人，本頁把它標成灰點，不列入比較。` : '') +
+      `分母用本 repo 的普查常住人口，與本頁其他區級比率同一套。`;
+
+    document.getElementById('crash-stats').innerHTML = [
+      ['Deaths 死亡', int(M.deaths), `${CR.period}，平均每年${M.perYear}人`],
+      ['Motorcycle 機車', (M.byMode['機車'] / M.events * 100).toFixed(1) + '%', `${int(M.byMode['機車'])}件`],
+      ['Pedestrian 行人', (M.byMode['人'] / M.events * 100).toFixed(1) + '%', `${int(M.byMode['人'])}件`],
+    ].map(([k, v, n]) =>
+      `<div class="stat"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`
+    ).join('');
+
+    document.getElementById('crash-body-1').innerHTML =
+      `十年${int(M.events)}件、${int(M.deaths)}人，平均每年${M.perYear}人。` +
+      `<b>其中${(M.byMode['機車'] / M.events * 100).toFixed(0)}%的受害者是機車騎士，` +
+      `${(M.byMode['人'] / M.events * 100).toFixed(0)}%是行人。</b>` +
+      `運具的分類是以最脆弱的用路人為準，不是以肇事的主要當事者：` +
+      `一輛左轉小客車撞死行人，這裡歸類為行人。它問的是誰死了，不是誰肇事。`;
+    document.getElementById('crash-body-2').innerHTML =
+      `<b>${mo.name}是唯一一個行人多過機車的區：` +
+      `十年${mo.deaths}人裡，行人占${mo.pedShare.toFixed(0)}%、機車只占${mo.motoShare.toFixed(0)}%。</b>` +
+      `全市的比例剛好相反。${mo.name}是臺中最小的區、` +
+      `空屋率最高的區（${dn[mo.name].vacancy}%），` +
+      `也是白天湧入最多人的區之一（日夜比${dn[mo.name].ratio}）。` +
+      `一個人來人往、行人密度極高的舊市區，死亡的結構因此完全不同。` +
+      `唯十年${mo.deaths}人這個數字不大，區間也寬，不宜當成穩定的排名讀。`;
+    document.getElementById('crash-body-3').innerHTML =
+      `把第06節的公車服務與這一節的死亡率放在一起，` +
+      `${use.length}個區（排除樣本過少的）的相關係數是${sg(rPop)}，` +
+      `看起來像是「公車越多的地方死越多人」。<b>這個數字是假的。</b>` +
+      `每千人班次與每十萬人死亡共用同一個人口分母，` +
+      `人口少的區在兩邊同時偏高，係數是被分母自己撐起來的。` +
+      `把公車那一邊的分母換成面積，同一組區的係數掉到${sg(rArea)}：` +
+      `<b>公車服務與死亡率之間，本來就沒有關係。</b>` +
+      `這件事在地圖上按兩下就看得見：把底圖從「每千人停靠班次」切到「每平方公里停靠班次」，` +
+      `顏色會整個翻過來。`;
+    document.getElementById('crash-body-4').innerHTML =
+      `站得住的是另一個方向。人口密度與每十萬人死亡的相關係數是${sg(rDens)}：` +
+      `<b>越稀疏的區，每十萬人死亡越高。</b>` +
+      `這與直覺相反，唯它符合已知的機制：低密度的區路更寬、車速更快、` +
+      `號誌與行人設施更少，一次碰撞的動能因此更大。` +
+      `這仍然是相關而不是因果，三者一起變動，區級的資料分不開它們。` +
+      `要分開得下到逐路段：本頁的逐件資料裡有${int(M.detailed)}件` +
+      `（占${(M.detailed / M.events * 100).toFixed(0)}%）帶著道路型態與速限，` +
+      `恐怕那才是唯一能把「路的設計」與「人的行為」分開的路。`;
+    jumps('crash-jumps', [
+      { zh: '事故點位', g: 5, ov: ['crash'], cm: 0 },
+      { zh: '只看行人', g: 5, ov: ['crash'], cm: 1 },
+      { zh: '每十萬人死亡', g: 4, m: 0, ov: [] },
+      { zh: '行人受害占比', g: 4, m: 2, ov: [] },
+      { zh: '事故點 × 公車路線', g: 5, ov: ['crash', 'bus'], cm: 0 },
+    ]);
+  }
+
+  document.getElementById('foot-l').textContent =
+    `Taichung Future Mobility — ${R.length} districts · ${D.periods.census} / ${D.periods.signal}`;
+
+  document.getElementById('hero-stats').innerHTML = [
+    ['Range 全距', SP.ratioRange.toFixed(3), `${SP.ratioMin} 到 ${SP.ratioMax}`],
+    ['Day-heavy 最高', top.ratio.toFixed(3), `${top.name}　白天淨增 ${int(top.net)} 人`],
+    ['Night-heavy 最低', bot.ratio.toFixed(3), `${bot.name}　白天淨減 ${int(Math.abs(bot.net))} 人`],
+  ].map(([k, v, n]) =>
+    `<div class="stat"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`
+  ).join('');
+
+  document.getElementById('hero-body-1').innerHTML =
+    `臺中全市工作日的日間人口${int(T.dayWork)}人、夜間${int(T.nightWork)}人，` +
+    `相除是${T.ratio.toFixed(3)}。這個數字看起來是一個通勤圈與市界重合、自給自足的城市。` +
+    `唯拆到${R.length}個區，從${bot.name}的${bot.ratio}到${top.name}的${top.ratio}，` +
+    `全距${SP.ratioRange.toFixed(3)}。` +
+    `<b>全市那個接近1的數字，是兩組方向相反的失衡互相抵銷出來的。</b>`;
+  document.getElementById('hero-body-2').innerHTML =
+    `以縣市為單位討論臺中的移動，等於把這件事整個抹掉，所以本專案的空間單位是區。` +
+    `要補一句限制：信令給的是每一區的日間與夜間總數，` +
+    `<b>它答得了${bot.name}白天少了多少人，答不了那些人去了哪一區。</b>`;
+
 
   /* ── 05 散布圖 ── */
   {
@@ -1169,313 +1352,6 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
       `橫軸是日夜間人口比（${D.periods.signal}），縱軸是普查空屋率（${D.periods.census}）。` +
       `虛線是日夜比1.0。標名的是空屋率前三高，以及日夜比的兩個極端。`;
   }
-
-  /* ── 06 公車班次 ────────────────────────────────────────────────────
-     線寬與濃度都跟著班次走。兩個通道編碼同一個變數是刻意的：
-     這張圖要回答的是「哪幾條走廊常有車」，不是「這裡有沒有公車」，
-     後者在臺中29個區裡幾乎處處成立，等於沒有資訊。
-     線寬取平方根，因為視覺讀的是面積：直接用班次會讓綠3粗到蓋掉整個舊市區。 */
-  {
-    const BB = BUS.bands, BD = BUS.days;
-    let bb = 0, bd = 0, br = 1, bp = 0;
-    /* 分母兩種都給，而且讓讀者自己切。
-       每千人問的是「這一區的人搭不搭得到車」，每平方公里問的是「路網有多密」。
-       和平區只有七千多人卻有開到谷關的長程路線，每千人的數字因此高居第一，
-       那不是它公車多，是它人少。第07節的假相關就是同一個分母造成的，
-       與其在圖說裡解釋，不如讓人按一下就看見。 */
-    const PER = [
-      { zh: '每千人', k: 'callsPerK', en: 'per 1,000 Residents',
-        fmt: v => v.toFixed(0) + '次', unit: '次' },
-      { zh: '每平方公里', k: 'callsPerKm2', en: 'per km²',
-        fmt: v => v.toFixed(0) + '次', unit: '次' },
-    ];
-    const maxTrips = Math.max(...BUS.routes.map(r =>
-      Math.max(...BB.map(b => Math.max(...BD.map(d => r.trips[d.k][b.k]))))));
-
-    const busGet = r => r.trips[BD[bd].k][BB[bb].k];
-    const CALL = d => d[PER[bp].k][BD[bd].k][BB[bb].k];
-    const byName = Object.fromEntries(BUS.districts.map(d => [d.name, d]));
-
-    function paintBus() {
-      const svg = document.getElementById('map-bus');
-      svg.setAttribute('viewBox', `0 0 ${BIG.W} ${BIG.H}`);
-      const box = svg.querySelector('g[data-zoom]') || svg;
-      box.textContent = '';
-      R.forEach(d => box.appendChild(el('path', { class: 'bus-base', d: BIG.path(d.rings) })));
-
-      // 班次少的先畫，班次多的疊在上面才看得見
-      const sorted = [...BUS.routes].filter(r => busGet(r) > 0)
-        .sort((a, b) => busGet(a) - busGet(b));
-      sorted.forEach(r => {
-        const n = busGet(r), f = Math.sqrt(n / maxTrips);
-        const path = el('path', {
-          class: 'bus-line',
-          d: 'M' + r.path.map(pt => `${BIG.px(pt[0]).toFixed(1)} ${BIG.py(pt[1]).toFixed(1)}`).join('L'),
-          style: `stroke-width:${(0.35 + f * 2.6).toFixed(2)};stroke-opacity:${(0.10 + f * 0.55).toFixed(3)}`,
-        });
-        path.appendChild(el('title', {}, `${r.name}　${r.headsign}　` +
-          `${BD[bd].zh}${BB[bb].zh}${n.toFixed(n % 1 ? 1 : 0)}班` +
-          (r.kind === 'estimated' ? '（由班距估算）' : '')));
-        box.appendChild(path);
-      });
-      if (br === 0) drawRail(box, BIG);
-
-      drawMap('map-buscall', 'legend-buscall', 'ticks-buscall',
-              d => CALL(byName[d.name]), PER[bp].fmt, 'seq', { minArea: 12 });
-      document.getElementById('h-buscall').innerHTML =
-        `Bus Calls ${PER[bp].en} <span class="zh">· ${PER[bp].zh}每日停靠班次</span>`;
-
-      const hi = [...sorted].reverse()[0];
-      const drawn = sorted.length;
-      document.getElementById('cap-bus').innerHTML =
-        `${BD[bd].zh}${BB[bb].zh}（${BB[bb].when}）有班次的子路線${drawn}條，` +
-        `線寬與濃度都是班次，最粗的是${hi.name}線（${busGet(hi).toFixed(0)}班）。` +
-        `<b>共用走廊變深，是多條線疊在一起的視覺結果，不是加總出來的數字。</b>` +
-        `TDX 的線形逐路線各自一條折線，走同一段臺灣大道的十幾條線頂點對不齊，加不起來。` +
-        `${BUS.caveat}`;
-
-      const cs = BUS.districts.map(CALL);
-      const chi = BUS.districts[cs.indexOf(Math.max(...cs))];
-      const clo = BUS.districts[cs.indexOf(Math.min(...cs))];
-      document.getElementById('cap-buscall').innerHTML =
-        `${PER[bp].zh}的${BD[bd].zh}${BB[bb].zh}停靠班次。最高${chi.name}` +
-        `${CALL(chi).toFixed(1)}次、最低${clo.name}${CALL(clo).toFixed(1)}次，` +
-        `相差${(CALL(chi) / CALL(clo)).toFixed(1)}倍。資料期${BUS.period}。` +
-        `<b>換一個分母，這張圖的顏色會整個翻過來。</b>` +
-        `每千人問的是這一區的人搭不搭得到車，每平方公里問的是路網有多密；` +
-        `和平區七千多人卻有開到谷關的長程路線，每千人排第一，那不是它公車多，是它人少。`;
-
-      const C = BUS.counts;
-      document.getElementById('bus-stats').innerHTML = [
-        ['Sub-routes 子路線', drawn, `${BD[bd].zh}${BB[bb].zh}有班次的`],
-        ['Trips 班次', int(BUS.routes.reduce((a, r) => a + busGet(r), 0)), `${BD[bd].zh}${BB[bb].zh}全市`],
-        ['Stops 站牌', int(C.stopsInCity), '市界內'],
-      ].map(([k, v, n]) =>
-        `<div class="stat"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`
-      ).join('');
-    }
-
-    mkPills('bus-bands', BB, () => bb, i => { bb = i; paintBus(); });
-    mkPills('bus-days', BD, () => bd, i => { bd = i; paintBus(); });
-    mkPills('bus-per', PER, () => bp, i => { bp = i; paintBus(); });
-    mkPills('bus-rail', [{ zh: '顯示' }, { zh: '隱藏' }], () => br, i => { br = i; paintBus(); });
-
-    const C = BUS.counts;
-    const rk = [...BUS.districts].sort((a, b) =>
-      a.callsPerK.work.all - b.callsPerK.work.all);
-    document.getElementById('bus-body-1').innerHTML =
-      `臺中市區公車${C.routes}條路線、${C.shapes}條子路線，` +
-      `其中${C.drawn}條同時有線形與班表，畫得出來。` +
-      `<b>班次是數出來的，不是換算的。</b>${C.counted}條子路線的班表給逐班的發車時刻，` +
-      `直接數；只有${C.estimated}條給班距，才用時段長度除以班距去估。` +
-      `兩者在資料裡分開標記，滑過線條會註明哪一條是估算的。`;
-    document.getElementById('bus-body-2').innerHTML =
-      `把班次除以人口，順序就翻過來了。` +
-      `<b>每千位常住人口的每日停靠班次，最少的是${rk[0].name}${rk[0].callsPerK.work.all}次，` +
-      `最多的是${rk[rk.length - 1].name}${rk[rk.length - 1].callsPerK.work.all}次。</b>` +
-      `${rk[0].name}住了${int(R.find(d => d.name === rk[0].name).residents)}人，` +
-      `是臺中人口第${[...R].sort((a, b) => b.residents - a.residents)
-        .findIndex(d => d.name === rk[0].name) + 1}多的區，` +
-      `公車服務卻是全市最稀的。這不是山區的問題：` +
-      `${rk[0].name}緊鄰市區，唯它沒有軌道、公車班次也追不上人口。`;
-    document.getElementById('bus-body-3').innerHTML =
-      `唯要說清楚這個數字是怎麼來的。<b>區的停靠班次不是逐站點名，是推算的：` +
-      `子路線在該區的站牌數，乘上那條子路線的班次。</b>` +
-      `班表的逐班到站時刻只給起站那一筆，逐站的時刻拿不到，這是唯一可推的路。` +
-      `代價在時段：一班車整趟都被歸進發車的那個時段，路線長的線受這個影響大。` +
-      `而班次終究是計畫班次，塞車、脫班、臨時停駛都不在裡面。`;
-
-    paintBus();
-    enableMapZoom(document.getElementById('map-bus'), { max: 8, anchor: ANCHOR });
-  }
-
-  /* ── 07 A1死亡事故 ────────────────────────────────────────────────── */
-  {
-    const MODE_COLOR = { '人': '#C8D400', '機車': '#1A1A1A', '汽車': '#888888',
-                         '慢車': '#4A4A4A', '其他': '#D0D0D0' };
-    const MODES = [{ zh: '全部', k: null }, ...CR.modes.map(m => ({ zh: m, k: m }))];
-    const BASES = [{ zh: '每十萬人死亡', k: 'per100k' }, { zh: '機車占比', k: 'motoShare' },
-                   { zh: '行人占比', k: 'pedShare' }, { zh: '不著色', k: null }];
-    let mi = 0, bi2 = 0;
-    const byName = Object.fromEntries(CR.districts.map(d => [d.name, d]));
-
-    function paintCrash() {
-      const mk = MODES[mi].k, bk = BASES[bi2].k;
-      const svg = document.getElementById('map-crash');
-      svg.setAttribute('viewBox', `0 0 ${BIG.W} ${BIG.H}`);
-      const box = svg.querySelector('g[data-zoom]') || svg;
-
-      if (bk) {
-        drawMap('map-crash', 'legend-crash', 'ticks-crash',
-                d => byName[d.name][bk],
-                v => bk === 'per100k' ? v.toFixed(0) + '人' : v.toFixed(0) + '%',
-                'seq', { proj: BIG, minArea: 3 });
-      } else {
-        box.textContent = '';
-        R.forEach(d => box.appendChild(el('path', { class: 'bus-base', d: BIG.path(d.rings) })));
-        document.getElementById('legend-crash').innerHTML = '';
-        document.getElementById('ticks-crash').innerHTML = '';
-      }
-      const g = svg.querySelector('g[data-zoom]') || svg;
-
-      const pts = CR.points.filter(p => !mk || p.mode === mk);
-      // 行人最後畫：它是這一頁真正的主角，被機車的點蓋掉就白畫了
-      [...pts].sort((a, b) => (a.mode === '人' ? 1 : 0) - (b.mode === '人' ? 1 : 0))
-        .forEach(pt => {
-          const c = el('circle', {
-            class: 'crash-pt', cx: BIG.px(pt.lon).toFixed(1), cy: BIG.py(pt.lat).toFixed(1),
-            r: (2.0 + ((pt.deaths || 1) - 1) * 1.2).toFixed(1),
-            fill: MODE_COLOR[pt.mode] || '#D0D0D0',
-            'fill-opacity': pt.mode === '機車' ? 0.55 : 0.85,
-          });
-          c.appendChild(el('title', {},
-            `民國${pt.year - 1911}年　${pt.district}　${pt.mode}　${pt.deaths || 1}人死亡\n` +
-            `${pt.location || ''}\n` +
-            [pt.road_type && `道路：${pt.road_type}`,
-             pt.speed_limit && `速限${pt.speed_limit}`,
-             pt.road_shape_main, pt.light, pt.cause_main].filter(Boolean).join('　')));
-          g.appendChild(c);
-        });
-
-      document.getElementById('crash-key').innerHTML = CR.modes.map(m =>
-        `<span class="it"><span class="mk" style="background:${MODE_COLOR[m]}"></span>` +
-        `${m}${int(CR.totals.byMode[m])}件</span>`).join('');
-
-      const nm = MODES[mi].zh;
-      const wide = [...CR.districts].sort((a, b) => b[bk || 'per100k'] - a[bk || 'per100k'])[0];
-      const dn2 = Object.fromEntries(R.map(d => [d.name, d]));
-      document.getElementById('cap-crash').innerHTML =
-        `A1死亡事故逐件落點，${nm === '全部' ? '全部運具' : '受害者為' + nm}，` +
-        `圖上${int(pts.length)}件。${CR.caveat}` +
-        (bk === 'per100k'
-          ? `<b>底圖著色最深的是${wide.name}，唯它十年只有${wide.deaths}人，` +
-            `95%區間是${wide.per100kLo}到${wide.per100kHi}。</b>` +
-            `一個面積占全市${(dn2[wide.name].area / R.reduce((a, d) => a + d.area, 0) * 100).toFixed(0)}%、` +
-            `住${int(dn2[wide.name].residents)}人的區，率的分母太小，` +
-            `顏色最深不代表那裡最危險。底下的區間圖比這一層可靠。`
-          : '');
-
-      document.getElementById('crash-stats').innerHTML = [
-        ['Deaths 死亡', int(CR.totals.deaths), `${CR.period}，平均每年${CR.totals.perYear}人`],
-        ['Motorcycle 機車', (CR.totals.byMode['機車'] / CR.totals.events * 100).toFixed(1) + '%',
-         `${int(CR.totals.byMode['機車'])}件`],
-        ['Pedestrian 行人', (CR.totals.byMode['人'] / CR.totals.events * 100).toFixed(1) + '%',
-         `${int(CR.totals.byMode['人'])}件`],
-      ].map(([k, v, n]) =>
-        `<div class="stat"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`
-      ).join('');
-    }
-
-    mkPills('crash-modes', MODES, () => mi, i => { mi = i; paintCrash(); });
-    mkPills('crash-base', BASES, () => bi2, i => { bi2 = i; paintCrash(); });
-
-    /* 每十萬人的橫條：畫的是95%區間，不是一根長條。
-       石岡區十年只有7人，那個率的區間寬到不該拿去排名，所以點與區間一起畫出來。 */
-    {
-      const rk = [...CR.districts].sort((a, b) => b.per100k - a.per100k);
-      const hi = Math.max(...rk.map(d => d.per100kHi));
-      document.getElementById('crash-rates').innerHTML = rk.map(d =>
-        `<div class="rate-bar${d.small ? ' small' : ''}">` +
-        `<span class="nm">${d.name}</span>` +
-        `<span class="tr"><span class="ci" style="left:${d.per100kLo / hi * 100}%;` +
-        `width:${(d.per100kHi - d.per100kLo) / hi * 100}%"></span>` +
-        `<span class="pt" style="left:calc(${d.per100k / hi * 100}% - 1.5px)"></span></span>` +
-        `<span class="vv">${d.per100k.toFixed(0)}　${d.deaths}人</span></div>`).join('');
-      const small = CR.districts.filter(d => d.small).map(d => d.name);
-      document.getElementById('cap-rates').innerHTML =
-        `直線是每十萬常住人口的十年死亡數，灰帶是95%區間（卜瓦松近似）。` +
-        `<b>區間越寬，那個排名越不該當真。</b>` +
-        (small.length ? `${small.join('、')}十年死亡數低於10人，` +
-          `本頁把它標成灰點，不列入比較。` : '') +
-        `分母用本 repo 的普查常住人口，與本頁其他區級比率同一套。`;
-    }
-
-    /* 公車服務與死亡率的關係。
-       第一版寫成「公車班次越稀的區死亡越高」，那是錯的，而且錯得有代表性：
-       每千人班次與每十萬人死亡共用同一個人口分母，人口少的區在兩邊同時偏高，
-       相關係數因此被分母自己撐到 +0.617。把公車那一邊的分母換成面積，
-       同一組區的相關係數掉到 +0.037，也就是說那個關係本來就不存在。
-       這一段刻意把三個係數都寫出來，而不是只留下最好看的那一個。 */
-    {
-      const bn = Object.fromEntries(BUS.districts.map(d => [d.name, d]));
-      const dn = Object.fromEntries(R.map(d => [d.name, d]));
-      const use = CR.districts.filter(d => !d.small);
-      const corr = (xs, ys) => {
-        const n = xs.length;
-        const mx = xs.reduce((a, b) => a + b, 0) / n, my = ys.reduce((a, b) => a + b, 0) / n;
-        return xs.reduce((a, x, i) => a + (x - mx) * (ys[i] - my), 0)
-          / Math.sqrt(xs.reduce((a, x) => a + (x - mx) ** 2, 0)
-                    * ys.reduce((a, y) => a + (y - my) ** 2, 0));
-      };
-      const ys = use.map(d => d.per100k);
-      const rPop = corr(use.map(d => bn[d.name].callsPerK.work.all), ys);
-      const rArea = corr(use.map(d => bn[d.name].callsPerKm2.work.all), ys);
-      const rDens = corr(use.map(d => dn[d.name].residents / dn[d.name].area), ys);
-      const sg = v => (v >= 0 ? '＋' : '－') + Math.abs(v).toFixed(3);
-      const mo = [...CR.districts].sort((a, b) => b.pedShare - a.pedShare)[0];
-      const M = CR.totals;
-
-      document.getElementById('crash-body-1').innerHTML =
-        `十年${int(M.events)}件、${int(M.deaths)}人，平均每年${M.perYear}人。` +
-        `<b>其中${(M.byMode['機車'] / M.events * 100).toFixed(0)}%的受害者是機車騎士，` +
-        `${(M.byMode['人'] / M.events * 100).toFixed(0)}%是行人。</b>` +
-        `運具的分類是以最脆弱的用路人為準，不是以肇事的主要當事者：` +
-        `一輛左轉小客車撞死行人，這裡歸類為行人。它問的是誰死了，不是誰肇事。`;
-
-      document.getElementById('crash-body-2').innerHTML =
-        `<b>${mo.name}是唯一一個行人多過機車的區：` +
-        `十年${mo.deaths}人裡，行人占${mo.pedShare.toFixed(0)}%、機車只占${mo.motoShare.toFixed(0)}%。</b>` +
-        `全市的比例剛好相反。${mo.name}是臺中最小的區、` +
-        `空屋率最高的區（${dn[mo.name].vacancy}%），` +
-        `也是白天湧入最多人的區之一（日夜比${dn[mo.name].ratio}）。` +
-        `一個人來人往、行人密度極高的舊市區，死亡的結構因此完全不同。` +
-        `唯十年${mo.deaths}人這個數字不大，區間也寬，不宜當成穩定的排名讀。`;
-
-      document.getElementById('crash-body-3').innerHTML =
-        `把第06節的公車服務與這一節的死亡率放在一起，` +
-        `${use.length}個區（排除樣本過少的）的相關係數是${sg(rPop)}，` +
-        `看起來像是「公車越多的地方死越多人」。<b>這個數字是假的。</b>` +
-        `每千人班次與每十萬人死亡共用同一個人口分母，` +
-        `人口少的區在兩邊同時偏高，係數是被分母自己撐起來的。` +
-        `把公車那一邊的分母換成面積，同一組區的係數掉到${sg(rArea)}：` +
-        `<b>公車服務與死亡率之間，本來就沒有關係。</b>`;
-
-      document.getElementById('crash-body-4').innerHTML =
-        `站得住的是另一個方向。人口密度與每十萬人死亡的相關係數是${sg(rDens)}：` +
-        `<b>越稀疏的區，每十萬人死亡越高。</b>` +
-        `這與直覺相反，唯它符合已知的機制：低密度的區路更寬、車速更快、` +
-        `號誌與行人設施更少，一次碰撞的動能因此更大。` +
-        `這仍然是相關而不是因果，三者一起變動，區級的資料分不開它們。` +
-        `要分開得下到逐路段：本頁的逐件資料裡有${int(M.detailed)}件` +
-        `（占${(M.detailed / M.events * 100).toFixed(0)}%）帶著道路型態與速限，` +
-        `恐怕那才是唯一能把「路的設計」與「人的行為」分開的路。`;
-    }
-
-    paintCrash();
-    enableMapZoom(document.getElementById('map-crash'), { max: 8, anchor: ANCHOR });
-  }
-
-  document.getElementById('foot-l').textContent =
-    `Taichung Future Mobility — ${R.length} districts · ${D.periods.census} / ${D.periods.signal}`;
-
-  document.getElementById('hero-stats').innerHTML = [
-    ['Range 全距', SP.ratioRange.toFixed(3), `${SP.ratioMin} 到 ${SP.ratioMax}`],
-    ['Day-heavy 最高', top.ratio.toFixed(3), `${top.name}　白天淨增 ${int(top.net)} 人`],
-    ['Night-heavy 最低', bot.ratio.toFixed(3), `${bot.name}　白天淨減 ${int(Math.abs(bot.net))} 人`],
-  ].map(([k, v, n]) =>
-    `<div class="stat"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`
-  ).join('');
-
-  document.getElementById('hero-body-1').innerHTML =
-    `臺中全市工作日的日間人口${int(T.dayWork)}人、夜間${int(T.nightWork)}人，` +
-    `相除是${T.ratio.toFixed(3)}。這個數字看起來是一個通勤圈與市界重合、自給自足的城市。` +
-    `唯拆到${R.length}個區，從${bot.name}的${bot.ratio}到${top.name}的${top.ratio}，` +
-    `全距${SP.ratioRange.toFixed(3)}。` +
-    `<b>全市那個接近1的數字，是兩組方向相反的失衡互相抵銷出來的。</b>`;
-  document.getElementById('hero-body-2').innerHTML =
-    `以縣市為單位討論臺中的移動，等於把這件事整個抹掉，所以本專案的空間單位是區。` +
-    `要補一句限制：信令給的是每一區的日間與夜間總數，` +
-    `<b>它答得了${bot.name}白天少了多少人，答不了那些人去了哪一區。</b>`;
 
 
   const corr = D.corrVacancyRatio;
