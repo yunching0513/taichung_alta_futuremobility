@@ -49,8 +49,19 @@ ENDPOINTS = [
      '高鐵車站含經緯度。補上目前有線形沒有站點的高鐵臺中站'),
     ('tra_station.json', '/Rail/TRA/Station',
      '臺鐵車站。TDX 這一份含 StationClass，那就是官方站等'),
+    # 公車。上一次跑 /Bus/Station/City/Taichung 失敗，所以這裡把站位的兩種路徑
+    # （Station 是站位群、Stop 是單一站牌）與路線、線形、班距都列上，
+    # 哪一個通就用哪一個；失敗的會列在結尾，不影響其餘端點。
+    ('bus_stop_taichung.json', '/Bus/Stop/City/Taichung',
+     '臺中公車站牌（單一站牌，含經緯度）'),
     ('bus_station_taichung.json', '/Bus/Station/City/Taichung',
-     '臺中公車站位。可及性那張圖要的站點'),
+     '臺中公車站位（同一路口的站牌群）'),
+    ('bus_route_taichung.json', '/Bus/Route/City/Taichung',
+     '臺中公車路線清單'),
+    ('bus_shape_taichung.json', '/Bus/Shape/City/Taichung',
+     '臺中公車路線線形。要畫路線圖就靠這一份'),
+    ('bus_frequency_taichung.json', '/Bus/Frequency/City/Taichung',
+     '臺中公車班距（每個時段的最小與最大班距分鐘數）。線寬按頻率畫粗細就靠這一份'),
 ]
 
 
@@ -96,7 +107,7 @@ def grab(tok, path):
     url = f'{BASE}{path}?%24format=JSON'
     req = urllib.request.Request(url, headers={
         'Authorization': f'Bearer {tok}', 'Accept-Encoding': 'identity'})
-    with urllib.request.urlopen(req, timeout=120) as r:
+    with urllib.request.urlopen(req, timeout=300) as r:
         return r.read()
 
 
