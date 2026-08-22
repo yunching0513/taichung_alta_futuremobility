@@ -28,6 +28,8 @@ PAGES = {
     'index.html': ('index.template.html', {
         '__TC_JSON__': 'tc_districts.json',
         '__RAIL_JSON__': 'tc_rail.json',
+        '__BUS_JSON__': 'tc_bus.json',
+        '__CRASH_JSON__': 'tc_crash.json',
     }, {
         '__MAPZOOM_JS__': 'mapzoom.js',
     }),

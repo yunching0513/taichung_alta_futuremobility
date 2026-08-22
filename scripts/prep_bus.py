@@ -324,6 +324,11 @@ def main():
             'calls': {dd: {b: round(v[dd][b]) for b, _, _, _ in BANDS} for dd, _ in DAYS},
             'callsPerK': {dd: {b: round(v[dd][b] / res[n] * 1000, 1) if res[n] else None
                                for b, _, _, _ in BANDS} for dd, _ in DAYS},
+            # 每平方公里的停靠班次。與每千人那個數的差別在分母：
+            # 人口當分母時，人口少的區在「公車服務」與「死亡率」兩邊會同時偏高，
+            # 兩者的相關係數因此會被共用的分母撐起來。面積當分母沒有這個問題。
+            'callsPerKm2': {dd: {b: round(v[dd][b] / d['area'], 1) if d['area'] else None
+                                 for b, _, _, _ in BANDS} for dd, _ in DAYS},
         })
 
     blob = {

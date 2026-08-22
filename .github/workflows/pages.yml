@@ -41,8 +41,20 @@ jobs:
       - name: 顯示 Python 版本
         run: python3 --version
 
+      # 從 data_TW/ 重跑整條管線，不吃版控裡現成的中間檔：
+      # 中間檔是有進版控的，唯若 prep 壞了而中間檔還在，部署會靜靜地送出過期的數字。
+      # 每一支 prep 裡的對帳因此都是部署的守門員，紅燈就不該上線。
       - name: 解析 29 區基本盤
         run: python3 scripts/prep_districts.py
+
+      - name: 解析軌道路網與車站
+        run: python3 scripts/prep_rail.py
+
+      - name: 解析公車班次
+        run: python3 scripts/prep_bus.py
+
+      - name: 解析 A1 死亡事故
+        run: python3 scripts/prep_crash.py
 
       - name: 建置版面
         run: python3 scripts/build.py

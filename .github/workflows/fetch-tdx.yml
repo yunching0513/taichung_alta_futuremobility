@@ -47,6 +47,8 @@ jobs:
         run: |
           python3 scripts/prep_districts.py
           python3 scripts/prep_rail.py
+          python3 scripts/prep_bus.py
+          python3 scripts/prep_crash.py
 
       - name: 確認沒有把金鑰寫進檔案
         run: |
