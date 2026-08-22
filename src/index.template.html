@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>臺中 · 未來移動</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@100;300;400;700;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ── VZT 視覺系統 ──────────────────────────────────────────────────────
+   單一強調色（石灰黃綠）、大量留白、超細字重配超大字號。
+   刻意只做淺色一套：這是報告書的視覺身分，深色版會把「留白為主體」這件事推翻。
+   因此每一個顏色都寫死在 token 上，不依賴瀏覽器的預設值。            */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  color-scheme: light;
+  --lime:   #C8D400;
+  --lime-dk:#A8B200;
+  --lime-lt:#E8F000;
+  --black:  #1A1A1A;
+  --grey-1: #4A4A4A;
+  --grey-2: #888888;
+  --grey-3: #D0D0D0;
+  --grey-4: #F2F2F2;
+  --white:  #FFFFFF;
+  --font-zh: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+  --font-en: 'Space Grotesk', ui-monospace, 'SF Mono', Menlo, monospace;
+}
+
+body {
+  font-family: var(--font-zh);
+  background: var(--grey-4);
+  color: var(--black);
+  padding: 48px 40px 64px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+@media (max-width: 720px) { body { padding: 28px 18px 48px; } }
+.wrap { max-width: 1180px; margin: 0 auto; }
+
+/* ── header ── */
+.page-header {
+  display: flex; align-items: flex-end; gap: 24px; flex-wrap: wrap;
+  margin-bottom: 64px; padding-bottom: 24px; border-bottom: 2px solid var(--black);
+}
+.logo-mark {
+  font-family: var(--font-en); font-size: 9px; font-weight: 600; letter-spacing: 0.15em;
+  border: 1.5px solid var(--black); padding: 4px 8px; text-transform: uppercase; white-space: nowrap;
+}
+.page-header h1 {
+  font-family: var(--font-en); font-size: 11px; font-weight: 500; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--grey-2); line-height: 1.4;
+}
+.page-header .stamp {
+  margin-left: auto; font-family: var(--font-en); font-size: 9px; letter-spacing: 0.18em;
+  color: var(--grey-2); text-transform: uppercase; text-align: right; line-height: 1.7;
+}
+
+/* ── sections ── */
+.section { margin-bottom: 64px; }
+.section-label {
+  font-family: var(--font-en); font-size: 10px; font-weight: 600; letter-spacing: 0.25em;
+  text-transform: uppercase; color: var(--grey-2); margin-bottom: 24px;
+  display: flex; align-items: center; gap: 12px;
+}
+.section-label .zh { font-family: var(--font-zh); letter-spacing: 0.1em; color: var(--grey-1); }
+.section-label::after { content: ''; flex: 1; height: 1px; background: var(--grey-3); }
+
+.card { background: var(--white); padding: 32px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+@media (max-width: 720px) { .card { padding: 20px; } }
+.card h4 {
+  font-family: var(--font-en); font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--grey-2); margin-bottom: 20px; font-weight: 600;
+}
+.card h4 .zh { font-family: var(--font-zh); letter-spacing: 0.08em; }
+
+/* ── hero ── */
+.hero { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 0; align-items: stretch; }
+@media (max-width: 900px) { .hero { grid-template-columns: 1fr; } }
+.hero-left { background: var(--white); padding: 40px; position: relative; overflow: hidden;
+             box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+.hero-num {
+  font-family: var(--font-en); font-size: clamp(72px, 12vw, 132px); font-weight: 300;
+  line-height: 0.86; letter-spacing: -0.03em; color: var(--black); position: relative; z-index: 1;
+}
+.hero-ring { position: absolute; right: -74px; top: -34px; width: 250px; height: 250px; z-index: 0; }
+.hero-zh {
+  font-size: clamp(20px, 2.4vw, 28px); font-weight: 100; letter-spacing: 0.08em;
+  line-height: 1.35; margin-top: 20px; position: relative; z-index: 1;
+}
+.hero-en {
+  font-family: var(--font-en); font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--black); margin-top: 10px; line-height: 1.6; position: relative; z-index: 1;
+}
+.hero-right { background: var(--white); padding: 40px; box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+              border-left: 1px solid var(--grey-3); display: flex; flex-direction: column; gap: 24px; }
+@media (max-width: 900px) { .hero-right { border-left: none; border-top: 1px solid var(--grey-3); } }
+.body-zh { font-size: 13px; font-weight: 300; line-height: 1.85; color: var(--grey-1); }
+.body-zh b { font-weight: 700; color: var(--black); }
+.body-zh + .body-zh { margin-top: 16px; }
+
+/* ── stat row ── */
+.stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)); gap: 24px; }
+.stat .k {
+  font-family: var(--font-en); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--grey-2); margin-bottom: 6px;
+}
+.stat .v {
+  font-family: var(--font-en); font-size: 30px; font-weight: 300; line-height: 1;
+  letter-spacing: -0.02em; color: var(--black);
+}
+.stat .v small { font-family: var(--font-zh); font-size: 12px; font-weight: 300; color: var(--grey-2);
+                 letter-spacing: 0; margin-left: 3px; }
+.stat .n { font-size: 11px; color: var(--grey-2); font-weight: 300; margin-top: 5px; letter-spacing: 0.03em; }
+
+/* ── pills ── */
+.cat-bar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
+.cat-pill {
+  font-family: var(--font-zh); font-size: 11px; font-weight: 400; padding: 5px 12px;
+  border: 1px solid var(--grey-3); background: var(--white); color: var(--grey-1);
+  cursor: pointer; letter-spacing: 0.03em;
+}
+.cat-pill:hover { border-color: var(--grey-2); color: var(--black); }
+.cat-pill[aria-pressed="true"] { background: var(--lime); border-color: var(--lime); color: var(--black); font-weight: 700; }
+.cat-pill:focus-visible { outline: 2px solid var(--black); outline-offset: 2px; }
+
+/* ── map ── */
+.map-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 24px; }
+@media (max-width: 900px) { .map-grid { grid-template-columns: 1fr; } }
+svg.map { display: block; width: 100%; height: auto; }
+.dist { stroke: var(--white); stroke-width: 0.8; cursor: default; }
+.dist:hover { stroke: var(--black); stroke-width: 1.6; }
+.dist-lbl { font-family: var(--font-zh); font-size: 8.5px; font-weight: 400; fill: var(--black);
+            paint-order: stroke; stroke: var(--white); stroke-width: 2.4px; pointer-events: none; }
+.legend { display: flex; align-items: center; gap: 0; margin-top: 14px; }
+.legend i { flex: 1; height: 10px; }
+.legend-ticks { display: flex; justify-content: space-between; font-family: var(--font-en);
+                font-size: 9px; color: var(--grey-2); margin-top: 5px; letter-spacing: 0.05em; }
+
+/* ── ranked bars ── */
+.bars { display: flex; flex-direction: column; gap: 2px; }
+.bar-row { display: grid; grid-template-columns: 56px 1fr 52px; gap: 8px; align-items: center;
+           font-size: 11px; padding: 1.5px 0; }
+.bar-row .nm { color: var(--black); font-weight: 400; }
+.bar-row .track { position: relative; height: 11px; background: var(--grey-4); }
+.bar-row .track i { position: absolute; top: 0; height: 11px; }
+.bar-row .track .zero { position: absolute; top: -2px; bottom: -2px; width: 1px; background: var(--grey-2); }
+.bar-row .vv { font-family: var(--font-en); font-size: 10.5px; color: var(--grey-1); text-align: right;
+               font-variant-numeric: tabular-nums; }
+.bar-row.on .nm { font-weight: 700; }
+
+/* ── scatter ── */
+.dot { fill: var(--lime-dk); }
+.dot.hi { fill: var(--black); }
+.ax { stroke: var(--grey-3); stroke-width: 1; }
+.ax-lbl { font-family: var(--font-en); font-size: 9px; fill: var(--grey-2); letter-spacing: 0.05em; }
+.pt-lbl { font-family: var(--font-zh); font-size: 9px; fill: var(--grey-1); }
+
+/* ── table ── */
+table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+th, td { padding: 6px 8px; text-align: right; border-bottom: 1px solid var(--grey-3); }
+th:first-child, td:first-child { text-align: left; }
+thead th { font-family: var(--font-en); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase;
+           color: var(--grey-2); font-weight: 600; border-bottom: 1px solid var(--black); }
+td { font-family: var(--font-en); font-variant-numeric: tabular-nums; color: var(--grey-1); }
+td:first-child { font-family: var(--font-zh); color: var(--black); }
+.scroll { overflow-x: auto; }
+
+/* ── caption / notes ── */
+.caption { font-size: 11px; color: var(--grey-2); font-weight: 300; letter-spacing: 0.03em;
+           line-height: 1.75; margin-top: 14px; }
+.en-small { font-family: var(--font-en); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+            font-weight: 500; color: var(--black); }
+.pending { border-top: 3px solid var(--grey-3); }
+.pending .tag {
+  display: inline-block; font-family: var(--font-en); font-size: 8px; letter-spacing: 0.18em;
+  text-transform: uppercase; border: 1px solid var(--grey-3); color: var(--grey-2); padding: 2px 7px;
+  margin-bottom: 14px;
+}
+.two-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; }
+
+.page-footer { border-top: 2px solid var(--black); padding-top: 20px; margin-top: 48px;
+               display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+.page-footer .l { font-family: var(--font-en); font-size: 9px; letter-spacing: 0.2em;
+                  color: var(--grey-2); text-transform: uppercase; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="page-header">
+  <div class="logo-mark">Taichung · Future Mobility</div>
+  <h1>29 Districts · Commuting &amp; Housing Base<br>臺中29個行政區 · 移動與住宅基本盤</h1>
+  <div class="stamp" id="stamp"></div>
+</div>
+
+<!-- ══ 01 通勤淨流 ══ -->
+<div class="section">
+  <div class="section-label">01 — Commuter Flow <span class="zh">全市那個接近1的數字</span></div>
+  <div class="hero">
+    <div class="hero-left">
+      <svg class="hero-ring" viewBox="0 0 260 260" aria-hidden="true">
+        <circle cx="130" cy="130" r="98" fill="none" stroke="#C8D400" stroke-width="40"/>
+        <circle cx="130" cy="130" r="98" fill="none" stroke="#E8F000" stroke-width="40"
+                stroke-dasharray="300 316" opacity="0.45"/>
+      </svg>
+      <div class="hero-num" id="hero-num"></div>
+      <div class="hero-zh">全市日夜間<br>人口比</div>
+      <div class="hero-en" id="hero-en"></div>
+    </div>
+    <div class="hero-right">
+      <div class="stat-row" id="hero-stats"></div>
+      <div>
+        <p class="body-zh" id="hero-body-1"></p>
+        <p class="body-zh" id="hero-body-2"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 02 日夜間人口比 ══ -->
+<div class="section">
+  <div class="section-label">02 — Day &amp; Night <span class="zh">誰白天多出來，誰晚上才回來</span></div>
+  <div class="card">
+    <h4>Day / Night Ratio by District <span class="zh">· 工作日日間人口 ÷ 夜間人口</span></h4>
+    <div class="map-grid">
+      <div>
+        <svg class="map" id="map-ratio" viewBox="0 0 560 700" role="img"
+             aria-label="臺中29個行政區的日夜間人口比面量圖"></svg>
+        <div class="legend" id="legend-ratio"></div>
+        <div class="legend-ticks" id="ticks-ratio"></div>
+      </div>
+      <div>
+        <div class="bars" id="bars-ratio"></div>
+      </div>
+    </div>
+    <p class="caption" id="cap-ratio"></p>
+  </div>
+</div>
+
+<!-- ══ 03 住宅基本盤 ══ -->
+<div class="section">
+  <div class="section-label">03 — Housing Base <span class="zh">住宅、家戶、空屋、人口、屋齡</span></div>
+  <div class="card">
+    <h4>Five Census Fields <span class="zh">· 切換著色依據</span></h4>
+    <div class="cat-bar" id="pills"></div>
+    <div class="map-grid">
+      <div>
+        <svg class="map" id="map-base" viewBox="0 0 560 700" role="img"
+             aria-label="臺中29個行政區的住宅基本盤面量圖"></svg>
+        <div class="legend" id="legend-base"></div>
+        <div class="legend-ticks" id="ticks-base"></div>
+      </div>
+      <div>
+        <div class="bars" id="bars-base"></div>
+      </div>
+    </div>
+    <p class="caption" id="cap-base"></p>
+  </div>
+</div>
+
+<!-- ══ 04 兩件事的關係 ══ -->
+<div class="section">
+  <div class="section-label">04 — Weak Correlation <span class="zh">空屋與通勤，關係比想像中弱</span></div>
+  <div class="two-col">
+    <div class="card">
+      <h4>Vacancy × Day/Night <span class="zh">· 29個區</span></h4>
+      <svg class="map" id="scatter" viewBox="0 0 460 360" role="img"
+           aria-label="空屋率與日夜間人口比散布圖"></svg>
+      <p class="caption" id="cap-scatter"></p>
+    </div>
+    <div class="card">
+      <h4>What It Means <span class="zh">· 這代表什麼</span></h4>
+      <p class="body-zh" id="corr-1"></p>
+      <p class="body-zh" id="corr-2"></p>
+      <p class="body-zh" id="corr-3"></p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 05 可及性：待接 ══ -->
+<div class="section">
+  <div class="section-label">05 — Accessibility <span class="zh">公共運輸站點 × 社宅基地</span></div>
+  <div class="card pending">
+    <span class="tag">Pending · 待接資料</span>
+    <h4>Transit Access Overlay <span class="zh">· 這一層還沒有資料</span></h4>
+    <div class="two-col">
+      <div>
+        <p class="body-zh"><b>要畫的是什麼。</b>把公共運輸站點、社會住宅基地與近十年新建住宅的落點疊在同一張圖上，
+          算每一個社宅基地到最近站牌的距離，看可及性的分布：
+          臺中的社宅蓋在有公共運輸的地方，還是蓋在只能開車到的地方。
+          這是「未來移動」這個題目最直接的一張圖，唯目前兩份輸入都還沒到位。</p>
+        <p class="body-zh"><b>缺的第一份是站點。</b>交通部TDX的公共運輸資料需要申請帳號取得
+          client_id 與 client_secret，無金鑰存取回401。
+          臺中市政府資料中心 datacenter.taichung.gov.tw 在本專案目前的網路環境下連不到，
+          CONNECT 被回502。兩者擇一取得之後，站點就能落圖。</p>
+      </div>
+      <div>
+        <p class="body-zh"><b>缺的第二份是社宅基地的座標。</b>內政部的社會住宅興辦進度只到縣市層級的戶數，
+          給不出基地在哪一個區、哪一個地號。基地清單要向臺中市住宅發展工程處取得，
+          或從公告的招租資訊逐案抄。</p>
+        <p class="body-zh"><b>先做得到的替代。</b>在站點到位之前，
+          本頁的第02節已經給出區級的通勤淨流：那是同一個問題的粗尺度版本。
+          真正要回答「白天走掉的人去了哪一區」，信令的區級總數答不了，
+          得接公車票證或運研所的通勤起訖調查。<span class="en-small">To be continued</span></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page-footer">
+  <div class="l" id="foot-l"></div>
+  <div style="display:flex;gap:6px;flex-wrap:wrap">
+    <span style="background:#C8D400;padding:3px 10px;font-size:9px;font-family:'Space Grotesk';font-weight:700">DAY-HEAVY</span>
+    <span style="background:#1A1A1A;color:white;padding:3px 10px;font-size:9px;font-family:'Space Grotesk';font-weight:700">NIGHT-HEAVY</span>
+  </div>
+</div>
+
+</div>
+
+<script type="application/json" id="tc">__TC_JSON__</script>
+<script>
+(() => {
+  'use strict';
+  const D = JSON.parse(document.getElementById('tc').textContent);
+  const R = D.districts;
+  const NS = 'http://www.w3.org/2000/svg';
+  const el = (t, a = {}, txt) => { const n = document.createElementNS(NS, t);
+    for (const k in a) n.setAttribute(k, a[k]);
+    if (txt != null) n.textContent = txt; return n; };
+  const int = v => v == null ? '－' : Math.round(v).toLocaleString('en-US');
+  const man = v => (v / 10000).toFixed(v >= 1e6 ? 0 : 1) + '萬';
+
+  /* ── 投影：等距圓柱，緯度方向按平均緯度的餘弦壓縮，臺中不會被拉長 ──
+     畫布高度由 bounds 算出來，不寫死：臺中東西長 南北短（和平區一個區就占了
+     全市快一半的面積），寫死成直式畫布會把市區那一團擠成看不見的小點。 */
+  const [x0, y0, x1, y1] = D.bounds;
+  const kx = Math.cos((y0 + y1) / 2 * Math.PI / 180);
+  const W = 560, PAD = 14;
+  const sx = (x1 - x0) * kx, sy = (y1 - y0);
+  const s = (W - PAD * 2) / sx;
+  const H = Math.round(sy * s + PAD * 2);
+  const ox = PAD, oy = PAD;
+  const px = lon => ox + (lon - x0) * kx * s;
+  const py = lat => oy + (y1 - lat) * s;
+  const path = rings => rings.map(r =>
+    'M' + r.map(p => `${px(p[0]).toFixed(1)} ${py(p[1]).toFixed(1)}`).join('L') + 'Z').join(' ');
+
+  /* 面積最大的環當標籤錨點，免得標籤落在飛地上 */
+  const centroid = d => {
+    let best = d.rings[0], area = -1;
+    for (const r of d.rings) {
+      let a = 0;
+      for (let i = 0, j = r.length - 1; i < r.length; j = i++)
+        a += r[j][0] * r[i][1] - r[i][0] * r[j][1];
+      if (Math.abs(a) > area) { area = Math.abs(a); best = r; }
+    }
+    let cx = 0, cy = 0;
+    for (const p of best) { cx += p[0]; cy += p[1]; }
+    return [px(cx / best.length), py(cy / best.length)];
+  };
+
+  /* ── 配色：VZT 只用一個強調色，所以發散用「石灰黃綠 ↔ 近黑」兩臂 ──
+     日間多的塗石灰黃綠（有人來），夜間多的塗近黑（人走了），中點是白。 */
+  const mix = (a, b, t) => {
+    const h = c => [parseInt(c.slice(1, 3), 16), parseInt(c.slice(3, 5), 16), parseInt(c.slice(5, 7), 16)];
+    const [r1, g1, b1] = h(a), [r2, g2, b2] = h(b);
+    const f = (u, v) => Math.round(u + (v - u) * t);
+    return `rgb(${f(r1, r2)},${f(g1, g2)},${f(b1, b2)})`;
+  };
+  const divColor = (v, lo, hi) => v >= 1
+    ? mix('#FFFFFF', '#A8B200', Math.min(1, (v - 1) / (hi - 1 || 1)))
+    : mix('#FFFFFF', '#1A1A1A', Math.min(1, (1 - v) / (1 - lo || 1)));
+  const seqColor = (v, lo, hi) =>
+    mix('#F2F2F2', '#A8B200', hi === lo ? 0 : (v - lo) / (hi - lo));
+
+  /* ── 面量圖 ── */
+  function drawMap(svgId, legId, tickId, get, fmt, mode) {
+    const svg = document.getElementById(svgId);
+    svg.textContent = '';
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    const vals = R.map(get);
+    const lo = Math.min(...vals), hi = Math.max(...vals);
+    const color = v => mode === 'div' ? divColor(v, lo, hi) : seqColor(v, lo, hi);
+    R.forEach(d => {
+      const p = el('path', { class: 'dist', d: path(d.rings), fill: color(get(d)) });
+      p.appendChild(el('title', {}, `${d.name}　${fmt(get(d))}`));
+      svg.appendChild(p);
+    });
+    R.forEach(d => {
+      if (d.area < 6) return;   // 面積不到 6 平方公里的區塞不下標籤，留給 tooltip
+      const [cx, cy] = centroid(d);
+      svg.appendChild(el('text', { class: 'dist-lbl', x: cx, y: cy, 'text-anchor': 'middle' },
+        d.name.replace(/區$/, '')));
+    });
+    const leg = document.getElementById(legId);
+    leg.innerHTML = '';
+    for (let i = 0; i < 40; i++) {
+      const v = lo + (hi - lo) * i / 39;
+      const b = document.createElement('i');
+      b.style.background = color(v);
+      leg.appendChild(b);
+    }
+    document.getElementById(tickId).innerHTML =
+      `<span>${fmt(lo)}</span>${mode === 'div' ? '<span>1.000</span>' : ''}<span>${fmt(hi)}</span>`;
+    return { lo, hi, color };
+  }
+
+  /* ── 排序長條 ── */
+  function drawBars(id, get, fmt, mode, base) {
+    const box = document.getElementById(id);
+    box.innerHTML = '';
+    const sorted = [...R].sort((a, b) => get(b) - get(a));
+    const vals = sorted.map(get);
+    const lo = Math.min(...vals), hi = Math.max(...vals);
+    sorted.forEach((d, i) => {
+      const v = get(d);
+      const row = document.createElement('div');
+      row.className = 'bar-row' + (i === 0 || i === sorted.length - 1 ? ' on' : '');
+      const track = document.createElement('div');
+      track.className = 'track';
+      const bar = document.createElement('i');
+      if (mode === 'div') {
+        const z = (base - lo) / (hi - lo) * 100;
+        const w = Math.abs(v - base) / (hi - lo) * 100;
+        bar.style.left = (v >= base ? z : z - w) + '%';
+        bar.style.width = w + '%';
+        bar.style.background = v >= base ? 'var(--lime-dk)' : 'var(--black)';
+        const zl = document.createElement('span');
+        zl.className = 'zero'; zl.style.left = z + '%';
+        track.appendChild(zl);
+      } else {
+        bar.style.left = '0';
+        bar.style.width = ((v - lo) / (hi - lo || 1) * 96 + 4) + '%';
+        bar.style.background = 'var(--lime-dk)';
+      }
+      track.appendChild(bar);
+      const nm = document.createElement('span'); nm.className = 'nm'; nm.textContent = d.name;
+      const vv = document.createElement('span'); vv.className = 'vv'; vv.textContent = fmt(v);
+      row.append(nm, track, vv);
+      box.appendChild(row);
+    });
+  }
+
+  /* ── 01 hero ── */
+  const T = D.totals, SP = D.spread;
+  const top = [...R].sort((a, b) => b.ratio - a.ratio)[0];
+  const bot = [...R].sort((a, b) => a.ratio - b.ratio)[0];
+  document.getElementById('hero-num').textContent = T.ratio.toFixed(3);
+  document.getElementById('hero-en').innerHTML =
+    `DAY ${int(T.dayWork)} · NIGHT ${int(T.nightWork)}<br>SIGNAL DATA ${D.periods.signal}`;
+  document.getElementById('stamp').innerHTML =
+    `Census ${D.periods.census}<br>Signal ${D.periods.signal}`;
+  document.getElementById('foot-l').textContent =
+    `Taichung Future Mobility — ${R.length} districts · ${D.periods.census} / ${D.periods.signal}`;
+
+  document.getElementById('hero-stats').innerHTML = [
+    ['Range 全距', SP.ratioRange.toFixed(3), `${SP.ratioMin} 到 ${SP.ratioMax}`],
+    ['Day-heavy 最高', top.ratio.toFixed(3), `${top.name}　白天淨增 ${int(top.net)} 人`],
+    ['Night-heavy 最低', bot.ratio.toFixed(3), `${bot.name}　白天淨減 ${int(Math.abs(bot.net))} 人`],
+  ].map(([k, v, n]) =>
+    `<div class="stat"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`
+  ).join('');
+
+  document.getElementById('hero-body-1').innerHTML =
+    `臺中全市工作日的日間人口${int(T.dayWork)}人、夜間${int(T.nightWork)}人，` +
+    `相除是${T.ratio.toFixed(3)}。這個數字看起來是一個通勤圈與市界重合、自給自足的城市。` +
+    `唯拆到${R.length}個區，從${bot.name}的${bot.ratio}到${top.name}的${top.ratio}，` +
+    `全距${SP.ratioRange.toFixed(3)}。` +
+    `<b>全市那個接近1的數字，是兩組方向相反的失衡互相抵銷出來的。</b>`;
+  document.getElementById('hero-body-2').innerHTML =
+    `以縣市為單位討論臺中的移動，等於把這件事整個抹掉，所以本專案的空間單位是區。` +
+    `要補一句限制：信令給的是每一區的日間與夜間總數，` +
+    `<b>它答得了${bot.name}白天少了多少人，答不了那些人去了哪一區。</b>`;
+
+  /* ── 02 日夜比 ── */
+  const rf = v => v.toFixed(3);
+  drawMap('map-ratio', 'legend-ratio', 'ticks-ratio', d => d.ratio, rf, 'div');
+  drawBars('bars-ratio', d => d.ratio, rf, 'div', 1);
+  document.getElementById('cap-ratio').textContent =
+    `工作日日間人口除以夜間人口，資料期${D.periods.signal}。石灰黃綠是白天多出來的區，` +
+    `近黑是晚上才回來的區，白色是1.0。長條圖的中線同樣是1.0。${D.caveat}`;
+
+  /* ── 03 住宅基本盤 ── */
+  const METRICS = [
+    { k: 'houses', zh: '住宅', fmt: v => man(v) + '宅', mode: 'seq',
+      note: '普查認定的住宅總數。西屯區與北屯區各超過十一萬宅，中區不到一萬。' },
+    { k: 'households', zh: '家戶', fmt: v => man(v) + '戶', mode: 'seq',
+      note: '普查認定的家戶總數。有五個區的家戶數多於住宅數，中區是其中之一。' },
+    { k: 'vacancy', zh: '空屋率', fmt: v => v.toFixed(2) + '%', mode: 'seq',
+      note: '普查的空閒住宅比率。這是109年的定義，與內政部按用電判定的低度使用不是同一回事。' },
+    { k: 'residents', zh: '常住人口', fmt: v => man(v) + '人', mode: 'seq',
+      note: '普查的常住人口，與信令的夜間人口是兩套量法，數字不會一樣。' },
+    { k: 'old40', zh: '屋齡40年以上', fmt: v => v.toFixed(1) + '%', mode: 'seq',
+      note: '屋齡四十年以上的住宅占比。舊市區的更新壓力最直接的指標。' },
+  ];
+  let cur = 2;
+  const pills = document.getElementById('pills');
+  pills.innerHTML = METRICS.map((m, i) =>
+    `<button type="button" class="cat-pill" data-i="${i}" aria-pressed="${i === cur}">${m.zh}</button>`).join('');
+  function paintBase() {
+    const m = METRICS[cur];
+    drawMap('map-base', 'legend-base', 'ticks-base', d => d[m.k], m.fmt, m.mode);
+    drawBars('bars-base', d => d[m.k], m.fmt, m.mode, 0);
+    const hi = [...R].sort((a, b) => b[m.k] - a[m.k])[0];
+    const lo = [...R].sort((a, b) => a[m.k] - b[m.k])[0];
+    document.getElementById('cap-base').textContent =
+      `${m.zh}，資料期${D.periods.census}。最高${hi.name}${m.fmt(hi[m.k])}、` +
+      `最低${lo.name}${m.fmt(lo[m.k])}。全市住宅${int(T.houses)}宅、家戶${int(T.households)}戶、` +
+      `常住人口${int(T.residents)}人、空屋率${T.vacancy}%。${m.note}`;
+    pills.querySelectorAll('.cat-pill').forEach(b =>
+      b.setAttribute('aria-pressed', String(+b.dataset.i === cur)));
+  }
+  pills.addEventListener('click', e => {
+    const b = e.target.closest('.cat-pill');
+    if (b) { cur = +b.dataset.i; paintBase(); }
+  });
+  paintBase();
+
+  /* ── 04 散布圖 ── */
+  {
+    const svg = document.getElementById('scatter');
+    const W2 = 460, H2 = 360, L = 46, Rr = 14, T2 = 16, B = 40;
+    const xs = R.map(d => d.ratio), ys = R.map(d => d.vacancy);
+    const xlo = Math.min(...xs) * 0.99, xhi = Math.max(...xs) * 1.01;
+    const ylo = 0, yhi = Math.max(...ys) * 1.08;
+    const X = v => L + (v - xlo) / (xhi - xlo) * (W2 - L - Rr);
+    const Y = v => T2 + (yhi - v) / (yhi - ylo) * (H2 - T2 - B);
+    svg.appendChild(el('line', { class: 'ax', x1: L, x2: W2 - Rr, y1: Y(0), y2: Y(0) }));
+    svg.appendChild(el('line', { class: 'ax', x1: L, x2: L, y1: T2, y2: Y(0) }));
+    if (xlo < 1 && xhi > 1)
+      svg.appendChild(el('line', { class: 'ax', x1: X(1), x2: X(1), y1: T2, y2: Y(0),
+        'stroke-dasharray': '3 3' }));
+    [0, 10, 20, 30].forEach(v => { if (v <= yhi)
+      svg.appendChild(el('text', { class: 'ax-lbl', x: L - 6, y: Y(v) + 3, 'text-anchor': 'end' }, v + '%')); });
+    [0.85, 1.0, 1.15].forEach(v => { if (v > xlo && v < xhi)
+      svg.appendChild(el('text', { class: 'ax-lbl', x: X(v), y: H2 - 22, 'text-anchor': 'middle' }, v.toFixed(2))); });
+    svg.appendChild(el('text', { class: 'ax-lbl', x: (L + W2) / 2, y: H2 - 6, 'text-anchor': 'middle' },
+      'DAY / NIGHT RATIO'));
+    svg.appendChild(el('text', { class: 'ax-lbl', x: L - 34, y: T2 + 6 }, 'VACANCY'));
+    const named = new Set([...R].sort((a, b) => b.vacancy - a.vacancy).slice(0, 3).map(d => d.name)
+      .concat([...R].sort((a, b) => b.ratio - a.ratio)[0].name,
+              [...R].sort((a, b) => a.ratio - b.ratio)[0].name));
+    R.forEach(d => {
+      const hi = named.has(d.name);
+      svg.appendChild(el('circle', { class: 'dot' + (hi ? ' hi' : ''), cx: X(d.ratio), cy: Y(d.vacancy),
+        r: hi ? 5 : 4 }))
+        .appendChild(el('title', {}, `${d.name}　日夜比 ${d.ratio}　空屋率 ${d.vacancy}%`));
+      if (hi) svg.appendChild(el('text', { class: 'pt-lbl', x: X(d.ratio) + 7, y: Y(d.vacancy) + 3 }, d.name));
+    });
+    document.getElementById('cap-scatter').textContent =
+      `橫軸是日夜間人口比（${D.periods.signal}），縱軸是普查空屋率（${D.periods.census}）。` +
+      `虛線是日夜比1.0。標名的是空屋率前三高，以及日夜比的兩個極端。`;
+  }
+
+  const corr = D.corrVacancyRatio;
+  const wt = Math.abs(corr) < 0.3 ? '弱' : Math.abs(corr) < 0.6 ? '中等' : '強';
+  const hiV = [...R].sort((a, b) => b.vacancy - a.vacancy).slice(0, 3);
+  const cross = hiV.map(d => `${d.name}（空屋率${d.vacancy}%、日夜比${d.ratio}）`).join('、');
+  document.getElementById('corr-1').innerHTML =
+    `直覺上會猜「白天聚集人的地方，就是晚上空著的地方」。` +
+    `${R.length}個區的空屋率與日夜間人口比，相關係數是<b>${corr}</b>，屬${wt}相關，` +
+    `這個猜測撐不起來。`;
+  document.getElementById('corr-2').innerHTML =
+    `空屋率最高的三個區是${cross}。` +
+    `前兩個確實是白天多出人的區，第三個卻剛好相反：<b>方向不一致，就代表成因不只一種。</b>`;
+  document.getElementById('corr-3').innerHTML =
+    `要把它們分開，需要更細的資料：屋齡、建物型態、產權年份，以及通勤的起訖對。` +
+    `本頁第03節的屋齡欄位是第一步，其餘還沒到位。` +
+    `<span class="en-small">Next — transit stops &amp; social housing sites</span>`;
+})();
+</script>
+</body>
+</html>

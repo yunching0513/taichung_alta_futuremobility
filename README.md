@@ -69,6 +69,27 @@
 烏日區、龍井區、大肚區、外埔區也是同樣的方向。
 住宅比家戶少、空屋率卻不低，這兩件事要並存，只可能是存量的位置與需求的位置對不上。
 
+## 目前產出
+
+```
+python3 scripts/prep_districts.py    # data_TW/from_housing/ → data/tc_districts.json
+python3 scripts/build.py             # data/ + src/ → dist/index.html
+```
+
+`dist/index.html` 是單一檔案、點開就能看，五節：
+
+| 節 | 內容 |
+|---|---|
+| 01 Commuter Flow | 全市日夜間人口比0.997與29區的全距0.379 |
+| 02 Day & Night | 29區日夜比面量圖與排序長條，石灰黃綠是白天多出來的區，近黑是晚上才回來的 |
+| 03 Housing Base | 住宅、家戶、空屋率、常住人口、屋齡40年以上，五項切換著色 |
+| 04 Weak Correlation | 空屋率×日夜比散布圖，相關係數0.282 |
+| 05 Accessibility | 公共運輸站點×社宅基地。**這一層還沒有資料**，缺什麼寫在頁面上 |
+
+視覺沿用 VZT 風格指南：單一強調色（石灰黃綠 #C8D400）、大量留白、
+超細字重配超大字號、中英並陳。刻意只做淺色一套，深色版會把「留白為主體」這件事推翻。
+唯一的外部請求是 Google Fonts，字型連不到時有系統字型後備，版面仍然成立。
+
 ## 資料夾結構
 
 ```
@@ -97,7 +118,16 @@ docs/       資料來源清單與方法筆記
 
 ## 待收的資料
 
-見 [`docs/sources.md`](docs/sources.md)。
+見 [`docs/sources.md`](docs/sources.md)。目前最擋路的兩份：
+
+**公共運輸站點。** 交通部TDX需要申請帳號取得 client_id 與 client_secret，
+無金鑰存取回401、取token回400 `invalid_client`。
+臺中市政府資料中心 `datacenter.taichung.gov.tw` 在本專案目前的網路環境下連不到，
+CONNECT 被回502。兩者擇一取得之後，站點就能落圖。
+
+**社宅基地座標。** 內政部的社會住宅興辦進度只到縣市層級的戶數，
+給不出基地在哪一個區、哪一個地號；清單要向臺中市住宅發展工程處取得，
+或從公告的招租資訊逐案抄。
 
 ## 授權
 

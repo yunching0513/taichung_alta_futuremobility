@@ -1,0 +1,1515 @@
+{
+ "_note": "主計總處《人口及住宅普查》民國109年，鄉鎮市區別。住宅、家戶、空屋、屋齡、面積級距",
+ "_upstream": "yunching0513/housing @ 5fc6d07 · data/tw_town_data.json",
+ "_extracted": "towns 之中 county == \"臺中市\" 者，共 29 筆",
+ "meta": {
+  "period": "民國109年11月",
+  "source": "行政院主計總處109年人口及住宅普查 縣市報告表20、31、37、38、39、41、42",
+  "national": {
+   "houses": 8993149,
+   "households": 8086905,
+   "idle": 1173608,
+   "vacant": 1662140,
+   "occasional": 488532,
+   "otherUse": 435122,
+   "ageVacant": [
+    536858,
+    268834,
+    398930,
+    201788,
+    255730
+   ],
+   "ageAll": [
+    2863340,
+    1707336,
+    2257023,
+    1180085,
+    985365
+   ],
+   "areaVacant": [
+    376891,
+    744765,
+    316398,
+    206009,
+    18077
+   ],
+   "areaAll": [
+    1157005,
+    4240327,
+    2172792,
+    1287862,
+    135163
+   ],
+   "vacancy": 13.05,
+   "perHousehold": 1.112
+  },
+  "vacancyCut": 13.05,
+  "inflowCut": 4.41
+ },
+ "rows": [
+  {
+   "key": "臺中市/中區",
+   "county": "臺中市",
+   "name": "中區",
+   "houses": 9415,
+   "occupied": 5795,
+   "unoccupied": 3620,
+   "occasional": 485,
+   "otherUse": 445,
+   "idle": 2690,
+   "vacancy": 28.57,
+   "households": 10399,
+   "residents": 19390,
+   "perHousehold": 0.905,
+   "inflow": 11.14,
+   "inflowCounty": 11.67,
+   "vacant": 3175,
+   "ageAll": [
+    3391,
+    2350,
+    3213,
+    147,
+    314
+   ],
+   "ageVacant": [
+    999,
+    863,
+    1193,
+    17,
+    103
+   ],
+   "areaAll": [
+    4252,
+    2983,
+    1037,
+    890,
+    253
+   ],
+   "areaVacant": [
+    1825,
+    882,
+    234,
+    202,
+    32
+   ],
+   "avgAreaAll": 90.1,
+   "avgAreaVacant": 71.1,
+   "quadrant": "slack_growing",
+   "margin": 15.52
+  },
+  {
+   "key": "臺中市/東區",
+   "county": "臺中市",
+   "name": "東區",
+   "houses": 33188,
+   "occupied": 25714,
+   "unoccupied": 7474,
+   "occasional": 1699,
+   "otherUse": 1688,
+   "idle": 4087,
+   "vacancy": 12.31,
+   "households": 28224,
+   "residents": 83344,
+   "perHousehold": 1.176,
+   "inflow": 5.27,
+   "inflowCounty": 10.34,
+   "vacant": 5786,
+   "ageAll": [
+    9164,
+    5663,
+    8903,
+    5710,
+    3748
+   ],
+   "ageVacant": [
+    1806,
+    954,
+    1472,
+    664,
+    890
+   ],
+   "areaAll": [
+    3355,
+    15736,
+    7124,
+    6314,
+    659
+   ],
+   "areaVacant": [
+    1128,
+    3016,
+    860,
+    738,
+    44
+   ],
+   "avgAreaAll": 128.5,
+   "avgAreaVacant": 106.8,
+   "quadrant": "tight_growing",
+   "margin": -0.74
+  },
+  {
+   "key": "臺中市/南區",
+   "county": "臺中市",
+   "name": "南區",
+   "houses": 59404,
+   "occupied": 43607,
+   "unoccupied": 15797,
+   "occasional": 2659,
+   "otherUse": 3151,
+   "idle": 9987,
+   "vacancy": 16.81,
+   "households": 51396,
+   "residents": 146708,
+   "perHousehold": 1.156,
+   "inflow": 9.76,
+   "inflowCounty": 9.03,
+   "vacant": 12646,
+   "ageAll": [
+    9592,
+    5915,
+    26221,
+    10998,
+    6678
+   ],
+   "ageVacant": [
+    1884,
+    1426,
+    5437,
+    2449,
+    1450
+   ],
+   "areaAll": [
+    6950,
+    32866,
+    12187,
+    6816,
+    585
+   ],
+   "areaVacant": [
+    2630,
+    6800,
+    2053,
+    1059,
+    104
+   ],
+   "avgAreaAll": 113.7,
+   "avgAreaVacant": 100.3,
+   "quadrant": "slack_growing",
+   "margin": 3.76
+  },
+  {
+   "key": "臺中市/西區",
+   "county": "臺中市",
+   "name": "西區",
+   "houses": 57573,
+   "occupied": 41940,
+   "unoccupied": 15633,
+   "occasional": 2665,
+   "otherUse": 3961,
+   "idle": 9007,
+   "vacancy": 15.64,
+   "households": 45148,
+   "residents": 121379,
+   "perHousehold": 1.275,
+   "inflow": 6.97,
+   "inflowCounty": 7.77,
+   "vacant": 11672,
+   "ageAll": [
+    14742,
+    13462,
+    21086,
+    5609,
+    2674
+   ],
+   "ageVacant": [
+    2838,
+    3106,
+    4064,
+    881,
+    783
+   ],
+   "areaAll": [
+    7396,
+    25762,
+    14863,
+    8643,
+    909
+   ],
+   "areaVacant": [
+    2352,
+    5033,
+    2429,
+    1735,
+    123
+   ],
+   "avgAreaAll": 123.2,
+   "avgAreaVacant": 113.8,
+   "quadrant": "slack_growing",
+   "margin": 2.59
+  },
+  {
+   "key": "臺中市/北區",
+   "county": "臺中市",
+   "name": "北區",
+   "houses": 74650,
+   "occupied": 53219,
+   "unoccupied": 21431,
+   "occasional": 3467,
+   "otherUse": 3157,
+   "idle": 14807,
+   "vacancy": 19.84,
+   "households": 61587,
+   "residents": 157585,
+   "perHousehold": 1.212,
+   "inflow": 6.3,
+   "inflowCounty": 6.78,
+   "vacant": 18274,
+   "ageAll": [
+    16493,
+    21326,
+    22851,
+    9744,
+    4236
+   ],
+   "ageVacant": [
+    4026,
+    5109,
+    5882,
+    2217,
+    1040
+   ],
+   "areaAll": [
+    11529,
+    35990,
+    15439,
+    10869,
+    823
+   ],
+   "areaVacant": [
+    4464,
+    8628,
+    2854,
+    2221,
+    107
+   ],
+   "avgAreaAll": 115.4,
+   "avgAreaVacant": 102.4,
+   "quadrant": "slack_growing",
+   "margin": 6.79
+  },
+  {
+   "key": "臺中市/西屯區",
+   "county": "臺中市",
+   "name": "西屯區",
+   "houses": 114057,
+   "occupied": 78932,
+   "unoccupied": 35125,
+   "occasional": 7736,
+   "otherUse": 5663,
+   "idle": 21726,
+   "vacancy": 19.05,
+   "households": 98068,
+   "residents": 290549,
+   "perHousehold": 1.163,
+   "inflow": 14.24,
+   "inflowCounty": 6.9,
+   "vacant": 29462,
+   "ageAll": [
+    11630,
+    17625,
+    48790,
+    19425,
+    16587
+   ],
+   "ageVacant": [
+    1947,
+    3068,
+    12334,
+    4846,
+    7267
+   ],
+   "areaAll": [
+    18790,
+    45536,
+    25923,
+    21537,
+    2271
+   ],
+   "areaVacant": [
+    8710,
+    10233,
+    4678,
+    5374,
+    467
+   ],
+   "avgAreaAll": 125.1,
+   "avgAreaVacant": 112.2,
+   "quadrant": "slack_growing",
+   "margin": 6.0
+  },
+  {
+   "key": "臺中市/南屯區",
+   "county": "臺中市",
+   "name": "南屯區",
+   "houses": 76160,
+   "occupied": 56865,
+   "unoccupied": 19295,
+   "occasional": 3746,
+   "otherUse": 2728,
+   "idle": 12821,
+   "vacancy": 16.83,
+   "households": 63118,
+   "residents": 195426,
+   "perHousehold": 1.207,
+   "inflow": 6.92,
+   "inflowCounty": 8.76,
+   "vacant": 16567,
+   "ageAll": [
+    5181,
+    7981,
+    33633,
+    15048,
+    14317
+   ],
+   "ageVacant": [
+    913,
+    1859,
+    7181,
+    2779,
+    3835
+   ],
+   "areaAll": [
+    7536,
+    31895,
+    21772,
+    13643,
+    1314
+   ],
+   "areaVacant": [
+    3880,
+    6480,
+    3629,
+    2476,
+    102
+   ],
+   "avgAreaAll": 131.8,
+   "avgAreaVacant": 111.4,
+   "quadrant": "slack_growing",
+   "margin": 3.78
+  },
+  {
+   "key": "臺中市/北屯區",
+   "county": "臺中市",
+   "name": "北屯區",
+   "houses": 117511,
+   "occupied": 94662,
+   "unoccupied": 22849,
+   "occasional": 4682,
+   "otherUse": 4345,
+   "idle": 13822,
+   "vacancy": 11.76,
+   "households": 101548,
+   "residents": 294430,
+   "perHousehold": 1.157,
+   "inflow": 5.17,
+   "inflowCounty": 8.86,
+   "vacant": 18504,
+   "ageAll": [
+    14787,
+    21078,
+    41307,
+    16010,
+    24329
+   ],
+   "ageVacant": [
+    2711,
+    2785,
+    6396,
+    2097,
+    4515
+   ],
+   "areaAll": [
+    8521,
+    58210,
+    27563,
+    20895,
+    2322
+   ],
+   "areaVacant": [
+    2053,
+    9543,
+    3728,
+    2972,
+    208
+   ],
+   "avgAreaAll": 129.6,
+   "avgAreaVacant": 120.6,
+   "quadrant": "tight_growing",
+   "margin": -1.29
+  },
+  {
+   "key": "臺中市/豐原區",
+   "county": "臺中市",
+   "name": "豐原區",
+   "houses": 50626,
+   "occupied": 37889,
+   "unoccupied": 12737,
+   "occasional": 1349,
+   "otherUse": 3316,
+   "idle": 8072,
+   "vacancy": 15.94,
+   "households": 49195,
+   "residents": 148643,
+   "perHousehold": 1.029,
+   "inflow": 1.87,
+   "inflowCounty": 4.61,
+   "vacant": 9421,
+   "ageAll": [
+    18167,
+    10081,
+    11554,
+    5608,
+    5216
+   ],
+   "ageVacant": [
+    3294,
+    1235,
+    2349,
+    779,
+    1764
+   ],
+   "areaAll": [
+    6032,
+    19660,
+    12609,
+    10719,
+    1606
+   ],
+   "areaVacant": [
+    2536,
+    3625,
+    1729,
+    1416,
+    115
+   ],
+   "avgAreaAll": 135.5,
+   "avgAreaVacant": 109.1,
+   "quadrant": "slack_shrinking",
+   "margin": 2.89
+  },
+  {
+   "key": "臺中市/東勢區",
+   "county": "臺中市",
+   "name": "東勢區",
+   "houses": 16188,
+   "occupied": 12969,
+   "unoccupied": 3219,
+   "occasional": 1011,
+   "otherUse": 964,
+   "idle": 1244,
+   "vacancy": 7.68,
+   "households": 14759,
+   "residents": 41219,
+   "perHousehold": 1.097,
+   "inflow": 1.8,
+   "inflowCounty": 3.41,
+   "vacant": 2255,
+   "ageAll": [
+    7050,
+    3171,
+    3475,
+    1159,
+    1333
+   ],
+   "ageVacant": [
+    1193,
+    280,
+    359,
+    170,
+    253
+   ],
+   "areaAll": [
+    1056,
+    4314,
+    4628,
+    5491,
+    699
+   ],
+   "areaVacant": [
+    226,
+    825,
+    512,
+    623,
+    69
+   ],
+   "avgAreaAll": 163.4,
+   "avgAreaVacant": 146.0,
+   "quadrant": "tight_shrinking",
+   "margin": -5.37
+  },
+  {
+   "key": "臺中市/大甲區",
+   "county": "臺中市",
+   "name": "大甲區",
+   "houses": 22956,
+   "occupied": 18086,
+   "unoccupied": 4870,
+   "occasional": 1174,
+   "otherUse": 1188,
+   "idle": 2508,
+   "vacancy": 10.93,
+   "households": 22882,
+   "residents": 74143,
+   "perHousehold": 1.003,
+   "inflow": 2.15,
+   "inflowCounty": 3.15,
+   "vacant": 3682,
+   "ageAll": [
+    9359,
+    4252,
+    5380,
+    2114,
+    1851
+   ],
+   "ageVacant": [
+    1871,
+    515,
+    722,
+    251,
+    323
+   ],
+   "areaAll": [
+    1443,
+    6236,
+    7932,
+    6460,
+    885
+   ],
+   "areaVacant": [
+    387,
+    1204,
+    1072,
+    927,
+    92
+   ],
+   "avgAreaAll": 157.5,
+   "avgAreaVacant": 144.1,
+   "quadrant": "tight_shrinking",
+   "margin": -2.12
+  },
+  {
+   "key": "臺中市/清水區",
+   "county": "臺中市",
+   "name": "清水區",
+   "houses": 31410,
+   "occupied": 21874,
+   "unoccupied": 9536,
+   "occasional": 1389,
+   "otherUse": 1964,
+   "idle": 6183,
+   "vacancy": 19.68,
+   "households": 26973,
+   "residents": 86191,
+   "perHousehold": 1.164,
+   "inflow": 1.88,
+   "inflowCounty": 5.15,
+   "vacant": 7572,
+   "ageAll": [
+    10653,
+    4976,
+    5877,
+    4198,
+    5706
+   ],
+   "ageVacant": [
+    2794,
+    968,
+    1217,
+    542,
+    2051
+   ],
+   "areaAll": [
+    1474,
+    8818,
+    12068,
+    7909,
+    1141
+   ],
+   "areaVacant": [
+    635,
+    2886,
+    2436,
+    1480,
+    135
+   ],
+   "avgAreaAll": 154.0,
+   "avgAreaVacant": 136.0,
+   "quadrant": "slack_shrinking",
+   "margin": 6.63
+  },
+  {
+   "key": "臺中市/沙鹿區",
+   "county": "臺中市",
+   "name": "沙鹿區",
+   "houses": 33672,
+   "occupied": 26092,
+   "unoccupied": 7580,
+   "occasional": 1621,
+   "otherUse": 2132,
+   "idle": 3827,
+   "vacancy": 11.37,
+   "households": 34046,
+   "residents": 108163,
+   "perHousehold": 0.989,
+   "inflow": 7.28,
+   "inflowCounty": 10.66,
+   "vacant": 5448,
+   "ageAll": [
+    9461,
+    4932,
+    6387,
+    6007,
+    6885
+   ],
+   "ageVacant": [
+    1236,
+    673,
+    978,
+    1240,
+    1321
+   ],
+   "areaAll": [
+    3014,
+    8803,
+    13116,
+    7934,
+    805
+   ],
+   "areaVacant": [
+    1029,
+    1314,
+    1746,
+    1319,
+    40
+   ],
+   "avgAreaAll": 147.5,
+   "avgAreaVacant": 133.6,
+   "quadrant": "tight_growing",
+   "margin": -1.68
+  },
+  {
+   "key": "臺中市/梧棲區",
+   "county": "臺中市",
+   "name": "梧棲區",
+   "houses": 18889,
+   "occupied": 14711,
+   "unoccupied": 4178,
+   "occasional": 624,
+   "otherUse": 799,
+   "idle": 2755,
+   "vacancy": 14.59,
+   "households": 18307,
+   "residents": 62243,
+   "perHousehold": 1.032,
+   "inflow": 3.48,
+   "inflowCounty": 8.92,
+   "vacant": 3379,
+   "ageAll": [
+    4534,
+    3634,
+    5451,
+    1837,
+    3433
+   ],
+   "ageVacant": [
+    806,
+    386,
+    837,
+    273,
+    1077
+   ],
+   "areaAll": [
+    741,
+    5408,
+    7450,
+    4846,
+    444
+   ],
+   "areaVacant": [
+    385,
+    935,
+    1129,
+    875,
+    55
+   ],
+   "avgAreaAll": 153.0,
+   "avgAreaVacant": 144.2,
+   "quadrant": "slack_shrinking",
+   "margin": 1.54
+  },
+  {
+   "key": "臺中市/后里區",
+   "county": "臺中市",
+   "name": "后里區",
+   "houses": 15730,
+   "occupied": 12630,
+   "unoccupied": 3100,
+   "occasional": 716,
+   "otherUse": 731,
+   "idle": 1653,
+   "vacancy": 10.51,
+   "households": 16156,
+   "residents": 58635,
+   "perHousehold": 0.974,
+   "inflow": 3.16,
+   "inflowCounty": 5.29,
+   "vacant": 2369,
+   "ageAll": [
+    7377,
+    2864,
+    2751,
+    988,
+    1750
+   ],
+   "ageVacant": [
+    1183,
+    299,
+    290,
+    135,
+    462
+   ],
+   "areaAll": [
+    887,
+    2838,
+    6388,
+    4813,
+    804
+   ],
+   "areaVacant": [
+    277,
+    644,
+    778,
+    600,
+    70
+   ],
+   "avgAreaAll": 167.2,
+   "avgAreaVacant": 146.4,
+   "quadrant": "tight_shrinking",
+   "margin": -2.54
+  },
+  {
+   "key": "臺中市/神岡區",
+   "county": "臺中市",
+   "name": "神岡區",
+   "houses": 18991,
+   "occupied": 14083,
+   "unoccupied": 4908,
+   "occasional": 535,
+   "otherUse": 2820,
+   "idle": 1553,
+   "vacancy": 8.18,
+   "households": 18882,
+   "residents": 71262,
+   "perHousehold": 1.006,
+   "inflow": 2.19,
+   "inflowCounty": 5.82,
+   "vacant": 2088,
+   "ageAll": [
+    6033,
+    3909,
+    5194,
+    1671,
+    2184
+   ],
+   "ageVacant": [
+    772,
+    356,
+    480,
+    123,
+    357
+   ],
+   "areaAll": [
+    1033,
+    4955,
+    6595,
+    5332,
+    1076
+   ],
+   "areaVacant": [
+    180,
+    611,
+    709,
+    503,
+    85
+   ],
+   "avgAreaAll": 162.0,
+   "avgAreaVacant": 150.2,
+   "quadrant": "tight_shrinking",
+   "margin": -4.87
+  },
+  {
+   "key": "臺中市/潭子區",
+   "county": "臺中市",
+   "name": "潭子區",
+   "houses": 36299,
+   "occupied": 30619,
+   "unoccupied": 5680,
+   "occasional": 853,
+   "otherUse": 1949,
+   "idle": 2878,
+   "vacancy": 7.93,
+   "households": 34936,
+   "residents": 117836,
+   "perHousehold": 1.039,
+   "inflow": 1.71,
+   "inflowCounty": 5.78,
+   "vacant": 3731,
+   "ageAll": [
+    9226,
+    4159,
+    14518,
+    5474,
+    2922
+   ],
+   "ageVacant": [
+    1091,
+    314,
+    1522,
+    486,
+    318
+   ],
+   "areaAll": [
+    2839,
+    16105,
+    10944,
+    5790,
+    621
+   ],
+   "areaVacant": [
+    437,
+    1936,
+    719,
+    602,
+    37
+   ],
+   "avgAreaAll": 127.2,
+   "avgAreaVacant": 117.3,
+   "quadrant": "tight_shrinking",
+   "margin": -5.12
+  },
+  {
+   "key": "臺中市/大雅區",
+   "county": "臺中市",
+   "name": "大雅區",
+   "houses": 30561,
+   "occupied": 22943,
+   "unoccupied": 7618,
+   "occasional": 1474,
+   "otherUse": 3541,
+   "idle": 2603,
+   "vacancy": 8.52,
+   "households": 31530,
+   "residents": 111266,
+   "perHousehold": 0.969,
+   "inflow": 3.21,
+   "inflowCounty": 6.74,
+   "vacant": 4077,
+   "ageAll": [
+    6221,
+    4400,
+    11631,
+    4585,
+    3724
+   ],
+   "ageVacant": [
+    882,
+    838,
+    1360,
+    375,
+    622
+   ],
+   "areaAll": [
+    2530,
+    9715,
+    11784,
+    5779,
+    753
+   ],
+   "areaVacant": [
+    663,
+    1611,
+    1183,
+    592,
+    28
+   ],
+   "avgAreaAll": 141.5,
+   "avgAreaVacant": 120.3,
+   "quadrant": "tight_shrinking",
+   "margin": -4.53
+  },
+  {
+   "key": "臺中市/新社區",
+   "county": "臺中市",
+   "name": "新社區",
+   "houses": 7735,
+   "occupied": 5923,
+   "unoccupied": 1812,
+   "occasional": 537,
+   "otherUse": 249,
+   "idle": 1026,
+   "vacancy": 13.26,
+   "households": 7653,
+   "residents": 26006,
+   "perHousehold": 1.011,
+   "inflow": 3.01,
+   "inflowCounty": 5.03,
+   "vacant": 1563,
+   "ageAll": [
+    3715,
+    1013,
+    1203,
+    1085,
+    719
+   ],
+   "ageVacant": [
+    837,
+    95,
+    160,
+    198,
+    273
+   ],
+   "areaAll": [
+    1035,
+    2201,
+    2107,
+    2028,
+    364
+   ],
+   "areaVacant": [
+    424,
+    419,
+    292,
+    381,
+    47
+   ],
+   "avgAreaAll": 148.5,
+   "avgAreaVacant": 129.6,
+   "quadrant": "slack_shrinking",
+   "margin": 0.21
+  },
+  {
+   "key": "臺中市/石岡區",
+   "county": "臺中市",
+   "name": "石岡區",
+   "houses": 4431,
+   "occupied": 3386,
+   "unoccupied": 1045,
+   "occasional": 374,
+   "otherUse": 288,
+   "idle": 383,
+   "vacancy": 8.64,
+   "households": 4156,
+   "residents": 12859,
+   "perHousehold": 1.066,
+   "inflow": 2.06,
+   "inflowCounty": 5.04,
+   "vacant": 757,
+   "ageAll": [
+    1983,
+    837,
+    777,
+    568,
+    266
+   ],
+   "ageVacant": [
+    364,
+    93,
+    128,
+    103,
+    69
+   ],
+   "areaAll": [
+    319,
+    863,
+    1676,
+    1328,
+    245
+   ],
+   "areaVacant": [
+    106,
+    223,
+    213,
+    201,
+    14
+   ],
+   "avgAreaAll": 165.8,
+   "avgAreaVacant": 140.4,
+   "quadrant": "tight_shrinking",
+   "margin": -4.41
+  },
+  {
+   "key": "臺中市/外埔區",
+   "county": "臺中市",
+   "name": "外埔區",
+   "houses": 9304,
+   "occupied": 7367,
+   "unoccupied": 1937,
+   "occasional": 481,
+   "otherUse": 571,
+   "idle": 885,
+   "vacancy": 9.51,
+   "households": 9483,
+   "residents": 32360,
+   "perHousehold": 0.981,
+   "inflow": 1.88,
+   "inflowCounty": 7.4,
+   "vacant": 1366,
+   "ageAll": [
+    3616,
+    1343,
+    2352,
+    1117,
+    876
+   ],
+   "ageVacant": [
+    661,
+    190,
+    234,
+    114,
+    167
+   ],
+   "areaAll": [
+    471,
+    2139,
+    3795,
+    2527,
+    372
+   ],
+   "areaVacant": [
+    117,
+    427,
+    465,
+    341,
+    16
+   ],
+   "avgAreaAll": 160.8,
+   "avgAreaVacant": 144.7,
+   "quadrant": "tight_shrinking",
+   "margin": -3.54
+  },
+  {
+   "key": "臺中市/大安區",
+   "county": "臺中市",
+   "name": "大安區",
+   "houses": 5276,
+   "occupied": 4018,
+   "unoccupied": 1258,
+   "occasional": 234,
+   "otherUse": 273,
+   "idle": 751,
+   "vacancy": 14.23,
+   "households": 4945,
+   "residents": 17612,
+   "perHousehold": 1.067,
+   "inflow": 1.51,
+   "inflowCounty": 5.02,
+   "vacant": 985,
+   "ageAll": [
+    1917,
+    980,
+    1541,
+    593,
+    245
+   ],
+   "ageVacant": [
+    515,
+    142,
+    202,
+    65,
+    61
+   ],
+   "areaAll": [
+    315,
+    1150,
+    1805,
+    1718,
+    288
+   ],
+   "areaVacant": [
+    117,
+    286,
+    301,
+    248,
+    33
+   ],
+   "avgAreaAll": 166.7,
+   "avgAreaVacant": 145.3,
+   "quadrant": "slack_shrinking",
+   "margin": 1.18
+  },
+  {
+   "key": "臺中市/烏日區",
+   "county": "臺中市",
+   "name": "烏日區",
+   "houses": 26035,
+   "occupied": 20612,
+   "unoccupied": 5423,
+   "occasional": 670,
+   "otherUse": 2817,
+   "idle": 1936,
+   "vacancy": 7.44,
+   "households": 27142,
+   "residents": 92331,
+   "perHousehold": 0.959,
+   "inflow": 8.38,
+   "inflowCounty": 7.99,
+   "vacant": 2606,
+   "ageAll": [
+    7702,
+    3519,
+    5460,
+    3048,
+    6306
+   ],
+   "ageVacant": [
+    692,
+    343,
+    554,
+    313,
+    704
+   ],
+   "areaAll": [
+    2109,
+    9395,
+    9196,
+    4935,
+    400
+   ],
+   "areaVacant": [
+    556,
+    981,
+    663,
+    388,
+    18
+   ],
+   "avgAreaAll": 135.9,
+   "avgAreaVacant": 117.3,
+   "quadrant": "tight_growing",
+   "margin": -5.61
+  },
+  {
+   "key": "臺中市/大肚區",
+   "county": "臺中市",
+   "name": "大肚區",
+   "houses": 16702,
+   "occupied": 13328,
+   "unoccupied": 3374,
+   "occasional": 552,
+   "otherUse": 1423,
+   "idle": 1399,
+   "vacancy": 8.38,
+   "households": 17428,
+   "residents": 58199,
+   "perHousehold": 0.958,
+   "inflow": 2.5,
+   "inflowCounty": 4.59,
+   "vacant": 1951,
+   "ageAll": [
+    7551,
+    1960,
+    4562,
+    1038,
+    1591
+   ],
+   "ageVacant": [
+    1033,
+    183,
+    415,
+    86,
+    234
+   ],
+   "areaAll": [
+    1049,
+    6570,
+    5595,
+    3086,
+    402
+   ],
+   "areaVacant": [
+    262,
+    804,
+    539,
+    333,
+    13
+   ],
+   "avgAreaAll": 137.6,
+   "avgAreaVacant": 121.5,
+   "quadrant": "tight_shrinking",
+   "margin": -4.67
+  },
+  {
+   "key": "臺中市/龍井區",
+   "county": "臺中市",
+   "name": "龍井區",
+   "houses": 23047,
+   "occupied": 18147,
+   "unoccupied": 4900,
+   "occasional": 952,
+   "otherUse": 2301,
+   "idle": 1647,
+   "vacancy": 7.15,
+   "households": 23386,
+   "residents": 76494,
+   "perHousehold": 0.986,
+   "inflow": 2.66,
+   "inflowCounty": 5.62,
+   "vacant": 2599,
+   "ageAll": [
+    5889,
+    3387,
+    9166,
+    1979,
+    2626
+   ],
+   "ageVacant": [
+    684,
+    346,
+    963,
+    216,
+    390
+   ],
+   "areaAll": [
+    1666,
+    5626,
+    8885,
+    5964,
+    906
+   ],
+   "areaVacant": [
+    270,
+    793,
+    917,
+    549,
+    70
+   ],
+   "avgAreaAll": 154.5,
+   "avgAreaVacant": 140.5,
+   "quadrant": "tight_shrinking",
+   "margin": -5.9
+  },
+  {
+   "key": "臺中市/霧峰區",
+   "county": "臺中市",
+   "name": "霧峰區",
+   "houses": 20686,
+   "occupied": 16013,
+   "unoccupied": 4673,
+   "occasional": 1448,
+   "otherUse": 1485,
+   "idle": 1740,
+   "vacancy": 8.41,
+   "households": 24081,
+   "residents": 84462,
+   "perHousehold": 0.859,
+   "inflow": 17.86,
+   "inflowCounty": 7.04,
+   "vacant": 3188,
+   "ageAll": [
+    7615,
+    2984,
+    5475,
+    2404,
+    2208
+   ],
+   "ageVacant": [
+    1419,
+    368,
+    538,
+    308,
+    555
+   ],
+   "areaAll": [
+    2041,
+    6701,
+    7343,
+    4020,
+    581
+   ],
+   "areaVacant": [
+    344,
+    1160,
+    1037,
+    589,
+    58
+   ],
+   "avgAreaAll": 141.0,
+   "avgAreaVacant": 134.1,
+   "quadrant": "tight_growing",
+   "margin": -4.64
+  },
+  {
+   "key": "臺中市/太平區",
+   "county": "臺中市",
+   "name": "太平區",
+   "houses": 66918,
+   "occupied": 52148,
+   "unoccupied": 14770,
+   "occasional": 2292,
+   "otherUse": 3675,
+   "idle": 8803,
+   "vacancy": 13.15,
+   "households": 64169,
+   "residents": 206652,
+   "perHousehold": 1.043,
+   "inflow": 5.63,
+   "inflowCounty": 7.89,
+   "vacant": 11095,
+   "ageAll": [
+    19654,
+    10218,
+    21096,
+    4811,
+    11139
+   ],
+   "ageVacant": [
+    3201,
+    1577,
+    3164,
+    664,
+    2489
+   ],
+   "areaAll": [
+    8070,
+    31463,
+    18135,
+    8730,
+    520
+   ],
+   "areaVacant": [
+    2250,
+    4876,
+    2712,
+    1181,
+    76
+   ],
+   "avgAreaAll": 118.9,
+   "avgAreaVacant": 110.3,
+   "quadrant": "slack_growing",
+   "margin": 0.1
+  },
+  {
+   "key": "臺中市/大里區",
+   "county": "臺中市",
+   "name": "大里區",
+   "houses": 72028,
+   "occupied": 57628,
+   "unoccupied": 14400,
+   "occasional": 2242,
+   "otherUse": 5559,
+   "idle": 6599,
+   "vacancy": 9.16,
+   "households": 73325,
+   "residents": 231398,
+   "perHousehold": 0.982,
+   "inflow": 3.47,
+   "inflowCounty": 6.37,
+   "vacant": 8841,
+   "ageAll": [
+    19026,
+    12465,
+    21338,
+    10825,
+    8374
+   ],
+   "ageVacant": [
+    2746,
+    1159,
+    1888,
+    721,
+    2327
+   ],
+   "areaAll": [
+    4694,
+    33866,
+    23318,
+    9711,
+    439
+   ],
+   "areaVacant": [
+    951,
+    5110,
+    1892,
+    832,
+    56
+   ],
+   "avgAreaAll": 124.5,
+   "avgAreaVacant": 108.9,
+   "quadrant": "tight_shrinking",
+   "margin": -3.89
+  },
+  {
+   "key": "臺中市/和平區",
+   "county": "臺中市",
+   "name": "和平區",
+   "houses": 3740,
+   "occupied": 2300,
+   "unoccupied": 1440,
+   "occasional": 700,
+   "otherUse": 306,
+   "idle": 434,
+   "vacancy": 11.6,
+   "households": 3035,
+   "residents": 7055,
+   "perHousehold": 1.232,
+   "inflow": 5.74,
+   "inflowCounty": 6.48,
+   "vacant": 1134,
+   "ageAll": [
+    2181,
+    456,
+    417,
+    301,
+    385
+   ],
+   "ageVacant": [
+    665,
+    127,
+    125,
+    76,
+    141
+   ],
+   "areaAll": [
+    594,
+    1632,
+    772,
+    673,
+    69
+   ],
+   "areaVacant": [
+    217,
+    483,
+    251,
+    175,
+    8
+   ],
+   "avgAreaAll": 123.7,
+   "avgAreaVacant": 115.5,
+   "quadrant": "tight_growing",
+   "margin": -1.45
+  }
+ ],
+ "ageLabels": [
+  "40年以上",
+  "30–39年",
+  "20–29年",
+  "10–19年",
+  "未滿10年"
+ ],
+ "areaLabels": [
+  "未滿60 m²",
+  "60–120",
+  "120–180",
+  "180–300",
+  "300 m² 以上"
+ ]
+}
