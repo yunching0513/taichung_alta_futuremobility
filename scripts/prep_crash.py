@@ -65,6 +65,18 @@ def load(name):
     return json.loads(p.read_text(encoding='utf-8'))['data']
 
 
+def zh(t):
+    """只正規化「台中」與「台灣」兩個詞。
+
+    警政署原文的地址寫「台中市」「台灣大道」，這一欄會直接顯示在版面的 tooltip 上，
+    而這兩個詞的官方寫法都是「臺」（臺中市、臺灣大道），本專案也一律用「臺」。
+    刻意只換這兩個詞而不是所有的「台」：「台」在別的詞裡可能是對的
+    （例如某些商號的正式名稱），一律替換會改到不該改的字。
+    原始檔裡的寫法沒有被動過，只有輸出的顯示字串換了。
+    """
+    return t.replace('台中', '臺中').replace('台灣', '臺灣')
+
+
 def has_xy(r):
     return (isinstance(r.get('lon'), (int, float)) and abs(r['lon']) > 100
             and isinstance(r.get('lat'), (int, float)) and abs(r['lat']) > 10)
@@ -102,6 +114,8 @@ def main():
             row = {k: r.get(k) for k in KEEP if r.get(k) not in (None, '')}
             row['lon'] = round(r['lon'], NDP)
             row['lat'] = round(r['lat'], NDP)
+            if row.get('location'):
+                row['location'] = zh(row['location'])
             kept.append(row)
         else:
             no_coord += 1

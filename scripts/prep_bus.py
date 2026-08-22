@@ -146,6 +146,12 @@ def thin(line):
     return [[round(c, NDP) for c in p] for p in out]
 
 
+def zh(t):
+    """只正規化「台中」與「台灣」兩個詞，理由同 prep_crash.py 的同名函式：
+    路線名與 Headsign 會顯示在 tooltip 上，而這兩個詞的官方寫法都是「臺」。"""
+    return (t or '').replace('台中', '臺中').replace('台灣', '臺灣')
+
+
 def zeros():
     return {d: {b: 0.0 for b, _, _, _ in BANDS} for d, _ in DAYS}
 
@@ -266,6 +272,7 @@ def main():
             no_sched.append(uid)
             continue
         nm, head = name_of.get(uid, (sh['RouteName']['Zh_tw'], ''))
+        nm, head = zh(nm), zh(head)
         t = per_route[key]
         out_routes.append({
             'id': uid, 'dir': sh.get('Direction'), 'name': nm, 'headsign': head,
