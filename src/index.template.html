@@ -292,6 +292,50 @@ svg.zoomable .dist-outline { vector-effect: non-scaling-stroke; }
 .road { fill: none; stroke-linecap: round; stroke-linejoin: round; }
 .road-case { fill: none; stroke: #FFFFFF; stroke-linecap: round; stroke-linejoin: round;
              opacity: .9; }
+
+/* ── 疊圖的分頁。三組疊圖的控制項加起來太長，一次全攤開會把地圖推到摺線以下，
+   而讀者一次通常只在調一組。分頁只藏控制項，**不關掉圖層**：
+   切到公路那一頁，軌道還是畫著的，所以每個頁籤帶一個小點，亮著代表那一組還有東西開著。 ── */
+.tabs { display: flex; gap: 0; margin: 4px 0 0; border-bottom: 1px solid var(--grey-3); }
+.tab { font-family: var(--font-zh); font-size: 12px; padding: 9px 16px; cursor: pointer;
+       background: none; border: 0; border-bottom: 2px solid transparent;
+       color: var(--grey-2); display: inline-flex; align-items: center; gap: 7px; }
+.tab:hover { color: var(--black); }
+.tab[aria-selected="true"] { color: var(--black); font-weight: 700;
+                             border-bottom-color: var(--lime); }
+.tab .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--grey-3); }
+.tab .dot.lit { background: var(--lime-dk); }
+.tab:focus-visible { outline: 2px solid var(--black); outline-offset: -2px; }
+.tabpane[hidden] { display: none; }
+
+/* ── 公車路線清單。392條路線攤開太長，所以預設收起來，
+   而且給搜尋與「班次前20」兩個入口：大部分人要找的是特定一條，或是最密的那幾條。 ── */
+.routebox { border: 1px solid var(--grey-3); padding: 12px 14px; margin-top: 4px; }
+.routebox[hidden] { display: none; }
+.rb-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.rb-k { font-family: var(--font-en); font-size: 9px; letter-spacing: 0.2em;
+        text-transform: uppercase; color: var(--grey-2); }
+#rb-q { font-family: var(--font-zh); font-size: 12px; padding: 6px 10px; min-width: 220px;
+        border: 1px solid var(--grey-3); background: var(--white); color: var(--black); }
+#rb-q:focus { outline: none; border-color: var(--black); }
+.rb-n { font-family: var(--font-en); font-size: 10.5px; color: var(--grey-2);
+        font-variant-numeric: tabular-nums; }
+.rb-b { font-family: var(--font-zh); font-size: 11px; padding: 5px 10px; cursor: pointer;
+        border: 1px solid var(--grey-3); background: var(--white); color: var(--grey-1); }
+.rb-b:hover { border-color: var(--black); color: var(--black); }
+.rb-list { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 11px;
+           max-height: 188px; overflow-y: auto; padding: 2px; }
+.rb-i { font-family: var(--font-zh); font-size: 11px; padding: 4px 9px; cursor: pointer;
+        border: 1px solid var(--grey-3); background: var(--white); color: var(--grey-1);
+        display: inline-flex; align-items: baseline; gap: 6px; white-space: nowrap; }
+.rb-i:hover { border-color: var(--black); color: var(--black); }
+.rb-i[aria-pressed="true"] { background: var(--lime); border-color: var(--lime);
+                             color: var(--black); font-weight: 700; }
+.rb-i .c { font-family: var(--font-en); font-size: 9.5px; color: var(--grey-2);
+           font-variant-numeric: tabular-nums; }
+.rb-i[aria-pressed="true"] .c { color: var(--black); }
+.bus-line.dim { stroke-opacity: .07 !important; stroke-width: .35 !important; }
+.bus-line.sel { stroke: #C8D400 !important; }
 svg.zoomable .road, svg.zoomable .road-case { vector-effect: non-scaling-stroke; }
 .stop { cursor: pointer; }
 .jump:hover .ar { color: var(--black); }
@@ -414,22 +458,49 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
       </div>
     </div>
 
-    <div class="ctrl">
+    <div class="tabs" id="at-tabs" role="tablist"></div>
+
+    <div class="ctrl tabpane" id="pane-transit">
       <div class="ctrl-g">
         <span class="ctrl-k">Rail 軌道 · 可複選</span>
         <div class="cat-bar" id="at-ov-rail"></div>
       </div>
       <div class="ctrl-g">
-        <span class="ctrl-k">Road 公路 · 可複選</span>
-        <div class="cat-bar" id="at-ov-road"></div>
-      </div>
-      <div class="ctrl-g">
-        <span class="ctrl-k">Other 其他</span>
-        <div class="cat-bar" id="at-ov-other"></div>
+        <span class="ctrl-k">Bus 公車</span>
+        <div class="cat-bar" id="at-ov-bus"></div>
       </div>
       <div class="ctrl-g" id="at-busband-wrap">
         <span class="ctrl-k">Bus time 公車時段</span>
         <div class="cat-bar" id="at-busbands"></div>
+      </div>
+      <div class="ctrl-g" id="at-busday-wrap">
+        <span class="ctrl-k">Day 平假日</span>
+        <div class="cat-bar" id="at-busdays"></div>
+      </div>
+    </div>
+    <div class="routebox" id="at-routes" hidden>
+      <div class="rb-head">
+        <span class="rb-k">Routes 路線 · 可複選</span>
+        <input type="search" id="rb-q" placeholder="找路線，例如 300、綠3、臺灣大道" aria-label="搜尋公車路線">
+        <span class="rb-n" id="rb-n"></span>
+        <button type="button" class="rb-b" data-rb="clear">清除</button>
+        <button type="button" class="rb-b" data-rb="top">班次前20</button>
+      </div>
+      <div class="rb-list" id="rb-list"></div>
+      <p class="caption" id="rb-cap"></p>
+    </div>
+
+    <div class="ctrl tabpane" id="pane-road" hidden>
+      <div class="ctrl-g">
+        <span class="ctrl-k">Road 公路 · 可複選</span>
+        <div class="cat-bar" id="at-ov-road"></div>
+      </div>
+    </div>
+
+    <div class="ctrl tabpane" id="pane-crash" hidden>
+      <div class="ctrl-g">
+        <span class="ctrl-k">Crash A1事故點</span>
+        <div class="cat-bar" id="at-ov-other"></div>
       </div>
       <div class="ctrl-g" id="at-mode-wrap">
         <span class="ctrl-k">Victim 受害者運具</span>
@@ -857,8 +928,9 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
   const OVL_RAIL = [{ k: 'tra', zh: '火車' }, { k: 'metro', zh: '捷運' },
                     { k: 'thsr', zh: '高鐵' }];
   const OVL_ROAD = RD.classes.map(c => ({ k: c.k, zh: c.zh }));
-  const OVL_OTHER = [{ k: 'bus', zh: '公車路線' }, { k: 'crash', zh: 'A1事故點' }];
-  const OVL = [...OVL_RAIL, ...OVL_ROAD, ...OVL_OTHER];
+  const OVL_BUS = [{ k: 'bus', zh: '顯示路線' }, { k: 'buspick', zh: '展開路線清單' }];
+  const OVL_OTHER = [{ k: 'crash', zh: 'A1事故點' }];
+  const OVL = [...OVL_RAIL, ...OVL_ROAD, ...OVL_BUS, ...OVL_OTHER];
   const RAILK = new Set(OVL_RAIL.map(o => o.k));
   const ROADK = new Set(OVL_ROAD.map(o => o.k));
   const ROAD_STYLE = Object.fromEntries(RD.classes.map(c => [c.k, c]));
@@ -867,9 +939,26 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
   const CMODES = [{ zh: '全部', k: null }, ...CR.modes.map(m => ({ zh: m, k: m }))];
 
   let gi = 0, mi = 0, bi = 0, di = 0, obi = 0, odi = 0, cmi = 0;
-  const on = { tra: true, metro: true, thsr: true, bus: false, crash: false };
+  const on = { tra: true, metro: true, thsr: true, bus: false, buspick: false, crash: false };
   RD.classes.forEach(c => { on[c.k] = false; });
   let pick = null;      // 目前點到的車站
+  let odi2 = 0;         // 公車疊圖自己的平假日，與底圖那一組分開
+
+  /* 公車路線清單。子路線是雙向各一條，讀者要挑的是「這一條線」而不是「這一條線的去程」，
+     因此按路線名歸併。選了之後只畫選中的那幾條，其餘留一層很淡的底：
+     沒有底就看不出這幾條在整個路網裡的位置。 */
+  const ROUTES = (() => {
+    const m = new Map();
+    BUS.routes.forEach(r => {
+      const a = m.get(r.name) || { name: r.name, trips: 0, heads: new Set() };
+      a.trips += r.trips.work.all;
+      if (r.headsign) a.heads.add(r.headsign);
+      m.set(r.name, a);
+    });
+    return [...m.values()].map(a => ({ name: a.name, trips: a.trips, heads: [...a.heads] }))
+      .sort((x, y) => y.trips - x.trips);
+  })();
+  const selected = new Set();
 
   const atSvg = document.getElementById('map-atlas');
   // 斜線網底給退回區級的那七格用。defs 不能被重畫清掉，所以掛在 svg 上而不是縮放群組裡
@@ -907,6 +996,7 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
     document.getElementById('at-band-wrap').hidden = !G.bands;
     document.getElementById('at-day-wrap').hidden = !G.bands;
     document.getElementById('at-busband-wrap').hidden = !on.bus;
+    document.getElementById('at-busday-wrap').hidden = !on.bus;
     document.getElementById('at-mode-wrap').hidden = !on.crash;
 
     atSvg.setAttribute('viewBox', `0 0 ${BIG.W} ${BIG.H}`);
@@ -949,18 +1039,25 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
 
     /* ── 疊圖。線與點不搶顏色，所以可以複選 ── */
     if (on.bus) {
-      const bb = BUS.bands[obi].k, bw = DAY2[odi].k;
+      const bb = BUS.bands[obi].k, bw = DAY2[odi2].k;
       const maxT = Math.max(...BUS.routes.map(r => r.trips[bw][bb]));
+      const anySel = selected.size > 0;
+      // 沒選就全部照班次畫；選了就只有選中的畫成石灰黃綠，其餘壓成很淡的底
       [...BUS.routes].filter(r => r.trips[bw][bb] > 0)
-        .sort((a, c) => a.trips[bw][bb] - c.trips[bw][bb])
+        .sort((a, c) => (selected.has(a.name) ? 1 : 0) - (selected.has(c.name) ? 1 : 0)
+                     || a.trips[bw][bb] - c.trips[bw][bb])
         .forEach(r => {
           const n = r.trips[bw][bb], f = Math.sqrt(n / maxT);
-          const path = el('path', { class: 'bus-line',
+          const sel = selected.has(r.name);
+          const path = el('path', {
+            class: 'bus-line' + (anySel ? (sel ? ' sel' : ' dim') : ''),
             d: 'M' + r.path.map(pt => `${BIG.px(pt[0]).toFixed(1)} ${BIG.py(pt[1]).toFixed(1)}`).join('L'),
-            style: `stroke-width:${(0.35 + f * 2.6).toFixed(2)};` +
-                   `stroke-opacity:${(0.10 + f * 0.55).toFixed(3)}` });
+            style: sel
+              ? `stroke-width:${(1.4 + f * 2.6).toFixed(2)};stroke-opacity:.95`
+              : `stroke-width:${(0.35 + f * 2.6).toFixed(2)};` +
+                `stroke-opacity:${(0.10 + f * 0.55).toFixed(3)}` });
           path.appendChild(el('title', {}, `${r.name}　${r.headsign}　` +
-            `${DAY2[odi].zh}${BUS.bands[obi].zh}${n.toFixed(n % 1 ? 1 : 0)}班` +
+            `${DAY2[odi2].zh}${BUS.bands[obi].zh}${n.toFixed(n % 1 ? 1 : 0)}班` +
             (r.kind === 'estimated' ? '（由班距估算）' : '')));
           box.appendChild(path);
         });
@@ -1059,8 +1156,13 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
       key.push('<span class="it" style="color:var(--grey-2)">點車站看每日進出站人次</span>');
     }
     if (on.bus)
-      key.push('<span class="it"><span class="ln" style="background:#1A1A1A"></span>' +
-        `公車路線（粗細與濃度＝班次，${BUS.counts.drawn}條子路線）</span>`);
+      key.push(selected.size
+        ? `<span class="it"><span class="ln" style="background:#C8D400"></span>` +
+          `已選 ${selected.size} 條路線</span>` +
+          '<span class="it"><span class="ln" style="background:#1A1A1A;opacity:.18"></span>' +
+          '其餘路線</span>'
+        : '<span class="it"><span class="ln" style="background:#1A1A1A"></span>' +
+          `公車路線（粗細與濃度＝班次，${BUS.counts.drawn}條子路線）</span>`);
     if (on.crash)
       key.push(...CR.modes.map(m => `<span class="it"><span class="mk" ` +
         `style="background:${MODE_COLOR[m]}"></span>${m}${int(CR.totals.byMode[m])}件</span>`));
@@ -1112,12 +1214,82 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
       `裁切至市界內。` + (railOn.has('tra')
         ? `圓的大小是臺鐵官方站等（TDX 的 StationClass），點下去看每日進出站人次。` : '') +
       `${RL.caveat}`);
-    if (on.bus) ovNote.push(`<b>公車</b>：${DAY2[odi].zh}${BUS.bands[obi].zh}` +
-      `（${BUS.bands[obi].when}）。共用走廊變深是多條線疊在一起的視覺結果，不是加總出來的數字。`);
+    if (on.bus) ovNote.push(`<b>公車</b>：${DAY2[odi2].zh}${BUS.bands[obi].zh}` +
+      `（${BUS.bands[obi].when}）` +
+      (selected.size ? `，已挑出 ${selected.size} 條路線。` : '。') +
+      `共用走廊變深是多條線疊在一起的視覺結果，不是加總出來的數字。`);
     if (on.crash) ovNote.push(`<b>事故</b>：${CMODES[cmi].zh === '全部' ? '全部運具' : '受害者為' + CMODES[cmi].zh}。` +
       `座標從${CR.coordPeriod}才有，民國105與106兩年的${CR.totals.noCoord}件沒有經緯度。`);
     document.getElementById('cap-atlas-ov').innerHTML = ovNote.join('　');
   }
+
+  /* ── 疊圖分頁 ────────────────────────────────────────────────────
+     分頁只藏控制項，不關掉圖層：切到公路那一頁，軌道還是畫著的。
+     因此每一個頁籤帶一個小點，亮著就代表那一組還有東西開著，
+     否則讀者會以為切走等於關掉。 */
+  const TABS = [
+    { k: 'transit', zh: '大眾運輸', pane: 'pane-transit',
+      lit: () => OVL_RAIL.some(o => on[o.k]) || on.bus },
+    { k: 'road', zh: '公路', pane: 'pane-road', lit: () => RD.classes.some(c => on[c.k]) },
+    { k: 'crash', zh: '事故', pane: 'pane-crash', lit: () => on.crash },
+  ];
+  let tab = 0;
+  function drawTabs() {
+    document.getElementById('at-tabs').innerHTML = TABS.map((t, i) =>
+      `<button type="button" class="tab" role="tab" data-i="${i}" ` +
+      `aria-selected="${i === tab}"><span class="dot${t.lit() ? ' lit' : ''}"></span>` +
+      `${t.zh}</button>`).join('');
+    TABS.forEach((t, i) => { document.getElementById(t.pane).hidden = i !== tab; });
+    document.getElementById('at-routes').hidden = !(tab === 0 && on.buspick);
+  }
+  document.getElementById('at-tabs').addEventListener('click', e => {
+    const b = e.target.closest('.tab');
+    if (b) { tab = +b.dataset.i; drawTabs(); }
+  });
+
+  /* ── 公車路線清單 ───────────────────────────────────────────────── */
+  function drawRoutes() {
+    const q = document.getElementById('rb-q').value.trim();
+    const list = q
+      ? ROUTES.filter(r => r.name.includes(q) || r.heads.some(h => h.includes(q)))
+      : ROUTES;
+    document.getElementById('rb-list').innerHTML = list.map(r =>
+      `<button type="button" class="rb-i" data-r="${r.name.replace(/"/g, '&quot;')}" ` +
+      `aria-pressed="${selected.has(r.name)}" title="${(r.heads[0] || '').replace(/"/g, '&quot;')}">` +
+      `${r.name}<span class="c">${r.trips.toFixed(0)}</span></button>`).join('')
+      || '<span class="rb-n">找不到符合的路線</span>';
+    document.getElementById('rb-n').textContent =
+      `${list.length}／${ROUTES.length} 條　已選 ${selected.size}`;
+    const picked = ROUTES.filter(r => selected.has(r.name));
+    document.getElementById('rb-cap').innerHTML = selected.size
+      ? `已選 ${picked.map(r => r.name).join('、')}，` +
+        `平日全日合計 ${picked.reduce((a, r) => a + r.trips, 0).toFixed(0)} 班。` +
+        `<b>選中的畫成石灰黃綠，其餘壓成很淡的底</b>：沒有底就看不出這幾條在路網裡的位置。`
+      : `按下路線就把它挑出來，可複選。數字是平日全日班次。` +
+        `<b>沒有選的時候，全部路線照班次畫粗細與濃淡。</b>` +
+        `子路線是雙向各一條，這裡按路線名歸併，所以選一條等於兩個方向都選。`;
+  }
+  document.getElementById('rb-list').addEventListener('click', e => {
+    const b = e.target.closest('.rb-i');
+    if (!b) return;
+    const n = b.dataset.r;
+    if (selected.has(n)) selected.delete(n); else selected.add(n);
+    if (!on.bus) { on.bus = true; syncPills(); }
+    drawRoutes();
+    drawTabs();
+    paintAtlas();
+  });
+  document.getElementById('rb-q').addEventListener('input', drawRoutes);
+  document.querySelector('.rb-head').addEventListener('click', e => {
+    const b = e.target.closest('[data-rb]');
+    if (!b) return;
+    if (b.dataset.rb === 'clear') selected.clear();
+    else ROUTES.slice(0, 20).forEach(r => selected.add(r.name));
+    if (selected.size && !on.bus) { on.bus = true; syncPills(); }
+    drawRoutes();
+    drawTabs();
+    paintAtlas();
+  });
 
   /* 點到車站就把它的基本資料與每日平均進出站人次攤開。
      高鐵與臺中捷運沒有可取得的公開運量檔案，那兩個系統顯示「無公開資料」，
@@ -1167,13 +1339,18 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
     if (GROUPS[gi].bands)
       mkPills('at-bands', GROUPS[gi].bands, () => bi, i => { bi = i; paintAtlas(); });
     mkPills('at-days', DAY2, () => di, i => { di = i; paintAtlas(); });
-    mkToggles('at-ov-rail', OVL_RAIL, on, k => { on[k] = !on[k]; paintAtlas(); });
-    mkToggles('at-ov-road', OVL_ROAD, on, k => { on[k] = !on[k]; paintAtlas(); });
-    mkToggles('at-ov-other', OVL_OTHER, on, k => { on[k] = !on[k]; paintAtlas(); });
+    const flip = k => { on[k] = !on[k]; drawTabs(); paintAtlas(); };
+    mkToggles('at-ov-rail', OVL_RAIL, on, flip);
+    mkToggles('at-ov-road', OVL_ROAD, on, flip);
+    mkToggles('at-ov-bus', OVL_BUS, on, flip);
+    mkToggles('at-ov-other', OVL_OTHER, on, flip);
     mkPills('at-busbands', BUS.bands, () => obi, i => { obi = i; paintAtlas(); });
+    mkPills('at-busdays', DAY2, () => odi2, i => { odi2 = i; paintAtlas(); });
     mkPills('at-modes', CMODES, () => cmi, i => { cmi = i; paintAtlas(); });
   }
   syncPills();
+  drawTabs();
+  drawRoutes();
 
   document.getElementById('at-body-1').innerHTML =
     `這一頁原本有五張地圖：信令、住宅、里級人口、公車、事故。` +
@@ -1215,7 +1392,10 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
       if (it.ov) OVL.forEach(o => { on[o.k] = it.ov.includes(o.k); });
       if (it.cm != null) cmi = it.cm;
       if (it.obi != null) obi = it.obi;
+      if (it.tab != null) tab = it.tab;
       syncPills();
+      drawTabs();
+      drawRoutes();
       paintAtlas();
       document.getElementById('atlas').scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
@@ -1333,10 +1513,10 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
       `代價在時段：一班車整趟都被歸進發車的那個時段，路線長的線受這個影響大。` +
       `而班次終究是計畫班次，塞車、脫班、臨時停駛都不在裡面。`;
     jumps('bus-jumps', [
-      { zh: '公車路線疊圖', g: 5, ov: ['bus'] },
+      { zh: '公車路線疊圖', g: 5, ov: ['bus'], tab: 0 },
       { zh: '每千人停靠班次', g: 3, m: 0 },
       { zh: '每平方公里停靠班次', g: 3, m: 1 },
-      { zh: '公車＋軌道一起看', g: 5, ov: ['bus', 'rail'] },
+      { zh: '公車＋軌道一起看', g: 5, ov: ['bus', 'tra', 'metro', 'thsr'], tab: 0 },
     ]);
   }
 
@@ -1420,11 +1600,11 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
       `（占${(M.detailed / M.events * 100).toFixed(0)}%）帶著道路型態與速限，` +
       `恐怕那才是唯一能把「路的設計」與「人的行為」分開的路。`;
     jumps('crash-jumps', [
-      { zh: '事故點位', g: 5, ov: ['crash'], cm: 0 },
-      { zh: '只看行人', g: 5, ov: ['crash'], cm: 1 },
+      { zh: '事故點位', g: 5, ov: ['crash'], cm: 0, tab: 2 },
+      { zh: '只看行人', g: 5, ov: ['crash'], cm: 1, tab: 2 },
       { zh: '每十萬人死亡', g: 4, m: 0, ov: [] },
       { zh: '行人受害占比', g: 4, m: 2, ov: [] },
-      { zh: '事故點 × 公車路線', g: 5, ov: ['crash', 'bus'], cm: 0 },
+      { zh: '事故點 × 公車路線', g: 5, ov: ['crash', 'bus'], cm: 0, tab: 2 },
     ]);
   }
 
