@@ -25,6 +25,7 @@ DIST = ROOT / 'dist'
 PAGES = {
     'index.html': ('index.template.html', {
         '__TC_JSON__': 'tc_districts.json',
+        '__RAIL_JSON__': 'tc_rail.json',
     }),
 }
 

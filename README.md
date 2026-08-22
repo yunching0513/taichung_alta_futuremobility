@@ -72,8 +72,9 @@
 ## 目前產出
 
 ```
-python3 scripts/prep_districts.py    # data_TW/from_housing/ → data/tc_districts.json
-python3 scripts/build.py             # data/ + src/ → dist/index.html
+python3 scripts/prep_districts.py    # data_TW/from_housing/          → data/tc_districts.json
+python3 scripts/prep_rail.py         # data_TW/from_tdx_transit_twin/ → data/tc_rail.json
+python3 scripts/build.py             # data/ + src/                   → dist/index.html
 ```
 
 `dist/index.html` 是單一檔案、點開就能看，五節：
@@ -81,10 +82,16 @@ python3 scripts/build.py             # data/ + src/ → dist/index.html
 | 節 | 內容 |
 |---|---|
 | 01 Commuter Flow | 全市日夜間人口比0.997與29區的全距0.379 |
-| 02 Day & Night | 29區日夜比面量圖與排序長條，石灰黃綠是白天多出來的區，近黑是晚上才回來的 |
+| 02 The City Breathing | 滿版大型地圖。六個圖層 × 四個時段 × 平假日，可疊軌道路網 |
 | 03 Housing Base | 住宅、家戶、空屋率、常住人口、屋齡40年以上，五項切換著色 |
 | 04 Weak Correlation | 空屋率×日夜比散布圖，相關係數0.282 |
 | 05 Accessibility | 公共運輸站點×社宅基地。**這一層還沒有資料**，缺什麼寫在頁面上 |
+
+第02節的軌道疊圖分臺鐵與高鐵兩系統：西部幹線（山線）、西部幹線（海線）實線，
+成追線虛線，高鐵另一色。臺中境內共23個臺鐵車站，依本研究從線形算出的三級標示：
+與高鐵線相距400公尺內的轉乘站（新烏日）、山海線的交會站（追分、成功）、一般站。
+**這個分別不是臺鐵官方的站等**，官方站等分特等至招呼共六級，來源檔沒有那個欄位。
+臺中捷運綠線也不在來源檔裡，兩者都列在待收清單。
 
 視覺沿用 VZT 風格指南：單一強調色（石灰黃綠 #C8D400）、大量留白、
 超細字重配超大字號、中英並陳。刻意只做淺色一套，深色版會把「留白為主體」這件事推翻。

@@ -151,6 +151,24 @@ svg.map.big { width: 100%; height: auto; margin-top: 4px; }
 .sig-foot { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px;
             margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--grey-3); }
 @media (max-width: 900px) { .sig-foot { grid-template-columns: 1fr; } }
+/* 軌道疊圖。面量圖從石灰黃綠到近黑都有，所以每條線先鋪一層白色外框（casing）
+   再畫本體，才在深淺底色上都看得見。線色用來源檔自帶的營運商色，
+   那是 VZT 風格指南允許的「資料視覺化例外用色」。 */
+.rail-case { fill: none; stroke: #FFFFFF; stroke-width: 5.0; stroke-linecap: round;
+             stroke-linejoin: round; opacity: .95; }
+.rail-line { fill: none; stroke-width: 2.3; stroke-linecap: round; stroke-linejoin: round; }
+.rail-line.dash { stroke-dasharray: 5 3.5; }
+.stop-case { fill: #FFFFFF; }
+.stop { stroke: #FFFFFF; stroke-width: 1.1; }
+.stop-lbl { font-family: var(--font-zh); font-size: 7.5px; font-weight: 700; fill: var(--black);
+            paint-order: stroke; stroke: #FFFFFF; stroke-width: 2.6px; pointer-events: none; }
+.rail-key { display: flex; flex-wrap: wrap; gap: 6px 20px; margin-top: 12px;
+            font-size: 11px; color: var(--grey-1); align-items: center; }
+.rail-key .it { display: flex; align-items: center; gap: 6px; }
+.rail-key .ln { width: 22px; height: 3px; border-radius: 2px; }
+.rail-key .mk { width: 11px; height: 11px; border-radius: 50%; border: 1.4px solid #FFF;
+                box-shadow: 0 0 0 1px var(--grey-3); }
+
 .dist-val { font-family: var(--font-en); font-size: 7.5px; fill: var(--grey-1);
             paint-order: stroke; stroke: var(--white); stroke-width: 2.2px;
             pointer-events: none; font-variant-numeric: tabular-nums; }
@@ -255,13 +273,19 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
         <span class="ctrl-k">Day 平假日</span>
         <div class="cat-bar" id="sig-days"></div>
       </div>
+      <div class="ctrl-g">
+        <span class="ctrl-k">Rail 軌道疊圖</span>
+        <div class="cat-bar" id="sig-rail"></div>
+      </div>
     </div>
 
     <svg class="map big" id="map-sig" role="img"
          aria-label="臺中29個行政區的電信信令人口大型面量圖"></svg>
     <div class="legend" id="legend-sig"></div>
     <div class="legend-ticks" id="ticks-sig"></div>
+    <div class="rail-key" id="rail-key"></div>
     <p class="caption" id="cap-sig"></p>
+    <p class="caption" id="cap-rail"></p>
 
     <div class="sig-foot">
       <div class="bars" id="bars-sig"></div>
@@ -355,10 +379,12 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
 </div>
 
 <script type="application/json" id="tc">__TC_JSON__</script>
+<script type="application/json" id="rail">__RAIL_JSON__</script>
 <script>
 (() => {
   'use strict';
   const D = JSON.parse(document.getElementById('tc').textContent);
+  const RL = JSON.parse(document.getElementById('rail').textContent);
   const R = D.districts;
   const NS = 'http://www.w3.org/2000/svg';
   const el = (t, a = {}, txt) => { const n = document.createElementNS(NS, t);
@@ -396,7 +422,7 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
       for (const p of best) { cx += p[0]; cy += p[1]; }
       return [px(cx / best.length), py(cy / best.length)];
     };
-    return { W, H, path, centroid };
+    return { W, H, path, centroid, px, py };
   }
   const SMALL = makeProj(560, 14);
   const BIG = makeProj(1120, 20);
@@ -440,6 +466,7 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
         svg.appendChild(el('text', { class: 'dist-val', x: cx, y: cy + 7, 'text-anchor': 'middle' },
           opt.sub(d)));
     });
+    if (opt.rail) drawRail(svg, P);
     const leg = document.getElementById(legId);
     leg.innerHTML = '';
     for (let i = 0; i < 40; i++) {
@@ -451,6 +478,47 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
     document.getElementById(tickId).innerHTML =
       `<span>${fmt(lo)}</span>${mode === 'div' ? `<span>${fmt(mid)}</span>` : ''}<span>${fmt(hi)}</span>`;
     return { lo, hi, color };
+  }
+
+  /* ── 軌道疊圖 ──────────────────────────────────────────────────────
+     線色用來源檔自帶的營運商色（臺鐵 #c8102e、高鐵 #f37021）。
+     成追線畫成虛線：它是連接山線與海線的短支線，實線會讓人以為是主幹。
+     車站的分別不是臺鐵官方站等（來源檔沒有那個欄位），而是本程式從線形算出來的三級：
+     與高鐵線相距400公尺內的轉乘站、山海線的交會站、以及一般站。 */
+  const RAIL_COLOR = { tra: '#c8102e', thsr: '#f37021', metro: '#3A7CC3', lrt: '#4CAF50' };
+  const STOP_TIERS = [
+    { k: 'hsr', zh: '高鐵轉乘', r: 5.4, fill: '#f37021' },
+    { k: 'jx', zh: '山海線交會', r: 4.2, fill: '#1A1A1A' },
+    { k: 'std', zh: '一般臺鐵站', r: 3.0, fill: '#c8102e' },
+  ];
+  const tierOf = t => t.hsrNear ? 'hsr' : t.junction ? 'jx' : 'std';
+
+  function drawRail(svg, P) {
+    const g = el('g', { 'aria-label': '軌道路網' });
+    // 先鋪全部的白色外框，再畫全部的本體，線才不會被後畫的外框蓋掉
+    for (const pass of ['case', 'line'])
+      RL.lines.forEach(L => {
+        L.segments.forEach(seg => {
+          const d = 'M' + seg.map(pt => `${P.px(pt[0]).toFixed(1)} ${P.py(pt[1]).toFixed(1)}`).join('L');
+          if (pass === 'case') g.appendChild(el('path', { class: 'rail-case', d }));
+          else g.appendChild(el('path', {
+            class: 'rail-line' + (L.line === '成追線' ? ' dash' : ''),
+            d, style: `stroke:${RAIL_COLOR[L.kind] || '#1A1A1A'}`,
+          }));
+        });
+      });
+    RL.stops.forEach(t => {
+      const T = STOP_TIERS.find(x => x.k === tierOf(t));
+      const cx = P.px(t.lon), cy = P.py(t.lat);
+      const c = el('circle', { class: 'stop', cx, cy, r: T.r, fill: T.fill });
+      c.appendChild(el('title', {}, `${t.name}站　${t.lines.join('＋')}　${t.district}` +
+        (t.hsrNear ? '　與高鐵線相距400公尺內' : '')));
+      g.appendChild(c);
+      if (T.k !== 'std')
+        g.appendChild(el('text', { class: 'stop-lbl', x: cx, y: cy - T.r - 3,
+          'text-anchor': 'middle' }, t.name));
+    });
+    svg.appendChild(g);
   }
 
   /* ── 排序長條 ── */
@@ -569,6 +637,9 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
   mkPills('sig-layers', LAYERS, () => li, i => { li = i; paintSig(); });
   mkPills('sig-bands', BANDS, () => bi, i => { bi = i; paintSig(); });
   mkPills('sig-days', DAYS, () => di, i => { di = i; paintSig(); });
+  const RAILSW = [{ zh: '顯示' }, { zh: '隱藏' }];
+  let ri = 0;
+  mkPills('sig-rail', RAILSW, () => ri, i => { ri = i; paintSig(); });
 
   function paintSig() {
     const L = LAYERS[li], b = BANDS[bi].k, w = DAYS[di].k;
@@ -577,7 +648,24 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
     const get = d => L.band ? L.get(d, b, w) : L.get(d);
     const sub = d => L.band ? L.sub(d, b, w) : L.sub(d);
     drawMap('map-sig', 'legend-sig', 'ticks-sig', get, L.fmt, L.mode,
-            { proj: BIG, mid: L.mid, sub, minArea: 3 });
+            { proj: BIG, mid: L.mid, sub, minArea: 3, rail: ri === 0 });
+
+    const key = document.getElementById('rail-key');
+    key.hidden = ri !== 0;
+    key.innerHTML = ri !== 0 ? '' :
+      RL.lines.map(L2 =>
+        `<span class="it"><span class="ln" style="background:${RAIL_COLOR[L2.kind]}` +
+        `${L2.line === '成追線' ? ';opacity:.55' : ''}"></span>${L2.sysLabel}　${L2.line}` +
+        `${L2.line === '成追線' ? '（虛線）' : ''}</span>`).join('') +
+      STOP_TIERS.map(T =>
+        `<span class="it"><span class="mk" style="background:${T.fill}"></span>${T.zh}</span>`).join('');
+
+    document.getElementById('cap-rail').innerHTML = ri !== 0 ? '' :
+      `軌道：${RL.lines.map(L2 => L2.sysLabel + L2.line).join('、')}，` +
+      `裁切至臺中市行政區界內；臺鐵車站${RL.stops.length}個，` +
+      `其中${RL.byLine['西部幹線']}站在山線、${RL.byLine['西部幹線 (海線)']}站在海線、` +
+      `${RL.byLine['成追線']}站在成追線（追分與成功同時屬於兩條線，因此重複計入）。` +
+      `<b>車站的分別不是臺鐵官方站等。</b>${RL.caveat}`;
     drawBars('bars-sig', get, L.fmt, L.mode, L.mid != null ? L.mid : 0);
 
     const hi = [...R].sort((a, c) => get(c) - get(a))[0];
