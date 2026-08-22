@@ -80,6 +80,7 @@ python3 scripts/prep_rail.py       # data_TW/from_tdx*/            → data/tc_r
 python3 scripts/prep_bus.py        # data_TW/from_tdx/             → data/tc_bus.json
 python3 scripts/prep_crash.py      # data_TW/from_mobility_atlas/  → data/tc_crash.json
 python3 scripts/prep_roads.py      # data_TW/from_mobility_atlas/  → data/tc_roads.json
+python3 scripts/prep_access.py     # data/tc_rail + tc_villages    → data/tc_access.json
 python3 scripts/prep_villages.py   # data_TW/from_moi/             → data/tc_villages.json
 python3 scripts/build.py           # data/ + src/                  → dist/index.html
 ```
@@ -98,7 +99,8 @@ python3 scripts/build.py           # data/ + src/                  → dist/inde
 | 05 Weak Correlation | 空屋率×日夜比散布圖，相關係數0.282 |
 | 06 Bus Frequency | 696條子路線的班次，以及每千人與每平方公里兩個分母 |
 | 07 Vision Zero | A1死亡1,607人，每十萬人死亡附95%區間 |
-| 08 Still Missing | 社宅基地座標。**這一層還沒有資料**，缺什麼寫在頁面上 |
+| 08 Station Catchment | 42個軌道車站方圓500公尺覆蓋的人口，四個會被講錯的地方都寫出來 |
+| 09 Still Missing | 社宅基地座標。**這一層還沒有資料**，缺什麼寫在頁面上 |
 
 第02節的軌道疊圖分臺鐵、高鐵與捷運三系統：西部幹線（山線）、西部幹線（海線）實線，
 成追線虛線，高鐵另一色。臺中境內共23個臺鐵車站，依本研究從線形算出的三級標示：
@@ -141,6 +143,26 @@ python3 scripts/build.py           # data/ + src/                  → dist/inde
 市區道路是市政府的權責，臺中市政府資料中心連不到。這一級缺席的後果要講清楚：
 **圖上看起來沒有路的地方不是沒有路**，是那些路不在這份資料的範圍內。
 在那之前，公車路線疊圖是最接近的替代：696條子路線走的就是市區的主要道路。
+
+## 車站方圓500公尺覆蓋多少人
+
+**279,545人，占算得出來那部分人口的13.93%；以全市287萬人為分母是至少10.21%。**
+捷運18站覆蓋198,830人、臺鐵23站103,067人、高鐵1站2,576人，三者相加大於聯集，
+差額是松竹、大慶、烏日與高鐵臺中那幾組轉乘站重疊的部分。
+
+這個數字有四個地方會被講錯，每一個都值幾個百分點，因此四個都寫在頁面上：
+
+1. **500公尺是直線距離，不是步行距離。** 實際走路是直線的1.2至1.4倍，所以這是上限。
+2. **母體只有457個里、佔全市70%。** 另外七個區沒有里界，其中潭子、沙鹿、后里、清水
+   四個區有臺鐵車站，本頁對它們照樣算面積比例，唯只當**下界**：車站蓋在市鎮中心，
+   而市鎮中心的密度遠高於整個區的平均。
+3. **方法本身值零點七個百分點。** 主數字用面積比例分配（把里切成格點）；
+   若改用常見的「里重心落在圈內就整個里算進來」，同一份資料得到14.59%而不是13.93%。
+4. **半徑從400到1000公尺，覆蓋率從9.3%跳到37.7%，差四倍。** 引用之前先問半徑。
+
+唯最值得看的不是那個百分比：**臺中車站每日進出48,644人，方圓500公尺卻只住了8,138人**，
+比值5.98。一個全市最忙的車站，旁邊幾乎沒有人住。
+那與第03節的中區空屋率28.57%、第07節的中區行人死亡占68%，講的是同一件事的三個切面。
 
 ## 為什麼只有一張地圖
 

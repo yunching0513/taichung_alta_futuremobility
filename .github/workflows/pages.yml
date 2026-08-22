@@ -62,6 +62,9 @@ jobs:
       - name: 解析公路路網
         run: python3 scripts/prep_roads.py
 
+      - name: 算車站500公尺覆蓋
+        run: python3 scripts/prep_access.py
+
       - name: 建置版面
         run: python3 scripts/build.py
 

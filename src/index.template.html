@@ -628,9 +628,45 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
   </div>
 </div>
 
-<!-- ══ 08 還沒接的 ══ -->
+<!-- ══ 08 車站500公尺 ══ -->
 <div class="section">
-  <div class="section-label">08 — Still Missing <span class="zh">社宅基地的座標</span></div>
+  <div class="section-label">08 — Station Catchment <span class="zh">車站方圓500公尺住了多少人</span></div>
+  <div class="card">
+    <h4>Who Lives Within 500 m <span class="zh">· 42個軌道車站，直線距離</span></h4>
+    <div class="sig-foot" style="margin-top:0;padding-top:0;border-top:0">
+      <div>
+        <div class="stat-row" id="ac-stats"></div>
+        <h4 style="margin:22px 0 10px">By Radius <span class="zh">· 換半徑會怎麼變</span></h4>
+        <div id="ac-radii"></div>
+        <p class="caption" id="ac-cap-r"></p>
+      </div>
+      <div>
+        <p class="body-zh" id="ac-1"></p>
+        <p class="body-zh" id="ac-2"></p>
+        <p class="body-zh" id="ac-3"></p>
+        <p class="body-zh" id="ac-4"></p>
+      </div>
+    </div>
+    <div class="sig-foot">
+      <div>
+        <h4 style="margin-bottom:10px">Per Station <span class="zh">· 每站500公尺內的人口，前15名</span></h4>
+        <div id="ac-stops"></div>
+        <p class="caption" id="ac-cap-s"></p>
+      </div>
+      <div>
+        <h4 style="margin-bottom:10px">Riders vs Residents
+          <span class="zh">· 每日進出人次 ÷ 周邊人口</span></h4>
+        <div id="ac-ratio"></div>
+        <p class="caption" id="ac-cap-x"></p>
+      </div>
+    </div>
+    <div class="jumps" id="ac-jumps"></div>
+  </div>
+</div>
+
+<!-- ══ 09 還沒接的 ══ -->
+<div class="section">
+  <div class="section-label">09 — Still Missing <span class="zh">社宅基地的座標</span></div>
   <div class="card pending">
     <span class="tag">Pending · 待接資料</span>
     <h4>Social Housing Sites <span class="zh">· 這一層還沒有資料</span></h4>
@@ -667,6 +703,7 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
 <script type="application/json" id="crash">__CRASH_JSON__</script>
 <script type="application/json" id="vil">__VIL_JSON__</script>
 <script type="application/json" id="road">__ROAD_JSON__</script>
+<script type="application/json" id="access">__ACCESS_JSON__</script>
 <script>__MAPZOOM_JS__</script>
 <script>
 (() => {
@@ -677,6 +714,7 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
   const CR = JSON.parse(document.getElementById('crash').textContent);
   const VL = JSON.parse(document.getElementById('vil').textContent);
   const RD = JSON.parse(document.getElementById('road').textContent);
+  const AC = JSON.parse(document.getElementById('access').textContent);
   const R = D.districts;
   const NS = 'http://www.w3.org/2000/svg';
   const el = (t, a = {}, txt) => { const n = document.createElementNS(NS, t);
@@ -1605,6 +1643,113 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
       { zh: '每十萬人死亡', g: 4, m: 0, ov: [] },
       { zh: '行人受害占比', g: 4, m: 2, ov: [] },
       { zh: '事故點 × 公車路線', g: 5, ov: ['crash', 'bus'], cm: 0, tab: 2 },
+    ]);
+  }
+
+  /* ── 08 車站方圓500公尺 ───────────────────────────────────────────
+     這一節的重點不在那個百分比，而在它有多容易被講錯。
+     母體、方法、距離的定義各動一次，數字就差好幾個百分點，
+     所以四個都寫出來，讓讀者自己判斷那個數字撐不撐得起他要下的結論。 */
+  {
+    const U = AC.universe, R5 = AC.radiusM;
+    const all = AC.systems.all.byRadius[R5];
+    const city = AC.cityFloor[R5];
+    const pctFine = all.pop / U.pop * 100;
+    const cen = all.centroidPop / U.pop * 100;
+
+    document.getElementById('ac-stats').innerHTML = [
+      ['Within 500 m 覆蓋', int(all.pop), `${U.villages}個里的母體`],
+      ['Share 占母體', pctFine.toFixed(2) + '%', `母體${man(U.pop)}人，全市的${U.sharePop}%`],
+      ['City-wide 全市', '≥' + city.pct.toFixed(2) + '%', `至少${int(city.pop)}人`],
+    ].map(([k, v, n]) =>
+      `<div class="stat"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`
+    ).join('');
+
+    const rs = AC.radii, hiR = AC.systems.all.byRadius[rs[rs.length - 1]].pop;
+    document.getElementById('ac-radii').innerHTML = rs.map(r => {
+      const v = AC.systems.all.byRadius[r];
+      return `<div class="bar-row${r === R5 ? ' on' : ''}">` +
+        `<span class="nm">${r}公尺</span><div class="track">` +
+        `<i style="left:0;width:${v.pop / hiR * 100}%;background:var(--lime-dk)"></i></div>` +
+        `<span class="vv">${(v.pop / U.pop * 100).toFixed(1)}%</span></div>`;
+    }).join('');
+    document.getElementById('ac-cap-r').innerHTML =
+      `占母體的比例。<b>從400公尺到1000公尺，覆蓋率從` +
+      `${(AC.systems.all.byRadius[400].pop / U.pop * 100).toFixed(1)}%跳到` +
+      `${(AC.systems.all.byRadius[1000].pop / U.pop * 100).toFixed(1)}%，差四倍。</b>` +
+      `引用這類數字之前一定要問清楚半徑是多少，否則兩篇報告可以用同一份資料吵起來。`;
+
+    const stops = AC.perStop.filter(t => t.pop != null);
+    const hiS = stops[0].pop;
+    document.getElementById('ac-stops').innerHTML = stops.slice(0, 15).map((t, i) =>
+      `<div class="bar-row${i === 0 ? ' on' : ''}">` +
+      `<span class="nm">${t.sysLabel}${t.name}</span><div class="track">` +
+      `<i style="left:0;width:${t.pop / hiS * 100}%;background:${
+        t.sys === 'metro' ? '#1E9E5A' : t.sys === 'thsr' ? '#f37021' : '#c8102e'}"></i></div>` +
+      `<span class="vv">${int(t.pop)}</span></div>`).join('');
+    const na = AC.perStop.filter(t => t.pop == null);
+    const metroTop = stops.slice(0, 10).filter(t => t.sys === 'metro').length;
+    document.getElementById('ac-cap-s').innerHTML =
+      `<b>前十名裡有${metroTop}站是捷運。</b>綠線走的正是臺中最密的那幾個里，` +
+      `而臺鐵的路廊多在舊市區與海線，周邊密度低得多。` +
+      `緩衝區會重疊，所以這些數字<b>不可以相加</b>：相加會把轉乘站附近的人算好幾次。` +
+      (na.length ? `另有${na.length}站算不出來（${na.map(t => t.name).join('、')}），` +
+        `因為它們所在的區沒有里界。<b>那是算不出來，不是零。</b>` : '');
+
+    const both = stops.filter(t => t.ridership).sort((a, b) =>
+      b.ridership / b.pop - a.ridership / a.pop);
+    const hiX = both[0].ridership / both[0].pop;
+    document.getElementById('ac-ratio').innerHTML = both.map((t, i) =>
+      `<div class="bar-row${i === 0 ? ' on' : ''}">` +
+      `<span class="nm">${t.name}</span><div class="track">` +
+      `<i style="left:0;width:${(t.ridership / t.pop) / hiX * 100}%;` +
+      `background:var(--black)"></i></div>` +
+      `<span class="vv">${(t.ridership / t.pop).toFixed(2)}</span></div>`).join('');
+    const tc = both.find(t => t.name === '臺中');
+    document.getElementById('ac-cap-x').innerHTML =
+      `每日平均進出站人次除以500公尺內的居住人口，只有臺鐵算得出來` +
+      `（捷運與高鐵沒有公開運量）。比值高代表<b>來搭車的人多半不住在這附近</b>。` +
+      `${tc ? `臺中站每日進出${int(tc.ridership)}人，周邊只住${int(tc.pop)}人，比值${(tc.ridership / tc.pop).toFixed(2)}。` : ''}` +
+      `這個比值不是效率指標：轉乘站與端點站本來就會高。`;
+
+    document.getElementById('ac-1').innerHTML =
+      `直接回答：<b>臺中42個軌道車站方圓${R5}公尺，覆蓋${int(all.pop)}人，` +
+      `占算得出來那部分人口的${pctFine.toFixed(2)}%。</b>` +
+      `以全市${man(U.cityPop)}人為分母，則是<b>至少${city.pct.toFixed(2)}%</b>。` +
+      `拆開來看，捷運18站覆蓋` +
+      `${int(AC.systems.metro.byRadius[R5].pop)}人、臺鐵23站` +
+      `${int(AC.systems.tra.byRadius[R5].pop)}人、高鐵1站` +
+      `${int(AC.systems.thsr.byRadius[R5].pop)}人；三者相加大於聯集，` +
+      `差額就是松竹、大慶、烏日與高鐵臺中那幾組轉乘站重疊的部分。`;
+    document.getElementById('ac-2').innerHTML =
+      `<b>這個數字有四個地方會被講錯，每一個都值幾個百分點。</b>` +
+      `其一，<b>${R5}公尺是直線距離，不是步行距離</b>：實際走路要繞街廓、河川與鐵路本身，` +
+      `一般是直線的1.2至1.4倍，因此這是可及人口的上限，真正走得到的人比這裡少。` +
+      `其二，母體只有${U.villages}個里、${man(U.pop)}人，佔全市${U.sharePop}%；` +
+      `另外${U.coarseDistricts}個區沒有里界，其中潭子、沙鹿、后里、清水四個區有臺鐵車站。` +
+      `本頁對那七個區照樣算了面積比例，唯只當<b>下界</b>：` +
+      `車站蓋在市鎮中心，而市鎮中心的密度遠高於整個區的平均，那個算法一定低估。`;
+    document.getElementById('ac-3').innerHTML =
+      `其三，<b>方法本身就值零點七個百分點</b>。本頁的主數字用面積比例分配：` +
+      `把每個里切成格點，數落在緩衝區內的比例，再乘上該里的人口，` +
+      `這假設里內人口均勻分布。若改用常見的「里重心落在圈內就整個里算進來」，` +
+      `同一份資料會得到${cen.toFixed(2)}%而不是${pctFine.toFixed(2)}%。` +
+      `<b>差得越多，代表那個數字越不該當成事實引用。</b>` +
+      `其四，車站只算軌道，不含公車站牌：13,877個站牌幾乎覆蓋全市，` +
+      `把它算進來這個指標就失去意義。`;
+    document.getElementById('ac-4').innerHTML =
+      `唯最值得看的不是那個百分比。<b>臺中車站每日進出${int(tc ? tc.ridership : 0)}人，` +
+      `方圓${R5}公尺卻只住了${int(tc ? tc.pop : 0)}人。</b>` +
+      `一個全市最忙的車站，旁邊幾乎沒有人住：` +
+      `那不是車站的問題，是舊市區在過去三十年被抽空的結果，` +
+      `第03節的中區空屋率28.57%與第07節中區行人死亡占68%，講的是同一件事的三個切面。` +
+      `<b>把人搬回車站旁邊，跟多蓋一條線是兩種完全不同的政策</b>，` +
+      `而這個城市目前只在做後者。`;
+
+    jumps('ac-jumps', [
+      { zh: '軌道路網與車站', g: 5, ov: ['tra', 'metro', 'thsr'], tab: 0 },
+      { zh: '里級人口密度', g: 2, m: 0 },
+      { zh: '中區的空屋率', g: 1, m: 2 },
     ]);
   }
 

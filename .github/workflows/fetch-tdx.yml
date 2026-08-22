@@ -51,6 +51,7 @@ jobs:
           python3 scripts/prep_crash.py
           python3 scripts/prep_villages.py
           python3 scripts/prep_roads.py
+          python3 scripts/prep_access.py
 
       - name: 確認沒有把金鑰寫進檔案
         run: |
