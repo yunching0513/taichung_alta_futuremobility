@@ -1,0 +1,12 @@
+# 原始檔可能很大，逐案決定要不要納入版控；先擋掉常見的暫存與衍生檔
+*.pyc
+__pycache__/
+.DS_Store
+.ipynb_checkpoints/
+dist/
+site/
+*.log
+
+# 大型原始檔：確定要納入版控時，用 git add -f 個別加入
+data_TW/**/*.zip
+data_TW/**/*.7z
