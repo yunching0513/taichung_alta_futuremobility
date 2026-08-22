@@ -136,6 +136,33 @@ CONNECT 被回502。兩者擇一取得之後，站點就能落圖。
 給不出基地在哪一個區、哪一個地號；清單要向臺中市住宅發展工程處取得，
 或從公告的招租資訊逐案抄。
 
+## TDX 金鑰放哪裡
+
+臺中捷運綠線、高鐵臺中站座標、臺鐵官方站等、公車站位，這四項都在交通部TDX，
+而TDX需要金鑰。到 <https://tdx.transportdata.tw> 註冊會員，於「資料服務」頁申請，
+會拿到一組 `client_id` 與 `client_secret`。三個地方可以放，擇一：
+
+**其一，GitHub 的 repository secrets（建議）。**
+到 Settings → Secrets and variables → Actions → New repository secret，
+分別建 `TDX_CLIENT_ID` 與 `TDX_CLIENT_SECRET`。
+之後在 Actions 頁手動跑「抓 TDX 資料」這個工作流程，它會抓完、重跑管線、直接提交。
+金鑰只存在GitHub的加密儲存區，不經過任何對話、不落在筆電上、不進版控，
+而且GitHub會把它在log裡遮成 `***`。
+
+**其二，本機的 `.env`。** 把 `.env.example` 複製成 `.env` 填上兩行，再跑：
+
+```
+python3 scripts/fetch_tdx.py
+python3 scripts/prep_rail.py
+```
+
+`.env` 已列入 `.gitignore`。刻意不接受命令列參數傳金鑰：那會留在 shell 的歷史紀錄裡。
+
+**其三，環境變數。** `export TDX_CLIENT_ID=... ; export TDX_CLIENT_SECRET=...` 之後同上。
+
+三種都不會讓金鑰進到這個公開的 repo。**平常的部署不需要金鑰**：
+`pages.yml` 只讀已經納入版控的原始檔，抓資料與建置是兩支分開的工作流程。
+
 ## 授權
 
 資料版權屬各原始機關。本 repo 的解析程式與圖表以 MIT 授權釋出。

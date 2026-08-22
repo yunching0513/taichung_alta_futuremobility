@@ -10,3 +10,10 @@ site/
 # 大型原始檔：確定要納入版控時，用 git add -f 個別加入
 data_TW/**/*.zip
 data_TW/**/*.7z
+
+# 金鑰。絕對不要進版控：這個 repo 是公開的
+.env
+.env.*
+!.env.example
+*secret*
+*credentials*
