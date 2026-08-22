@@ -13,6 +13,29 @@
   "10–19年",
   "未滿10年"
  ],
+ "bands": [
+  {
+   "k": "morning",
+   "zh": "上午",
+   "when": "07:00–13:00"
+  },
+  {
+   "k": "afternoon",
+   "zh": "下午",
+   "when": "13:00–19:00"
+  },
+  {
+   "k": "day",
+   "zh": "日間",
+   "when": "白天停留"
+  },
+  {
+   "k": "night",
+   "zh": "夜間",
+   "when": "居住地"
+  }
+ ],
+ "signalSource": "社會經濟資料服務平臺（SEGIS）行政區電信信令人口統計，資料時間112Y11M",
  "totals": {
   "houses": 1073182,
   "households": 985957,
@@ -21,6 +44,8 @@
   "vacancy": 13.77,
   "dayWork": 3043848,
   "nightWork": 3052296,
+  "trips": 39818917,
+  "area": 2214.7,
   "ratio": 0.997
  },
  "spread": {
@@ -32,6 +57,12 @@
   "vacancyRange": 21.42
  },
  "corrVacancyRatio": 0.282,
+ "crossBoundary": {
+  "morning": -4417,
+  "afternoon": -5258,
+  "day": -8448,
+  "night": 0
+ },
  "bounds": [
   120.4608,
   23.9985,
@@ -57,14 +88,30 @@
    "old40": 36.02,
    "new10": 3.34,
    "avgAreaAll": 90.1,
-   "dayWork": 24066,
-   "nightWork": 20607,
+   "work": {
+    "morning": 23637,
+    "afternoon": 24690,
+    "day": 24066,
+    "night": 20607
+   },
+   "weekend": {
+    "morning": 23851,
+    "afternoon": 25126,
+    "day": 23653,
+    "night": 22737
+   },
    "ratio": 1.168,
-   "net": 3459,
-   "morningRatio": 1.147,
    "ratioWeekend": 1.04,
+   "morningRatio": 1.147,
+   "net": 3459,
+   "morningNet": 3030,
+   "trips": 390392,
+   "tripsWeekend": 453153,
+   "tripsPer": 18.94,
    "area": 0.9,
    "nightDensity": 22897,
+   "morningDensity": 26263,
+   "signalRatio": 1.063,
    "rings": [
     [
      [
@@ -116,14 +163,30 @@
    "old40": 22.09,
    "new10": 5.67,
    "avgAreaAll": 115.4,
-   "dayWork": 187367,
-   "nightWork": 187046,
+   "work": {
+    "morning": 187311,
+    "afternoon": 188807,
+    "day": 187367,
+    "night": 187046
+   },
+   "weekend": {
+    "morning": 184969,
+    "afternoon": 188429,
+    "day": 185222,
+    "night": 184619
+   },
    "ratio": 1.002,
-   "net": 321,
-   "morningRatio": 1.001,
    "ratioWeekend": 1.003,
+   "morningRatio": 1.001,
+   "net": 321,
+   "morningNet": 265,
+   "trips": 2448603,
+   "tripsWeekend": 2429494,
+   "tripsPer": 13.09,
    "area": 6.9,
    "nightDensity": 27108,
+   "morningDensity": 27147,
+   "signalRatio": 1.187,
    "rings": [
     [
      [
@@ -251,14 +314,30 @@
    "old40": 12.58,
    "new10": 20.7,
    "avgAreaAll": 129.6,
-   "dayWork": 270162,
-   "nightWork": 317189,
+   "work": {
+    "morning": 274089,
+    "afternoon": 268185,
+    "day": 270162,
+    "night": 317189
+   },
+   "weekend": {
+    "morning": 308544,
+    "afternoon": 299926,
+    "day": 304956,
+    "night": 315222
+   },
    "ratio": 0.852,
-   "net": -47027,
-   "morningRatio": 0.864,
    "ratioWeekend": 0.967,
+   "morningRatio": 0.864,
+   "net": -47027,
+   "morningNet": -43100,
+   "trips": 3747806,
+   "tripsWeekend": 3963345,
+   "tripsPer": 11.82,
    "area": 62.7,
    "nightDensity": 5059,
+   "morningDensity": 4371,
+   "signalRatio": 1.077,
    "rings": [
     [
      [
@@ -626,14 +705,30 @@
    "old40": 16.15,
    "new10": 11.24,
    "avgAreaAll": 113.7,
-   "dayWork": 132871,
-   "nightWork": 148008,
+   "work": {
+    "morning": 134677,
+    "afternoon": 132054,
+    "day": 132871,
+    "night": 148008
+   },
+   "weekend": {
+    "morning": 140441,
+    "afternoon": 134541,
+    "day": 138446,
+    "night": 144617
+   },
    "ratio": 0.898,
-   "net": -15137,
-   "morningRatio": 0.91,
    "ratioWeekend": 0.957,
+   "morningRatio": 0.91,
+   "net": -15137,
+   "morningNet": -13331,
+   "trips": 1682842,
+   "tripsWeekend": 1602716,
+   "tripsPer": 11.37,
    "area": 6.8,
    "nightDensity": 21766,
+   "morningDensity": 19805,
+   "signalRatio": 1.009,
    "rings": [
     [
      [
@@ -785,14 +880,30 @@
    "old40": 6.8,
    "new10": 18.8,
    "avgAreaAll": 131.8,
-   "dayWork": 222158,
-   "nightWork": 202425,
+   "work": {
+    "morning": 220355,
+    "afternoon": 223835,
+    "day": 222158,
+    "night": 202425
+   },
+   "weekend": {
+    "morning": 207905,
+    "afternoon": 212054,
+    "day": 209494,
+    "night": 200297
+   },
    "ratio": 1.097,
-   "net": 19733,
-   "morningRatio": 1.089,
    "ratioWeekend": 1.046,
+   "morningRatio": 1.089,
+   "net": 19733,
+   "morningNet": 17930,
+   "trips": 2889119,
+   "tripsWeekend": 2749289,
+   "tripsPer": 14.27,
    "area": 31.3,
    "nightDensity": 6467,
+   "morningDensity": 7040,
+   "signalRatio": 1.036,
    "rings": [
     [
      [
@@ -1016,14 +1127,30 @@
    "old40": 46.9,
    "new10": 11.13,
    "avgAreaAll": 167.2,
-   "dayWork": 66390,
-   "nightWork": 56503,
+   "work": {
+    "morning": 66733,
+    "afternoon": 66149,
+    "day": 66390,
+    "night": 56503
+   },
+   "weekend": {
+    "morning": 59309,
+    "afternoon": 62104,
+    "day": 60487,
+    "night": 54806
+   },
    "ratio": 1.175,
-   "net": 9887,
-   "morningRatio": 1.181,
    "ratioWeekend": 1.104,
+   "morningRatio": 1.181,
+   "net": 9887,
+   "morningNet": 10230,
+   "trips": 864195,
+   "tripsWeekend": 967242,
+   "tripsPer": 15.29,
    "area": 58.9,
    "nightDensity": 959,
+   "morningDensity": 1133,
+   "signalRatio": 0.964,
    "rings": [
     [
      [
@@ -1203,14 +1330,30 @@
    "old40": 58.32,
    "new10": 10.29,
    "avgAreaAll": 123.7,
-   "dayWork": 13875,
-   "nightWork": 12864,
+   "work": {
+    "morning": 14033,
+    "afternoon": 13979,
+    "day": 13875,
+    "night": 12864
+   },
+   "weekend": {
+    "morning": 19762,
+    "afternoon": 19348,
+    "day": 19266,
+    "night": 15756
+   },
    "ratio": 1.079,
-   "net": 1011,
-   "morningRatio": 1.091,
    "ratioWeekend": 1.223,
+   "morningRatio": 1.091,
+   "net": 1011,
+   "morningNet": 1169,
+   "trips": 153110,
+   "tripsWeekend": 232345,
+   "tripsPer": 11.9,
    "area": 1037.8,
    "nightDensity": 12,
+   "morningDensity": 14,
+   "signalRatio": 1.823,
    "rings": [
     [
      [
@@ -2366,14 +2509,30 @@
    "old40": 38.87,
    "new10": 9.42,
    "avgAreaAll": 160.8,
-   "dayWork": 21286,
-   "nightWork": 25975,
+   "work": {
+    "morning": 21308,
+    "afternoon": 21439,
+    "day": 21286,
+    "night": 25975
+   },
+   "weekend": {
+    "morning": 24421,
+    "afternoon": 24721,
+    "day": 24539,
+    "night": 26460
+   },
    "ratio": 0.819,
-   "net": -4689,
-   "morningRatio": 0.82,
    "ratioWeekend": 0.927,
+   "morningRatio": 0.82,
+   "net": -4689,
+   "morningNet": -4667,
+   "trips": 332742,
+   "tripsWeekend": 402951,
+   "tripsPer": 12.81,
    "area": 42.4,
    "nightDensity": 613,
+   "morningDensity": 503,
+   "signalRatio": 0.803,
    "rings": [
     [
      [
@@ -2541,14 +2700,30 @@
    "old40": 36.33,
    "new10": 4.64,
    "avgAreaAll": 166.7,
-   "dayWork": 14984,
-   "nightWork": 15023,
+   "work": {
+    "morning": 13451,
+    "afternoon": 14329,
+    "day": 14984,
+    "night": 15023
+   },
+   "weekend": {
+    "morning": 14322,
+    "afternoon": 14760,
+    "day": 14948,
+    "night": 15022
+   },
    "ratio": 0.997,
-   "net": -39,
-   "morningRatio": 0.895,
    "ratioWeekend": 0.995,
+   "morningRatio": 0.895,
+   "net": -39,
+   "morningNet": -1572,
+   "trips": 144423,
+   "tripsWeekend": 160557,
+   "tripsPer": 9.61,
    "area": 27.4,
    "nightDensity": 548,
+   "morningDensity": 491,
+   "signalRatio": 0.853,
    "rings": [
     [
      [
@@ -2824,14 +2999,30 @@
    "old40": 40.77,
    "new10": 8.06,
    "avgAreaAll": 157.5,
-   "dayWork": 73938,
-   "nightWork": 67024,
+   "work": {
+    "morning": 74195,
+    "afternoon": 74024,
+    "day": 73938,
+    "night": 67024
+   },
+   "weekend": {
+    "morning": 69643,
+    "afternoon": 69728,
+    "day": 69559,
+    "night": 67479
+   },
    "ratio": 1.103,
-   "net": 6914,
-   "morningRatio": 1.107,
    "ratioWeekend": 1.031,
+   "morningRatio": 1.107,
+   "net": 6914,
+   "morningNet": 7171,
+   "trips": 948736,
+   "tripsWeekend": 949103,
+   "tripsPer": 14.16,
    "area": 58.5,
    "nightDensity": 1146,
+   "morningDensity": 1268,
+   "signalRatio": 0.904,
    "rings": [
     [
      [
@@ -3135,14 +3326,30 @@
    "old40": 45.21,
    "new10": 9.53,
    "avgAreaAll": 137.6,
-   "dayWork": 44316,
-   "nightWork": 51847,
+   "work": {
+    "morning": 44515,
+    "afternoon": 44213,
+    "day": 44316,
+    "night": 51847
+   },
+   "weekend": {
+    "morning": 49759,
+    "afternoon": 48436,
+    "day": 49390,
+    "night": 52589
+   },
    "ratio": 0.855,
-   "net": -7531,
-   "morningRatio": 0.859,
    "ratioWeekend": 0.939,
+   "morningRatio": 0.859,
+   "net": -7531,
+   "morningNet": -7332,
+   "trips": 580242,
+   "tripsWeekend": 598010,
+   "tripsPer": 11.19,
    "area": 37.0,
    "nightDensity": 1401,
+   "morningDensity": 1203,
+   "signalRatio": 0.891,
    "rings": [
     [
      [
@@ -3306,14 +3513,30 @@
    "old40": 26.41,
    "new10": 11.63,
    "avgAreaAll": 124.5,
-   "dayWork": 183046,
-   "nightWork": 204346,
+   "work": {
+    "morning": 184241,
+    "afternoon": 182683,
+    "day": 183046,
+    "night": 204346
+   },
+   "weekend": {
+    "morning": 190861,
+    "afternoon": 186969,
+    "day": 189947,
+    "night": 203879
+   },
    "ratio": 0.896,
-   "net": -21300,
-   "morningRatio": 0.902,
    "ratioWeekend": 0.932,
+   "morningRatio": 0.902,
+   "net": -21300,
+   "morningNet": -20105,
+   "trips": 2443649,
+   "tripsWeekend": 2315693,
+   "tripsPer": 11.96,
    "area": 28.9,
    "nightDensity": 7071,
+   "morningDensity": 6375,
+   "signalRatio": 0.883,
    "rings": [
     [
      [
@@ -3517,14 +3740,30 @@
    "old40": 20.36,
    "new10": 12.19,
    "avgAreaAll": 141.5,
-   "dayWork": 113825,
-   "nightWork": 102131,
+   "work": {
+    "morning": 113974,
+    "afternoon": 113957,
+    "day": 113825,
+    "night": 102131
+   },
+   "weekend": {
+    "morning": 99187,
+    "afternoon": 97902,
+    "day": 99089,
+    "night": 100533
+   },
    "ratio": 1.115,
-   "net": 11694,
-   "morningRatio": 1.116,
    "ratioWeekend": 0.986,
+   "morningRatio": 1.116,
+   "net": 11694,
+   "morningNet": 11843,
+   "trips": 1346592,
+   "tripsWeekend": 1145590,
+   "tripsPer": 13.18,
    "area": 32.4,
    "nightDensity": 3152,
+   "morningDensity": 3518,
+   "signalRatio": 0.918,
    "rings": [
     [
      [
@@ -3732,14 +3971,30 @@
    "old40": 29.37,
    "new10": 16.65,
    "avgAreaAll": 118.9,
-   "dayWork": 169082,
-   "nightWork": 193295,
+   "work": {
+    "morning": 170597,
+    "afternoon": 168328,
+    "day": 169082,
+    "night": 193295
+   },
+   "weekend": {
+    "morning": 182216,
+    "afternoon": 176996,
+    "day": 180675,
+    "night": 192839
+   },
    "ratio": 0.875,
-   "net": -24213,
-   "morningRatio": 0.883,
    "ratioWeekend": 0.937,
+   "morningRatio": 0.883,
+   "net": -24213,
+   "morningNet": -22698,
+   "trips": 2012695,
+   "tripsWeekend": 1936109,
+   "tripsPer": 10.41,
    "area": 120.7,
    "nightDensity": 1601,
+   "morningDensity": 1413,
+   "signalRatio": 0.935,
    "rings": [
     [
      [
@@ -4107,14 +4362,30 @@
    "old40": 48.03,
    "new10": 9.3,
    "avgAreaAll": 148.5,
-   "dayWork": 21794,
-   "nightWork": 21459,
+   "work": {
+    "morning": 22025,
+    "afternoon": 21757,
+    "day": 21794,
+    "night": 21459
+   },
+   "weekend": {
+    "morning": 23332,
+    "afternoon": 23043,
+    "day": 22922,
+    "night": 21460
+   },
    "ratio": 1.016,
-   "net": 335,
-   "morningRatio": 1.026,
    "ratioWeekend": 1.068,
+   "morningRatio": 1.026,
+   "net": 335,
+   "morningNet": 566,
+   "trips": 277934,
+   "tripsWeekend": 358453,
+   "tripsPer": 12.95,
    "area": 68.9,
    "nightDensity": 311,
+   "morningDensity": 320,
+   "signalRatio": 0.825,
    "rings": [
     [
      [
@@ -4606,14 +4877,30 @@
    "old40": 43.55,
    "new10": 8.23,
    "avgAreaAll": 163.4,
-   "dayWork": 32589,
-   "nightWork": 36625,
+   "work": {
+    "morning": 32643,
+    "afternoon": 32731,
+    "day": 32589,
+    "night": 36625
+   },
+   "weekend": {
+    "morning": 38139,
+    "afternoon": 38359,
+    "day": 37921,
+    "night": 38654
+   },
    "ratio": 0.89,
-   "net": -4036,
-   "morningRatio": 0.891,
    "ratioWeekend": 0.981,
+   "morningRatio": 0.891,
+   "net": -4036,
+   "morningNet": -3982,
+   "trips": 426318,
+   "tripsWeekend": 510779,
+   "tripsPer": 11.64,
    "area": 117.4,
    "nightDensity": 312,
+   "morningDensity": 278,
+   "signalRatio": 0.889,
    "rings": [
     [
      [
@@ -4965,14 +5252,30 @@
    "old40": 27.61,
    "new10": 11.29,
    "avgAreaAll": 128.5,
-   "dayWork": 77066,
-   "nightWork": 81133,
+   "work": {
+    "morning": 77147,
+    "afternoon": 77200,
+    "day": 77066,
+    "night": 81133
+   },
+   "weekend": {
+    "morning": 83011,
+    "afternoon": 90198,
+    "day": 84542,
+    "night": 81730
+   },
    "ratio": 0.95,
-   "net": -4067,
-   "morningRatio": 0.951,
    "ratioWeekend": 1.034,
+   "morningRatio": 0.951,
+   "net": -4067,
+   "morningNet": -3986,
+   "trips": 1136416,
+   "tripsWeekend": 1306250,
+   "tripsPer": 14.01,
    "area": 9.3,
    "nightDensity": 8724,
+   "morningDensity": 8295,
+   "signalRatio": 0.973,
    "rings": [
     [
      [
@@ -5076,14 +5379,30 @@
    "old40": 24.0,
    "new10": 18.17,
    "avgAreaAll": 153.0,
-   "dayWork": 74723,
-   "nightWork": 66207,
+   "work": {
+    "morning": 75217,
+    "afternoon": 74986,
+    "day": 74723,
+    "night": 66207
+   },
+   "weekend": {
+    "morning": 68521,
+    "afternoon": 69891,
+    "day": 68504,
+    "night": 65134
+   },
    "ratio": 1.129,
-   "net": 8516,
-   "morningRatio": 1.136,
    "ratioWeekend": 1.052,
+   "morningRatio": 1.136,
+   "net": 8516,
+   "morningNet": 9010,
+   "trips": 903079,
+   "tripsWeekend": 830402,
+   "tripsPer": 13.64,
    "area": 16.6,
    "nightDensity": 3988,
+   "morningDensity": 4531,
+   "signalRatio": 1.064,
    "rings": [
     [
      [
@@ -5433,14 +5752,30 @@
    "old40": 28.1,
    "new10": 20.45,
    "avgAreaAll": 147.5,
-   "dayWork": 103084,
-   "nightWork": 117210,
+   "work": {
+    "morning": 102947,
+    "afternoon": 103421,
+    "day": 103084,
+    "night": 117210
+   },
+   "weekend": {
+    "morning": 110135,
+    "afternoon": 107675,
+    "day": 109334,
+    "night": 113820
+   },
    "ratio": 0.879,
-   "net": -14126,
-   "morningRatio": 0.878,
    "ratioWeekend": 0.961,
+   "morningRatio": 0.878,
+   "net": -14126,
+   "morningNet": -14263,
+   "trips": 1428008,
+   "tripsWeekend": 1427482,
+   "tripsPer": 12.18,
    "area": 40.5,
    "nightDensity": 2894,
+   "morningDensity": 2542,
+   "signalRatio": 1.084,
    "rings": [
     [
      [
@@ -5624,14 +5959,30 @@
    "old40": 33.92,
    "new10": 18.17,
    "avgAreaAll": 154.0,
-   "dayWork": 70893,
-   "nightWork": 82072,
+   "work": {
+    "morning": 71107,
+    "afternoon": 70844,
+    "day": 70893,
+    "night": 82072
+   },
+   "weekend": {
+    "morning": 79987,
+    "afternoon": 79861,
+    "day": 80121,
+    "night": 82916
+   },
    "ratio": 0.864,
-   "net": -11179,
-   "morningRatio": 0.866,
    "ratioWeekend": 0.966,
+   "morningRatio": 0.866,
+   "net": -11179,
+   "morningNet": -10965,
+   "trips": 976189,
+   "tripsWeekend": 1101394,
+   "tripsPer": 11.89,
    "area": 64.2,
    "nightDensity": 1278,
+   "morningDensity": 1108,
+   "signalRatio": 0.952,
    "rings": [
     [
      [
@@ -6149,14 +6500,30 @@
    "old40": 25.42,
    "new10": 8.05,
    "avgAreaAll": 127.2,
-   "dayWork": 114895,
-   "nightWork": 111821,
+   "work": {
+    "morning": 115588,
+    "afternoon": 113489,
+    "day": 114895,
+    "night": 111821
+   },
+   "weekend": {
+    "morning": 110259,
+    "afternoon": 106232,
+    "day": 109018,
+    "night": 111022
+   },
    "ratio": 1.027,
-   "net": 3074,
-   "morningRatio": 1.034,
    "ratioWeekend": 0.982,
+   "morningRatio": 1.034,
+   "net": 3074,
+   "morningNet": 3767,
+   "trips": 1368381,
+   "tripsWeekend": 1270167,
+   "tripsPer": 12.24,
    "area": 25.8,
    "nightDensity": 4334,
+   "morningDensity": 4480,
+   "signalRatio": 0.949,
    "rings": [
     [
      [
@@ -6484,14 +6851,30 @@
    "old40": 29.58,
    "new10": 24.22,
    "avgAreaAll": 135.9,
-   "dayWork": 91942,
-   "nightWork": 84309,
+   "work": {
+    "morning": 92777,
+    "afternoon": 91532,
+    "day": 91942,
+    "night": 84309
+   },
+   "weekend": {
+    "morning": 84761,
+    "afternoon": 83200,
+    "day": 84221,
+    "night": 82506
+   },
    "ratio": 1.091,
-   "net": 7633,
-   "morningRatio": 1.1,
    "ratioWeekend": 1.021,
+   "morningRatio": 1.1,
+   "net": 7633,
+   "morningNet": 8468,
+   "trips": 1404268,
+   "tripsWeekend": 1373291,
+   "tripsPer": 16.66,
    "area": 43.4,
    "nightDensity": 1943,
+   "morningDensity": 2138,
+   "signalRatio": 0.913,
    "rings": [
     [
      [
@@ -6835,14 +7218,30 @@
    "old40": 44.75,
    "new10": 6.0,
    "avgAreaAll": 165.8,
-   "dayWork": 9066,
-   "nightWork": 10800,
+   "work": {
+    "morning": 9122,
+    "afternoon": 9066,
+    "day": 9066,
+    "night": 10800
+   },
+   "weekend": {
+    "morning": 10954,
+    "afternoon": 10842,
+    "day": 10885,
+    "night": 11110
+   },
    "ratio": 0.839,
-   "net": -1734,
-   "morningRatio": 0.845,
    "ratioWeekend": 0.98,
+   "morningRatio": 0.845,
+   "net": -1734,
+   "morningNet": -1678,
+   "trips": 159084,
+   "tripsWeekend": 210291,
+   "tripsPer": 14.73,
    "area": 18.2,
    "nightDensity": 593,
+   "morningDensity": 501,
+   "signalRatio": 0.84,
    "rings": [
     [
      [
@@ -7042,14 +7441,30 @@
    "old40": 31.77,
    "new10": 11.5,
    "avgAreaAll": 162.0,
-   "dayWork": 72058,
-   "nightWork": 66409,
+   "work": {
+    "morning": 72695,
+    "afternoon": 71712,
+    "day": 72058,
+    "night": 66409
+   },
+   "weekend": {
+    "morning": 63912,
+    "afternoon": 62875,
+    "day": 63639,
+    "night": 65203
+   },
    "ratio": 1.085,
-   "net": 5649,
-   "morningRatio": 1.095,
    "ratioWeekend": 0.976,
+   "morningRatio": 1.095,
+   "net": 5649,
+   "morningNet": 6286,
+   "trips": 944206,
+   "tripsWeekend": 860044,
+   "tripsPer": 14.22,
    "area": 35.0,
    "nightDensity": 1897,
+   "morningDensity": 2077,
+   "signalRatio": 0.932,
    "rings": [
     [
      [
@@ -7253,14 +7668,30 @@
    "old40": 25.61,
    "new10": 4.64,
    "avgAreaAll": 123.2,
-   "dayWork": 146098,
-   "nightWork": 125529,
+   "work": {
+    "morning": 142797,
+    "afternoon": 149015,
+    "day": 146098,
+    "night": 125529
+   },
+   "weekend": {
+    "morning": 127494,
+    "afternoon": 136176,
+    "day": 130481,
+    "night": 124548
+   },
    "ratio": 1.164,
-   "net": 20569,
-   "morningRatio": 1.138,
    "ratioWeekend": 1.048,
+   "morningRatio": 1.138,
+   "net": 20569,
+   "morningNet": 17268,
+   "trips": 1978736,
+   "tripsWeekend": 2000666,
+   "tripsPer": 15.76,
    "area": 5.7,
    "nightDensity": 22023,
+   "morningDensity": 25052,
+   "signalRatio": 1.034,
    "rings": [
     [
      [
@@ -7384,14 +7815,30 @@
    "old40": 10.2,
    "new10": 14.54,
    "avgAreaAll": 125.1,
-   "dayWork": 401068,
-   "nightWork": 334709,
+   "work": {
+    "morning": 397358,
+    "afternoon": 404235,
+    "day": 401068,
+    "night": 334709
+   },
+   "weekend": {
+    "morning": 340980,
+    "afternoon": 353161,
+    "day": 344774,
+    "night": 325965
+   },
    "ratio": 1.198,
-   "net": 66359,
-   "morningRatio": 1.187,
    "ratioWeekend": 1.058,
+   "morningRatio": 1.187,
+   "net": 66359,
+   "morningNet": 62649,
+   "trips": 4906920,
+   "tripsWeekend": 4530766,
+   "tripsPer": 14.66,
    "area": 39.8,
    "nightDensity": 8410,
+   "morningDensity": 9984,
+   "signalRatio": 1.152,
    "rings": [
     [
      [
@@ -7643,14 +8090,30 @@
    "old40": 35.88,
    "new10": 10.3,
    "avgAreaAll": 135.5,
-   "dayWork": 132875,
-   "nightWork": 145446,
+   "work": {
+    "morning": 133104,
+    "afternoon": 133406,
+    "day": 132875,
+    "night": 145446
+   },
+   "weekend": {
+    "morning": 144559,
+    "afternoon": 144324,
+    "day": 144701,
+    "night": 146907
+   },
    "ratio": 0.914,
-   "net": -12571,
-   "morningRatio": 0.915,
    "ratioWeekend": 0.985,
+   "morningRatio": 0.915,
+   "net": -12571,
+   "morningNet": -12342,
+   "trips": 1863290,
+   "tripsWeekend": 1926666,
+   "tripsPer": 12.81,
    "area": 41.2,
    "nightDensity": 3530,
+   "morningDensity": 3231,
+   "signalRatio": 0.978,
    "rings": [
     [
      [
@@ -7902,14 +8365,30 @@
    "old40": 36.81,
    "new10": 10.67,
    "avgAreaAll": 141.0,
-   "dayWork": 81799,
-   "nightWork": 75875,
+   "work": {
+    "morning": 82301,
+    "afternoon": 81641,
+    "day": 81799,
+    "night": 75875
+   },
+   "weekend": {
+    "morning": 72980,
+    "afternoon": 70463,
+    "day": 71793,
+    "night": 72647
+   },
    "ratio": 1.078,
-   "net": 5924,
-   "morningRatio": 1.085,
    "ratioWeekend": 0.988,
+   "morningRatio": 1.085,
+   "net": 5924,
+   "morningNet": 6426,
+   "trips": 1058695,
+   "tripsWeekend": 1060327,
+   "tripsPer": 13.95,
    "area": 98.1,
    "nightDensity": 773,
+   "morningDensity": 839,
+   "signalRatio": 0.898,
    "rings": [
     [
      [
@@ -8237,14 +8716,30 @@
    "old40": 25.55,
    "new10": 11.39,
    "avgAreaAll": 154.5,
-   "dayWork": 76532,
-   "nightWork": 88409,
+   "work": {
+    "morning": 77935,
+    "afternoon": 75331,
+    "day": 76532,
+    "night": 88409
+   },
+   "weekend": {
+    "morning": 83250,
+    "afternoon": 80329,
+    "day": 82478,
+    "night": 87421
+   },
    "ratio": 0.866,
-   "net": -11877,
-   "morningRatio": 0.882,
    "ratioWeekend": 0.943,
+   "morningRatio": 0.882,
+   "net": -11877,
+   "morningNet": -10474,
+   "trips": 1002247,
+   "tripsWeekend": 987998,
+   "tripsPer": 11.34,
    "area": 38.0,
    "nightDensity": 2327,
+   "morningDensity": 2051,
+   "signalRatio": 1.156,
    "rings": [
     [
      [

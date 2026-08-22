@@ -139,6 +139,22 @@ svg.map { display: block; width: 100%; height: auto; }
 .legend-ticks { display: flex; justify-content: space-between; font-family: var(--font-en);
                 font-size: 9px; color: var(--grey-2); margin-top: 5px; letter-spacing: 0.05em; }
 
+/* ── 大型地圖與它的控制列 ── */
+svg.map.big { width: 100%; height: auto; margin-top: 4px; }
+.ctrl { display: flex; flex-wrap: wrap; gap: 24px 40px; align-items: flex-start;
+        padding-bottom: 20px; margin-bottom: 8px; border-bottom: 1px solid var(--grey-3); }
+.ctrl-g { display: flex; flex-direction: column; gap: 8px; }
+.ctrl-g .cat-bar { margin-bottom: 0; }
+.ctrl-k { font-family: var(--font-en); font-size: 9px; letter-spacing: 0.2em;
+          text-transform: uppercase; color: var(--grey-2); }
+.ctrl-g[hidden] { display: none; }
+.sig-foot { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px;
+            margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--grey-3); }
+@media (max-width: 900px) { .sig-foot { grid-template-columns: 1fr; } }
+.dist-val { font-family: var(--font-en); font-size: 7.5px; fill: var(--grey-1);
+            paint-order: stroke; stroke: var(--white); stroke-width: 2.2px;
+            pointer-events: none; font-variant-numeric: tabular-nums; }
+
 /* ── ranked bars ── */
 .bars { display: flex; flex-direction: column; gap: 2px; }
 .bar-row { display: grid; grid-template-columns: 56px 1fr 52px; gap: 8px; align-items: center;
@@ -220,23 +236,41 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
   </div>
 </div>
 
-<!-- ══ 02 日夜間人口比 ══ -->
+<!-- ══ 02 大型信令地圖 ══ -->
 <div class="section">
-  <div class="section-label">02 — Day &amp; Night <span class="zh">誰白天多出來，誰晚上才回來</span></div>
+  <div class="section-label">02 — The City Breathing <span class="zh">一天之內，臺中怎麼呼吸</span></div>
   <div class="card">
-    <h4>Day / Night Ratio by District <span class="zh">· 工作日日間人口 ÷ 夜間人口</span></h4>
-    <div class="map-grid">
-      <div>
-        <svg class="map" id="map-ratio" viewBox="0 0 560 700" role="img"
-             aria-label="臺中29個行政區的日夜間人口比面量圖"></svg>
-        <div class="legend" id="legend-ratio"></div>
-        <div class="legend-ticks" id="ticks-ratio"></div>
+    <h4>Signal Population by District <span class="zh">· 電信信令停留人口，29個行政區</span></h4>
+
+    <div class="ctrl">
+      <div class="ctrl-g">
+        <span class="ctrl-k">Layer 圖層</span>
+        <div class="cat-bar" id="sig-layers"></div>
       </div>
-      <div>
-        <div class="bars" id="bars-ratio"></div>
+      <div class="ctrl-g" id="sig-band-wrap">
+        <span class="ctrl-k">Time 時段</span>
+        <div class="cat-bar" id="sig-bands"></div>
+      </div>
+      <div class="ctrl-g" id="sig-day-wrap">
+        <span class="ctrl-k">Day 平假日</span>
+        <div class="cat-bar" id="sig-days"></div>
       </div>
     </div>
-    <p class="caption" id="cap-ratio"></p>
+
+    <svg class="map big" id="map-sig" role="img"
+         aria-label="臺中29個行政區的電信信令人口大型面量圖"></svg>
+    <div class="legend" id="legend-sig"></div>
+    <div class="legend-ticks" id="ticks-sig"></div>
+    <p class="caption" id="cap-sig"></p>
+
+    <div class="sig-foot">
+      <div class="bars" id="bars-sig"></div>
+      <div>
+        <div class="stat-row" id="sig-stats"></div>
+        <p class="body-zh" id="sig-body-1" style="margin-top:20px"></p>
+        <p class="body-zh" id="sig-body-2"></p>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -335,32 +369,37 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
 
   /* ── 投影：等距圓柱，緯度方向按平均緯度的餘弦壓縮，臺中不會被拉長 ──
      畫布高度由 bounds 算出來，不寫死：臺中東西長 南北短（和平區一個區就占了
-     全市快一半的面積），寫死成直式畫布會把市區那一團擠成看不見的小點。 */
+     全市快一半的面積），寫死成直式畫布會把市區那一團擠成看不見的小點。
+     寬度可以指定：大型地圖用 1120，小圖用 560。SVG 會縮放到容器寬度，
+     所以畫布寬度決定的其實是「標籤相對於地圖有多大」。 */
   const [x0, y0, x1, y1] = D.bounds;
   const kx = Math.cos((y0 + y1) / 2 * Math.PI / 180);
-  const W = 560, PAD = 14;
   const sx = (x1 - x0) * kx, sy = (y1 - y0);
-  const s = (W - PAD * 2) / sx;
-  const H = Math.round(sy * s + PAD * 2);
-  const ox = PAD, oy = PAD;
-  const px = lon => ox + (lon - x0) * kx * s;
-  const py = lat => oy + (y1 - lat) * s;
-  const path = rings => rings.map(r =>
-    'M' + r.map(p => `${px(p[0]).toFixed(1)} ${py(p[1]).toFixed(1)}`).join('L') + 'Z').join(' ');
 
-  /* 面積最大的環當標籤錨點，免得標籤落在飛地上 */
-  const centroid = d => {
-    let best = d.rings[0], area = -1;
-    for (const r of d.rings) {
-      let a = 0;
-      for (let i = 0, j = r.length - 1; i < r.length; j = i++)
-        a += r[j][0] * r[i][1] - r[i][0] * r[j][1];
-      if (Math.abs(a) > area) { area = Math.abs(a); best = r; }
-    }
-    let cx = 0, cy = 0;
-    for (const p of best) { cx += p[0]; cy += p[1]; }
-    return [px(cx / best.length), py(cy / best.length)];
-  };
+  function makeProj(W, PAD) {
+    const s = (W - PAD * 2) / sx;
+    const H = Math.round(sy * s + PAD * 2);
+    const px = lon => PAD + (lon - x0) * kx * s;
+    const py = lat => PAD + (y1 - lat) * s;
+    const path = rings => rings.map(r =>
+      'M' + r.map(p => `${px(p[0]).toFixed(1)} ${py(p[1]).toFixed(1)}`).join('L') + 'Z').join(' ');
+    /* 面積最大的環當標籤錨點，免得標籤落在飛地上 */
+    const centroid = d => {
+      let best = d.rings[0], area = -1;
+      for (const r of d.rings) {
+        let a = 0;
+        for (let i = 0, j = r.length - 1; i < r.length; j = i++)
+          a += r[j][0] * r[i][1] - r[i][0] * r[j][1];
+        if (Math.abs(a) > area) { area = Math.abs(a); best = r; }
+      }
+      let cx = 0, cy = 0;
+      for (const p of best) { cx += p[0]; cy += p[1]; }
+      return [px(cx / best.length), py(cy / best.length)];
+    };
+    return { W, H, path, centroid };
+  }
+  const SMALL = makeProj(560, 14);
+  const BIG = makeProj(1120, 20);
 
   /* ── 配色：VZT 只用一個強調色，所以發散用「石灰黃綠 ↔ 近黑」兩臂 ──
      日間多的塗石灰黃綠（有人來），夜間多的塗近黑（人走了），中點是白。 */
@@ -370,30 +409,36 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
     const f = (u, v) => Math.round(u + (v - u) * t);
     return `rgb(${f(r1, r2)},${f(g1, g2)},${f(b1, b2)})`;
   };
-  const divColor = (v, lo, hi) => v >= 1
-    ? mix('#FFFFFF', '#A8B200', Math.min(1, (v - 1) / (hi - 1 || 1)))
-    : mix('#FFFFFF', '#1A1A1A', Math.min(1, (1 - v) / (1 - lo || 1)));
+  const divColor = (v, lo, hi, mid = 1) => v >= mid
+    ? mix('#FFFFFF', '#A8B200', Math.min(1, (v - mid) / (hi - mid || 1)))
+    : mix('#FFFFFF', '#1A1A1A', Math.min(1, (mid - v) / (mid - lo || 1)));
   const seqColor = (v, lo, hi) =>
     mix('#F2F2F2', '#A8B200', hi === lo ? 0 : (v - lo) / (hi - lo));
 
   /* ── 面量圖 ── */
-  function drawMap(svgId, legId, tickId, get, fmt, mode) {
+  function drawMap(svgId, legId, tickId, get, fmt, mode, opt = {}) {
+    const P = opt.proj || SMALL;
     const svg = document.getElementById(svgId);
     svg.textContent = '';
-    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    svg.setAttribute('viewBox', `0 0 ${P.W} ${P.H}`);
     const vals = R.map(get);
-    const lo = Math.min(...vals), hi = Math.max(...vals);
-    const color = v => mode === 'div' ? divColor(v, lo, hi) : seqColor(v, lo, hi);
+    const lo = opt.lo != null ? opt.lo : Math.min(...vals);
+    const hi = opt.hi != null ? opt.hi : Math.max(...vals);
+    const mid = opt.mid != null ? opt.mid : 1;
+    const color = v => mode === 'div' ? divColor(v, lo, hi, mid) : seqColor(v, lo, hi);
     R.forEach(d => {
-      const p = el('path', { class: 'dist', d: path(d.rings), fill: color(get(d)) });
+      const p = el('path', { class: 'dist', d: P.path(d.rings), fill: color(get(d)) });
       p.appendChild(el('title', {}, `${d.name}　${fmt(get(d))}`));
       svg.appendChild(p);
     });
     R.forEach(d => {
-      if (d.area < 6) return;   // 面積不到 6 平方公里的區塞不下標籤，留給 tooltip
-      const [cx, cy] = centroid(d);
-      svg.appendChild(el('text', { class: 'dist-lbl', x: cx, y: cy, 'text-anchor': 'middle' },
-        d.name.replace(/區$/, '')));
+      if (d.area < (opt.minArea || 6)) return;   // 太小的區塞不下標籤，留給 tooltip
+      const [cx, cy] = P.centroid(d);
+      svg.appendChild(el('text', { class: 'dist-lbl', x: cx, y: cy - (opt.sub ? 3 : 0),
+        'text-anchor': 'middle' }, d.name.replace(/區$/, '')));
+      if (opt.sub)
+        svg.appendChild(el('text', { class: 'dist-val', x: cx, y: cy + 7, 'text-anchor': 'middle' },
+          opt.sub(d)));
     });
     const leg = document.getElementById(legId);
     leg.innerHTML = '';
@@ -404,7 +449,7 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
       leg.appendChild(b);
     }
     document.getElementById(tickId).innerHTML =
-      `<span>${fmt(lo)}</span>${mode === 'div' ? '<span>1.000</span>' : ''}<span>${fmt(hi)}</span>`;
+      `<span>${fmt(lo)}</span>${mode === 'div' ? `<span>${fmt(mid)}</span>` : ''}<span>${fmt(hi)}</span>`;
     return { lo, hi, color };
   }
 
@@ -475,13 +520,97 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
     `要補一句限制：信令給的是每一區的日間與夜間總數，` +
     `<b>它答得了${bot.name}白天少了多少人，答不了那些人去了哪一區。</b>`;
 
-  /* ── 02 日夜比 ── */
-  const rf = v => v.toFixed(3);
-  drawMap('map-ratio', 'legend-ratio', 'ticks-ratio', d => d.ratio, rf, 'div');
-  drawBars('bars-ratio', d => d.ratio, rf, 'div', 1);
-  document.getElementById('cap-ratio').textContent =
-    `工作日日間人口除以夜間人口，資料期${D.periods.signal}。石灰黃綠是白天多出來的區，` +
-    `近黑是晚上才回來的區，白色是1.0。長條圖的中線同樣是1.0。${D.caveat}`;
+  /* ── 02 大型信令地圖 ────────────────────────────────────────────────
+     六個圖層。前兩個吃「時段」與「平假日」，其餘四個是單一數值，
+     選到它們的時候把那兩排控制項收起來，免得使用者以為切了有作用。 */
+  const BANDS = D.bands;                       // 上午／下午／日間／夜間
+  const DAYS = [{ k: 'work', zh: '平日' }, { k: 'weekend', zh: '假日' }];
+  const LAYERS = [
+    { k: 'fill', zh: '相對夜間', mode: 'div', mid: 1, band: true,
+      get: (d, b, w) => +(d[w][b] / d[w].night).toFixed(3),
+      fmt: v => v.toFixed(3), sub: (d, b, w) => (d[w][b] / d[w].night).toFixed(2),
+      note: '該區該時段的停留人口，除以該區自己的夜間人口。石灰黃綠是白天灌進來的區，'
+          + '近黑是人走光的區，1.0是白色。這一層看的是每一個區自己的漲落，不是區與區比大小。' },
+    { k: 'pop', zh: '停留人口', mode: 'seq', band: true,
+      get: (d, b, w) => d[w][b], fmt: man, sub: (d, b, w) => (d[w][b] / 1000).toFixed(0) + 'k',
+      note: '該時段實際停留在該區的人數。這一層是絕對值，大區必然深，'
+          + '所以它回答的是「人在哪裡」，不是「哪一區變化大」。' },
+    { k: 'trips', zh: '每人趟次', mode: 'seq',
+      get: d => d.tripsPer, fmt: v => v.toFixed(2) + '趟', sub: d => d.tripsPer.toFixed(1),
+      note: '該區平日的移動趟次除以夜間人口。趟次是全區總量，不除以人口就只是在畫人口多寡。' },
+    { k: 'density', zh: '夜間密度', mode: 'seq',
+      get: d => d.nightDensity, fmt: v => int(v) + '人/km²', sub: d => int(Math.round(d.nightDensity / 100) / 10) + 'k',
+      note: '每平方公里的夜間人口。和平區1,037.8平方公里、密度12人，中區0.9平方公里、密度22,897人，'
+          + '兩者相差近兩千倍：臺中的「一個區」不是同一種東西。' },
+    { k: 'signalRatio', zh: '信令÷常住', mode: 'div', mid: 1,
+      get: d => d.signalRatio, fmt: v => v.toFixed(3), sub: d => d.signalRatio.toFixed(2),
+      note: '信令夜間人口除以普查常住人口。兩份資料差三年、量法也不同（一個是設籍與居住事實，'
+          + '一個是手機停留），這個比值同時混著人口變化與量法差異，不宜單獨解讀。' },
+    { k: 'netAbs', zh: '日間淨流', mode: 'div', mid: 0,
+      get: d => d.net, fmt: v => (v > 0 ? '+' : '') + int(v) + '人',
+      sub: d => (d.net > 0 ? '+' : '−') + Math.abs(Math.round(d.net / 1000)) + 'k',
+      note: '日間人口減夜間人口。這一層是人數不是比率，因此看得出「哪一區搬動的人最多」，'
+          + '而不只是「哪一區比例變化最大」。' },
+  ];
+  let li = 0, bi = 0, di = 0;
+
+  const mkPills = (id, items, sel, on) => {
+    const box = document.getElementById(id);
+    box.innerHTML = items.map((it, i) =>
+      `<button type="button" class="cat-pill" data-i="${i}" aria-pressed="${i === sel()}">${it.zh}</button>`).join('');
+    box.addEventListener('click', e => {
+      const b = e.target.closest('.cat-pill');
+      if (!b) return;
+      on(+b.dataset.i);
+      document.querySelectorAll('#' + id + ' .cat-pill').forEach(x =>
+        x.setAttribute('aria-pressed', String(+x.dataset.i === sel())));
+    });
+  };
+  mkPills('sig-layers', LAYERS, () => li, i => { li = i; paintSig(); });
+  mkPills('sig-bands', BANDS, () => bi, i => { bi = i; paintSig(); });
+  mkPills('sig-days', DAYS, () => di, i => { di = i; paintSig(); });
+
+  function paintSig() {
+    const L = LAYERS[li], b = BANDS[bi].k, w = DAYS[di].k;
+    document.getElementById('sig-band-wrap').hidden = !L.band;
+    document.getElementById('sig-day-wrap').hidden = !L.band;
+    const get = d => L.band ? L.get(d, b, w) : L.get(d);
+    const sub = d => L.band ? L.sub(d, b, w) : L.sub(d);
+    drawMap('map-sig', 'legend-sig', 'ticks-sig', get, L.fmt, L.mode,
+            { proj: BIG, mid: L.mid, sub, minArea: 3 });
+    drawBars('bars-sig', get, L.fmt, L.mode, L.mid != null ? L.mid : 0);
+
+    const hi = [...R].sort((a, c) => get(c) - get(a))[0];
+    const lo = [...R].sort((a, c) => get(a) - get(c))[0];
+    const when = L.band ? `${DAYS[di].zh}${BANDS[bi].zh}（${BANDS[bi].when}）` : '平日';
+    document.getElementById('cap-sig').textContent =
+      `${L.zh}，${when}，資料期${D.periods.signal}。最高${hi.name}${L.fmt(get(hi))}、` +
+      `最低${lo.name}${L.fmt(get(lo))}。${L.note}`;
+
+    const cb = D.crossBoundary;
+    document.getElementById('sig-stats').innerHTML = [
+      ['Highest 最高', L.fmt(get(hi)), hi.name],
+      ['Lowest 最低', L.fmt(get(lo)), lo.name],
+      ['City-wide 全市', L.band ? man(R.reduce((a, d) => a + d[w][b], 0)) + '人' : '－',
+       L.band ? `${when}停留人口` : '此圖層無全市值'],
+    ].map(([k, v, n]) =>
+      `<div class="stat"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`
+    ).join('');
+
+    document.getElementById('sig-body-1').innerHTML =
+      `信令把一天切成四段：上午${BANDS[0].when}、下午${BANDS[1].when}，` +
+      `再加上日間與夜間兩個彙總。切換上面的時段，看的是同一批人在29個區之間怎麼重新分布。` +
+      `<b>臺中不是一個封閉的系統。</b>29個區的停留人口加總，` +
+      `日間比夜間少${int(Math.abs(cb.day))}人、上午少${int(Math.abs(cb.morning))}人：` +
+      `那些人白天到市外去了。全國層級的四個時段總量幾乎一模一樣（國境是封閉的），` +
+      `市層級不是，這個差額就是跨市界的淨流。`;
+    document.getElementById('sig-body-2').innerHTML =
+      `唯要說清楚這份資料答不了什麼。<b>信令給的是每一區在每個時段的停留總數，不是起訖對。</b>` +
+      `它算得出北屯區白天少了${int(Math.abs(R.find(d => d.name === '北屯區').net))}人，` +
+      `答不了那些人去了西屯還是去了南屯，也答不了他們用什麼工具移動。` +
+      `要回答前者得接公車票證或運研所的通勤起訖調查，後者要接運具別的調查。`;
+  }
+  paintSig();
 
   /* ── 03 住宅基本盤 ── */
   const METRICS = [

@@ -47,6 +47,15 @@ PERIODS = {
     'signal': '民國112年11月',
 }
 
+# 信令的四個時段。上午與下午的時間界線寫在來源檔的 meta.bands 裡，
+# 這裡照抄，不自己定義：時段的切法一改，所有的比值都會跟著變。
+BANDS = [
+    ('morning',   '上午', '07:00–13:00'),
+    ('afternoon', '下午', '13:00–19:00'),
+    ('day',       '日間', '白天停留'),
+    ('night',     '夜間', '居住地'),
+]
+
 
 def load(path):
     if not path.exists():
@@ -99,15 +108,24 @@ def main():
             'old40': round(ages[0] / c['houses'] * 100, 2),
             'new10': round(ages[4] / c['houses'] * 100, 2),
             'avgAreaAll': c['avgAreaAll'],
-            # 移動
-            'dayWork': s['dayWork'],
-            'nightWork': s['nightWork'],
+            # 移動：四個時段 × 平日與假日，全部帶進來
+            'work': {b: s[b + 'Work'] for b, _, _ in BANDS},
+            'weekend': {b: s[b + 'Weekend'] for b, _, _ in BANDS},
             'ratio': s['ratio'],
-            'net': s['dayWork'] - s['nightWork'],
-            'morningRatio': s['morningRatio'],
             'ratioWeekend': s['ratioWeekend'],
+            'morningRatio': s['morningRatio'],
+            'net': s['dayWork'] - s['nightWork'],
+            'morningNet': s['morningNet'],
+            'trips': s['tripsWork'],
+            'tripsWeekend': s['tripsWeekend'],
+            # 每人每日的移動趟次。趟次是全區總量，除以夜間人口才比得了大小區。
+            'tripsPer': round(s['tripsWork'] / s['nightWork'], 2) if s['nightWork'] else None,
             'area': s['area'],
             'nightDensity': s['nightDensity'],
+            'morningDensity': s['morningDensity'],
+            # 信令人口除以普查常住人口。明顯大於1的區，多半是白天有大量外來停留，
+            # 唯它同時也受兩份資料差三年的影響，不宜單獨解讀。
+            'signalRatio': s['signalRatio'],
             'rings': g['rings'],
         })
 
@@ -118,9 +136,26 @@ def main():
         back = r['idle'] / r['houses'] * 100
         if abs(back - r['vacancy']) > 0.02:
             sys.exit(f'{r["name"]} 的空屋率 {r["vacancy"]} 與 idle/houses 算出來的 {back:.2f} 對不上')
-        back_ratio = r['dayWork'] / r['nightWork']
+        back_ratio = r['work']['day'] / r['work']['night']
         if abs(back_ratio - r['ratio']) > 0.002:
             sys.exit(f'{r["name"]} 的日夜比 {r["ratio"]} 與 day/night 算出來的 {back_ratio:.3f} 對不上')
+        back_wk = r['weekend']['day'] / r['weekend']['night']
+        if abs(back_wk - r['ratioWeekend']) > 0.002:
+            sys.exit(f'{r["name"]} 的假日日夜比 {r["ratioWeekend"]} 與算出來的 {back_wk:.3f} 對不上')
+
+    # ── 跨市界的淨流：29 區加總在各時段的差，就是臺中與市外之間的淨流動 ──
+    # 全國層級四個時段的總量幾乎一致（來源檔的 meta.national 四個數字彼此差 7 人以內），
+    # 因為國境是封閉的。市層級不是：臺中的上午總人口比夜間少，代表有人跨出市界上班。
+    # 這個差額不是解析錯誤，是實際的跨市通勤，所以算出來輸出而不是中止。
+    # 唯超過 5% 就不可能是通勤了，那才是真的讀錯欄位，屆時中止。
+    base = sum(r['work']['night'] for r in rows)
+    cross = {}
+    for b, zh, _ in BANDS:
+        tot = sum(r['work'][b] for r in rows)
+        if abs(tot - base) / base > 0.05:
+            sys.exit(f'{zh}的全市人口 {tot:,} 與夜間 {base:,} 差 {abs(tot-base)/base*100:.1f}%，'
+                     f'超過 5%：跨市通勤不會這麼大，比較可能是讀錯欄位')
+        cross[b] = tot - base
 
     ratios = [r['ratio'] for r in rows]
     vacs = [r['vacancy'] for r in rows]
@@ -133,14 +168,18 @@ def main():
                    '日夜間人口比是工作日的日間除以夜間，反映的是通勤的淨流向，'
                    '給不出起訖對，答不了「白天走掉的人去了哪一區」。'),
         'ageLabels': census['ageLabels'],
+        'bands': [{'k': b, 'zh': zh, 'when': w} for b, zh, w in BANDS],
+        'signalSource': signal['meta'].get('source', ''),
         'totals': {
             'houses': tot_houses,
             'households': tot_hh,
             'residents': sum(r['residents'] for r in rows),
             'idle': sum(r['idle'] for r in rows),
             'vacancy': round(sum(r['idle'] for r in rows) / tot_houses * 100, 2),
-            'dayWork': sum(r['dayWork'] for r in rows),
-            'nightWork': sum(r['nightWork'] for r in rows),
+            'dayWork': sum(r['work']['day'] for r in rows),
+            'nightWork': sum(r['work']['night'] for r in rows),
+            'trips': sum(r['trips'] for r in rows),
+            'area': round(sum(r['area'] for r in rows), 1),
         },
         'spread': {
             'ratioMin': min(ratios), 'ratioMax': max(ratios),
@@ -150,6 +189,8 @@ def main():
         },
         # 弱相關。輸出它是為了讓版面必須說出「這兩件事關係不強」。
         'corrVacancyRatio': pearson(ratios, vacs),
+        # 各時段的市內總人口減去夜間，正的是市外淨流入、負的是淨流出
+        'crossBoundary': cross,
         'bounds': [
             min(p[0] for r in rows for ring in r['rings'] for p in ring),
             min(p[1] for r in rows for ring in r['rings'] for p in ring),
@@ -169,6 +210,8 @@ def main():
           f"（區級 {blob['spread']['ratioMin']}–{blob['spread']['ratioMax']}，"
           f"全距 {blob['spread']['ratioRange']}）")
     print(f"  空屋率與日夜比的相關係數 {blob['corrVacancyRatio']}（弱相關）")
+    print('  跨市界淨流：' + '　'.join(
+        f'{zh} {cross[b]:+,}' for b, zh, _ in BANDS))
 
 
 if __name__ == '__main__':
