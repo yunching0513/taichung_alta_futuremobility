@@ -173,6 +173,57 @@ svg.map.big { width: 100%; height: auto; margin-top: 4px; }
             paint-order: stroke; stroke: var(--white); stroke-width: 2.2px;
             pointer-events: none; font-variant-numeric: tabular-nums; }
 
+/* ── 大型地圖的平移縮放。行為與理由見 mapzoom.js 的檔頭 ──────────────
+   --zk 是目前的倍率，由 mapzoom.js 每次變形時寫上來。
+   線寬用 non-scaling-stroke 固定，字級用 calc 反向縮小，兩者都是為了
+   讓「放大」真的等於「看得更清楚」，而不是等於「同一張圖印得比較大」。 */
+.mapwrap { position: relative; }
+svg.zoomable { touch-action: none; }
+svg.zoomable:focus-visible { outline: 2px solid var(--lime); outline-offset: 3px; }
+svg.zoomable.zoomed { cursor: grab; }
+svg.zoomable.zoomed:active { cursor: grabbing; }
+svg.zoomable .dist, svg.zoomable .rail-line, svg.zoomable .rail-case,
+svg.zoomable .stop { vector-effect: non-scaling-stroke; }
+svg.zoomable .dist-lbl { font-size: calc(8.5px / var(--zk, 1));
+                         stroke-width: calc(2.4px / var(--zk, 1)); }
+svg.zoomable .dist-val { font-size: calc(7.5px / var(--zk, 1));
+                         stroke-width: calc(2.2px / var(--zk, 1)); }
+svg.zoomable .stop-lbl { font-size: calc(7.5px / var(--zk, 1));
+                         stroke-width: calc(2.6px / var(--zk, 1)); }
+/* 全圖時塞不下標籤的小區（中區只有0.9平方公里），放大之後塞得下就讓它出現 */
+svg.zoomable .tiny { display: none; }
+svg.zoomable.zdeep .tiny { display: inline; }
+
+.zoomctl {
+  position: absolute; top: 10px; right: 10px; z-index: 3;
+  display: flex; align-items: center; gap: 2px; padding: 3px;
+  background: var(--white); border: 1px solid var(--grey-3);
+}
+.zoomctl button {
+  font-family: var(--font-en); font-size: 10px; letter-spacing: 0.1em; line-height: 1;
+  color: var(--grey-1); background: none; border: 0; padding: 6px 8px; cursor: pointer;
+  min-width: 26px;
+}
+.zoomctl button:hover:not(:disabled) { background: var(--grey-4); color: var(--black); }
+.zoomctl button:disabled { opacity: .3; cursor: default; }
+.zoomctl button:focus-visible { outline: 2px solid var(--black); outline-offset: 1px; }
+.zoomctl button[data-a="in"], .zoomctl button[data-a="out"] { font-size: 15px; font-weight: 500; }
+.zoomctl button[data-a="wheel"] { font-family: var(--font-zh); font-size: 11px; letter-spacing: 0; }
+.zoomctl .wheel[aria-pressed="true"] { background: var(--lime); color: var(--black); font-weight: 700; }
+.zoomctl .lvl {
+  font-family: var(--font-en); font-size: 10px; color: var(--grey-2);
+  padding: 0 6px; min-width: 3.2em; text-align: right; font-variant-numeric: tabular-nums;
+}
+@media (max-width: 560px) { .zoomctl .lvl { display: none; } }
+
+.zoomhint {
+  position: absolute; inset: auto 0 14px 0; margin: 0 auto; width: max-content; z-index: 3;
+  background: var(--black); color: var(--white); font-size: 12px;
+  padding: 8px 14px; pointer-events: none;
+  opacity: 0; transform: translateY(4px); transition: opacity .14s ease, transform .14s ease;
+}
+.zoomhint.on { opacity: .95; transform: none; }
+
 /* ── ranked bars ── */
 .bars { display: flex; flex-direction: column; gap: 2px; }
 .bar-row { display: grid; grid-template-columns: 56px 1fr 52px; gap: 8px; align-items: center;
@@ -380,6 +431,7 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
 
 <script type="application/json" id="tc">__TC_JSON__</script>
 <script type="application/json" id="rail">__RAIL_JSON__</script>
+<script>__MAPZOOM_JS__</script>
 <script>
 (() => {
   'use strict';
@@ -445,8 +497,11 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
   function drawMap(svgId, legId, tickId, get, fmt, mode, opt = {}) {
     const P = opt.proj || SMALL;
     const svg = document.getElementById(svgId);
-    svg.textContent = '';
     svg.setAttribute('viewBox', `0 0 ${P.W} ${P.H}`);
+    /* 縮放啟用之後，內容住在 <g data-zoom> 裡。重畫時清空那個群組而不是整張 svg，
+       切換圖層或時段時目前的倍率與位置才不會跳回原點。 */
+    const box = svg.querySelector('g[data-zoom]') || svg;
+    box.textContent = '';
     const vals = R.map(get);
     const lo = opt.lo != null ? opt.lo : Math.min(...vals);
     const hi = opt.hi != null ? opt.hi : Math.max(...vals);
@@ -455,18 +510,20 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
     R.forEach(d => {
       const p = el('path', { class: 'dist', d: P.path(d.rings), fill: color(get(d)) });
       p.appendChild(el('title', {}, `${d.name}　${fmt(get(d))}`));
-      svg.appendChild(p);
+      box.appendChild(p);
     });
     R.forEach(d => {
-      if (d.area < (opt.minArea || 6)) return;   // 太小的區塞不下標籤，留給 tooltip
+      // 太小的區在全圖尺度塞不下標籤，標成 tiny 先藏起來留給 tooltip；
+      // 放大過門檻之後 CSS 會把它顯示出來（見 .zdeep .tiny）
+      const t = d.area < (opt.minArea || 6) ? ' tiny' : '';
       const [cx, cy] = P.centroid(d);
-      svg.appendChild(el('text', { class: 'dist-lbl', x: cx, y: cy - (opt.sub ? 3 : 0),
+      box.appendChild(el('text', { class: 'dist-lbl' + t, x: cx, y: cy - (opt.sub ? 3 : 0),
         'text-anchor': 'middle' }, d.name.replace(/區$/, '')));
       if (opt.sub)
-        svg.appendChild(el('text', { class: 'dist-val', x: cx, y: cy + 7, 'text-anchor': 'middle' },
-          opt.sub(d)));
+        box.appendChild(el('text', { class: 'dist-val' + t, x: cx, y: cy + 7,
+          'text-anchor': 'middle' }, opt.sub(d)));
     });
-    if (opt.rail) drawRail(svg, P);
+    if (opt.rail) drawRail(box, P);
     const leg = document.getElementById(legId);
     leg.innerHTML = '';
     for (let i = 0; i < 40; i++) {
@@ -493,7 +550,7 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
   ];
   const tierOf = t => t.hsrNear ? 'hsr' : t.junction ? 'jx' : 'std';
 
-  function drawRail(svg, P) {
+  function drawRail(box, P) {
     const g = el('g', { 'aria-label': '軌道路網' });
     // 先鋪全部的白色外框，再畫全部的本體，線才不會被後畫的外框蓋掉
     for (const pass of ['case', 'line'])
@@ -518,7 +575,7 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
         g.appendChild(el('text', { class: 'stop-lbl', x: cx, y: cy - T.r - 3,
           'text-anchor': 'middle' }, t.name));
     });
-    svg.appendChild(g);
+    box.appendChild(g);
   }
 
   /* ── 排序長條 ── */
@@ -699,6 +756,9 @@ td:first-child { font-family: var(--font-zh); color: var(--black); }
       `要回答前者得接公車票證或運研所的通勤起訖調查，後者要接運具別的調查。`;
   }
   paintSig();
+  // 先畫再啟用：mapzoom 需要 viewBox 才有座標系可算，而 viewBox 是 drawMap 設的。
+  // 只掛在這一張大圖上，03 節那幾張小圖各自只有一個圖層，放大沒有東西可看。
+  enableMapZoom(document.getElementById('map-sig'), { max: 8 });
 
   /* ── 03 住宅基本盤 ── */
   const METRICS = [

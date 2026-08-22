@@ -21,11 +21,24 @@
 端點清單見 ENDPOINTS。臺中捷運的營運業者代碼是 TMRT。
 若某個端點回 404 或 401，本程式會記下來繼續抓下一個，不中止：
 TDX 的路徑偶爾會改版，一個端點失效不該讓其餘的資料也抓不到。
+
+── 為什麼要退避與分頁 ────────────────────────────────────────────────
+民國115年8月22日那一次，五個軌道端點全數成功，五個公車端點全數回 HTTP 429。
+429 是「請求太密集」，不是路徑錯了：軌道那五個把該分鐘的額度用完，
+公車那五個接著送出就全被擋下。因此本程式做三件事：
+每兩個請求之間至少間隔 GAP 秒、遇 429 依 Retry-After 退避重試、
+以及對筆數多的端點（公車路線與線形動輒數千筆）改用 $top／$skip 分頁抓。
+分頁抓回來的會重新組成一個 JSON 陣列再寫檔，因此那幾份不是逐位元組的原樣，
+唯每一筆記錄本身沒有被加工過。
+
+要只補其中幾份，設 TDX_ONLY，用逗號分隔檔名（額度有限時很有用）：
+    TDX_ONLY=bus_shape_taichung.json,bus_frequency_taichung.json
 """
 import json
 import os
 import pathlib
 import sys
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -37,32 +50,35 @@ ENV = ROOT / '.env'
 TOKEN_URL = 'https://tdx.transportdata.tw/auth/realms/TDXConnect/protocol/openid-connect/token'
 BASE = 'https://tdx.transportdata.tw/api/basic/v2'
 
-# (檔名, 路徑, 這份資料補的是哪一個缺口)
+# (檔名, 路徑, 這份資料補的是哪一個缺口, 要不要分頁)
 ENDPOINTS = [
     ('metro_network_tmrt.json', '/Rail/Metro/Network/TMRT',
-     '臺中捷運的路線與車站關聯。補上目前完全缺席的綠線'),
+     '臺中捷運的路線與車站關聯。補上目前完全缺席的綠線', False),
     ('metro_station_tmrt.json', '/Rail/Metro/Station/TMRT',
-     '臺中捷運車站，含經緯度'),
+     '臺中捷運車站，含經緯度', False),
     ('metro_shape_tmrt.json', '/Rail/Metro/Shape/TMRT',
-     '臺中捷運的路線線形（WKT）。畫得出綠線的實際走向'),
+     '臺中捷運的路線線形（WKT）。畫得出綠線的實際走向', False),
     ('thsr_station.json', '/Rail/THSR/Station',
-     '高鐵車站含經緯度。補上目前有線形沒有站點的高鐵臺中站'),
+     '高鐵車站含經緯度。補上目前有線形沒有站點的高鐵臺中站', False),
     ('tra_station.json', '/Rail/TRA/Station',
-     '臺鐵車站。TDX 這一份含 StationClass，那就是官方站等'),
-    # 公車。上一次跑 /Bus/Station/City/Taichung 失敗，所以這裡把站位的兩種路徑
-    # （Station 是站位群、Stop 是單一站牌）與路線、線形、班距都列上，
-    # 哪一個通就用哪一個；失敗的會列在結尾，不影響其餘端點。
+     '臺鐵車站。TDX 這一份含 StationClass，那就是官方站等', False),
+    # 公車。站位有兩種路徑（Station 是同一路口的站牌群、Stop 是單一站牌），兩個都列，
+    # 哪一個通就用哪一個。這五份筆數都是數千起跳，一律分頁。
     ('bus_stop_taichung.json', '/Bus/Stop/City/Taichung',
-     '臺中公車站牌（單一站牌，含經緯度）'),
+     '臺中公車站牌（單一站牌，含經緯度）', True),
     ('bus_station_taichung.json', '/Bus/Station/City/Taichung',
-     '臺中公車站位（同一路口的站牌群）'),
+     '臺中公車站位（同一路口的站牌群）', True),
     ('bus_route_taichung.json', '/Bus/Route/City/Taichung',
-     '臺中公車路線清單'),
+     '臺中公車路線清單', True),
     ('bus_shape_taichung.json', '/Bus/Shape/City/Taichung',
-     '臺中公車路線線形。要畫路線圖就靠這一份'),
+     '臺中公車路線線形。要畫路線圖就靠這一份', True),
     ('bus_frequency_taichung.json', '/Bus/Frequency/City/Taichung',
-     '臺中公車班距（每個時段的最小與最大班距分鐘數）。線寬按頻率畫粗細就靠這一份'),
+     '臺中公車班距（每個時段的最小與最大班距分鐘數）。線寬按頻率畫粗細就靠這一份', True),
 ]
+
+PAGE = 1000      # 一頁幾筆。TDX 對 $top 有上限，取一個保守值
+GAP = 2.0        # 兩個請求之間至少隔幾秒。429 就是踩到這個節奏才發生的
+TRIES = 5        # 遇 429 最多重試幾次
 
 
 def creds():
@@ -103,28 +119,73 @@ def token(cid, sec):
                  f'400 invalid_client 通常是 client_id 或 secret 抄錯或已失效。')
 
 
-def grab(tok, path):
-    url = f'{BASE}{path}?%24format=JSON'
-    req = urllib.request.Request(url, headers={
-        'Authorization': f'Bearer {tok}', 'Accept-Encoding': 'identity'})
-    with urllib.request.urlopen(req, timeout=300) as r:
-        return r.read()
+def get(tok, url):
+    """抓一個網址，遇 429 退避重試。回傳原始位元組。"""
+    for i in range(TRIES):
+        req = urllib.request.Request(url, headers={
+            'Authorization': f'Bearer {tok}', 'Accept-Encoding': 'identity'})
+        try:
+            with urllib.request.urlopen(req, timeout=300) as r:
+                return r.read()
+        except urllib.error.HTTPError as e:
+            if e.code != 429 or i == TRIES - 1:
+                raise
+            # TDX 有給 Retry-After 就聽它的，沒給就指數退避
+            try:
+                wait = float(e.headers.get('Retry-After') or 0)
+            except ValueError:
+                wait = 0
+            wait = min(max(wait, GAP * 2 ** i), 90)
+            print(f'      429 請求太密集，等 {wait:.0f} 秒再試（第 {i + 1} 次）')
+            time.sleep(wait)
+
+
+def grab(tok, path, paged):
+    if not paged:
+        return get(tok, f'{BASE}{path}?%24format=JSON')
+    # 分頁：一直往下翻，直到某一頁不滿 PAGE 筆為止。
+    # 回傳的是重新組起來的陣列，每一筆記錄本身原樣不動。
+    rows = []
+    while True:
+        url = (f'{BASE}{path}?%24format=JSON'
+               f'&%24top={PAGE}&%24skip={len(rows)}')
+        page = json.loads(get(tok, url))
+        if not isinstance(page, list):
+            return json.dumps(page, ensure_ascii=False).encode()   # 不是陣列就別硬翻
+        rows += page
+        print(f'      第 {len(rows) // PAGE + (0 if len(page) == PAGE else 1)} 頁，'
+              f'累計 {len(rows):,} 筆')
+        if len(page) < PAGE:
+            return json.dumps(rows, ensure_ascii=False).encode()
+        time.sleep(GAP)
 
 
 def main():
+    todo = {n.strip() for n in os.environ.get('TDX_ONLY', '').split(',') if n.strip()}
+    known = {n for n, _, _, _ in ENDPOINTS}
+    if todo - known:
+        sys.exit(f'TDX_ONLY 裡有不認識的檔名：{sorted(todo - known)}\n'
+                 f'可用的是：{sorted(known)}')
+    if todo:
+        print(f'只抓 {len(todo)} 個端點（TDX_ONLY）\n')
     tok = token(*creds())
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / 'README.md').write_text(
         '# TDX 原始檔\n\n'
         '由 `scripts/fetch_tdx.py` 抓下來，原樣存放，不做加工。\n'
         '金鑰不在這裡也不在版控裡，見專案 README 的「TDX 金鑰放哪裡」。\n\n'
-        + '\n'.join(f'- `{n}` — {why}' for n, _, why in ENDPOINTS) + '\n',
+        + '\n'.join(f'- `{n}` — {why}' for n, _, why, _ in ENDPOINTS) + '\n',
         encoding='utf-8')
 
-    ok, bad = 0, []
-    for name, path, why in ENDPOINTS:
+    ok, bad, first = 0, [], True
+    for name, path, why, paged in ENDPOINTS:
+        if todo and name not in todo:
+            continue
+        if not first:
+            time.sleep(GAP)      # 額度是按時間算的，端點之間不要連著送
+        first = False
         try:
-            blob = grab(tok, path)
+            blob = grab(tok, path, paged)
         except urllib.error.HTTPError as e:
             bad.append((name, f'HTTP {e.code}'))
             print(f'  ✗ {name:30s} HTTP {e.code}')
@@ -140,7 +201,8 @@ def main():
 
     print(f'\n成功 {ok} ・ 失敗 {len(bad)}')
     if bad:
-        print('失敗的端點（TDX 路徑偶爾改版，對照官方文件調整 ENDPOINTS）：')
+        print('失敗的端點。429 是額度或節奏問題，隔一段時間用 TDX_ONLY 單獨補抓；'
+              '404 才是路徑改版，要對照官方文件調整 ENDPOINTS：')
         for n, e in bad:
             print(f'  {n}　{e}')
     print(f'\n原始檔在 {OUT.relative_to(ROOT)}/，接下來跑 scripts/prep_rail.py 併進地圖')

@@ -22,10 +22,14 @@ SRC = ROOT / 'src'
 DATA = ROOT / 'data'
 DIST = ROOT / 'dist'
 
+# 每一頁：(模板, 要內嵌的 data/ 中間檔, 要內嵌的 src/ 程式碼)
+# 程式碼也內嵌而不用 <script src>：頁面必須是單一檔案，寄給別人才點得開。
 PAGES = {
     'index.html': ('index.template.html', {
         '__TC_JSON__': 'tc_districts.json',
         '__RAIL_JSON__': 'tc_rail.json',
+    }, {
+        '__MAPZOOM_JS__': 'mapzoom.js',
     }),
 }
 
@@ -34,7 +38,7 @@ def main():
     if not SRC.exists():
         sys.exit('找不到 src/')
     DIST.mkdir(exist_ok=True)
-    for out_name, (tpl_name, tokens) in PAGES.items():
+    for out_name, (tpl_name, tokens, assets) in PAGES.items():
         tpl = SRC / tpl_name
         if not tpl.exists():
             sys.exit(f'找不到模板 {tpl.relative_to(ROOT)}')
@@ -47,6 +51,11 @@ def main():
             blob = json.dumps(json.loads(path.read_text(encoding='utf-8')),
                               ensure_ascii=False, separators=(',', ':'))
             html = html.replace(token, blob.replace('</', '<\\/'))
+        for token, filename in assets.items():
+            path = SRC / filename
+            if not path.exists():
+                sys.exit(f'{tpl_name} 要 {filename}，但 src/ 裡沒有')
+            html = html.replace(token, path.read_text(encoding='utf-8'))
         left = re.findall(r'__[A-Z0-9_]+__', html)
         if left:
             sys.exit(f'{tpl_name} 還有沒替換的 token：{sorted(set(left))}')

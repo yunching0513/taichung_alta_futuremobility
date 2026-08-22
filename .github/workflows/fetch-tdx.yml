@@ -10,6 +10,10 @@
 # 刻意做成 workflow_dispatch 而不是排程：TDX 免費會員有流量上限，
 # 而且這些是幾乎不會變的靜態資料（車站位置、路線線形），沒有天天抓的理由。
 #
+# only 這個輸入是給「額度用完」準備的：TDX 的限制是按時間算的，
+# 民國115年8月22日那一次，軌道五個端點把該分鐘的額度用完，公車五個接著送就全回 429。
+# 隔一段時間再跑一次，only 填 bus_shape_taichung.json 之類的檔名，就只補那幾份。
+#
 # 抓完提交的是 data_TW/from_tdx/ 的原始 JSON。平常的部署（pages.yml）只讀
 # 已經納入版控的原始檔，因此**部署不需要金鑰**，這一支跟那一支是分開的。
 
@@ -17,6 +21,11 @@ name: 抓 TDX 資料
 
 on:
   workflow_dispatch:
+    inputs:
+      only:
+        description: '只抓這幾份（逗號分隔的檔名，留空＝全部）。額度用完時單獨補抓某一份用'
+        required: false
+        default: ''
 
 permissions:
   contents: write
@@ -31,6 +40,7 @@ jobs:
         env:
           TDX_CLIENT_ID: ${{ secrets.TDX_CLIENT_ID }}
           TDX_CLIENT_SECRET: ${{ secrets.TDX_CLIENT_SECRET }}
+          TDX_ONLY: ${{ inputs.only }}
         run: python3 scripts/fetch_tdx.py
 
       - name: 重跑管線
