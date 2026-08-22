@@ -13,3 +13,4 @@
 - `bus_route_taichung.json` — 臺中公車路線清單
 - `bus_shape_taichung.json` — 臺中公車路線線形。要畫路線圖就靠這一份
 - `bus_schedule_taichung.json` — 臺中公車班表與班距。線寬按頻率畫粗細就靠這一份
+- `bus_stopofroute_taichung.json` — 臺中公車每條子路線的完整停靠站序。區級的停靠班次靠它乘班次算出來
