@@ -72,8 +72,13 @@ ENDPOINTS = [
      '臺中公車路線清單', True),
     ('bus_shape_taichung.json', '/Bus/Shape/City/Taichung',
      '臺中公車路線線形。要畫路線圖就靠這一份', True),
-    ('bus_frequency_taichung.json', '/Bus/Frequency/City/Taichung',
-     '臺中公車班距（每個時段的最小與最大班距分鐘數）。線寬按頻率畫粗細就靠這一份', True),
+    # 班距原本填 /Bus/Frequency/City/Taichung，帶著有效 token 仍然回 404，
+    # 代表那個路徑不服務市區公車（另外兩個公車端點同一個 token 都通）。
+    # 市區公車的班距與時刻表在 /Bus/Schedule：有固定班距的路線給 Frequencys
+    # （StartTime、EndTime、MinHeadwayMins、MaxHeadwayMins），
+    # 走固定時刻表的路線給 Timetables，兩種都算得出每小時班次。
+    ('bus_schedule_taichung.json', '/Bus/Schedule/City/Taichung',
+     '臺中公車班表與班距。線寬按頻率畫粗細就靠這一份', True),
 ]
 
 PAGE = 1000      # 一頁幾筆。TDX 對 $top 有上限，取一個保守值
